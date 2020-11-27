@@ -1,0 +1,110 @@
+{
+  "maps": "Maps",
+  "forecasts": "Forecasts",
+  "plot": "plot",
+  "about": "About",
+  "language": "Language",
+  "meteomap": "Meteorological Map",
+  "404": "This page does not exist",
+  "refresh forecast data": "refresh forecast data",
+  "search forecast data": "search forecast data",
+  "search for": "Search for",
+
+  "add": "Add",
+  "already added": "already added",
+  "no results": "No results found",
+  "close": "Close",
+
+  "term of use": "Term of Use",
+
+  "about info": "<li><ul><h3><a href='https://vue2-leaflet.netlify.app/' target='_blank'>Vue Leaflet</a> and <a href='https://www.openstreetmap.org/copyright' target='_blank'>OpenStreetMap</a> to render the map</h3></ul><ul><h3><a href='https://openweathermap.org/api' target='_blank'>OpenWeather</a> for forecast data</h3></ul><ul><h3><a href='https://nominatim.org/' target='_blank'>Nominatim</a> for city search</h3></ul></li>",
+
+  "center": "Center",
+  "zoom": "Zoom",
+  "bounds": "Bounds",
+  
+  "temperature": "Temperature",
+  "humidity": "Humidity",
+  "pressure": "Pressure",
+  "wind": "Wind",
+  "clouds": "Clouds",
+  "precipitation": "Precipitation",
+  "size": "Size",
+  "small": "smal",
+  "normal": "normal",
+  "large": "large",
+  "no data": "No data to show",
+
+  "active layers": "Active layers",
+
+  "reset": "reset",
+  "actions": "Actions",
+  "delete": "delete",
+  "deleteMessage": "Do you want to delete entry for {0} {1}?",
+  "deleteTitle": "Delete city",
+  "addMessage": "Do you want to add {0} {1}?",
+  "addTitle": "Add city",
+  "yes": "Yes",
+  "no": "No",
+
+
+  "in": "in",
+  "no forecasts": "No forecasts to show",
+
+  "plot for": "Plot for",
+  "hours": "hours",
+
+  "city": "City",
+  "add city": "Add a city",
+
+  "mediterannea": "Mediterrannea",
+  "greece": "Greece",
+  "patras": "Patras",
+  "athens": "Athens",
+  "thessaloniki": "Thessaloniki",
+  "kavala": "Kavala",
+  "alexandroupolis": "Alexandroupolis",
+  "ioannina": "Ioannina",
+  "larissa": "Larissa",
+  "kalamata": "Kalamata",
+  "chania": "Chania",
+  "rodos": "Rodos",
+
+  "map date": "Map date",
+  "map prompt": "City weather conditions. Select a city to view more",
+  "forecast prompt": "Choose one of the variables to view detailed forecast",
+  "options": "Options",
+  "variable": "Variable",
+  "overview": "Overview",
+
+  "cloudiness": "Cloudiness",
+  "dew point": "Dew point",
+  "visibility": "Visibility",
+  "wind speed": "Wind speed",
+  "wind gust": "Wind gust",
+  "wind direction": "Wind direction",
+
+  "functions": "Functions",
+  "search-add.header": "Search and add city",
+  "search-add.step1": "Use the search toolbar in the navigation bar",
+  "search-add.step2": "Select city to add from the search results",
+  "search-add.step3": "Then answer the prompt",
+  "search-add.step4": "You will be notified when the city has been added, or if it already exists",
+  "city name": "City name",
+  "region": "Region",
+  "postal code": "Postal code",
+  "country": "Country",
+  
+  "forecasts.header2": "Under column {0} in {1} table",
+  "forecasts.step0": "to select a variable",
+  "forecasts.step1": "Click on city name to display a 2-day period detailed hourly forecast",
+  "forecasts.step2": "Click on to display a plot for the selected variable",
+  "click on": "Click on",
+  "forecasts.step3": "to remove a city",
+  "forecasts.step4":  "to refresh meteorological data",
+
+  "map.step1": "Click on a city marker to display a popup",
+  "map.step2": "Right-click on a city marker to remove it"
+
+
+}
