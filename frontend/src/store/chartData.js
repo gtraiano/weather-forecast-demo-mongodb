@@ -16,6 +16,12 @@ import store from './'
   ]
 */
 
+const units = {
+	temperature: '\u2103',
+	humidity: '%',
+	pressure: 'hPa'
+}
+
 const forecastVariables = source => {
 /* returns a list of plot variables */
     let variables = Object.keys(source.forecast).filter(key => !['hourlyDt', 'hourlyWeatherIcon'].includes(key)); // exclude non-variable properties
@@ -38,7 +44,7 @@ const generateData = source => {
 
 				chartData[variable] = {
 					locale: store.i18n.locale,
-		    		variable: store.i18n.t(variable), // pass selected variable name
+		    		variable: `${store.i18n.t(variable)} ${units[variable]}`, // pass selected variable name
 		    		labels: labels,
 		    		title: city.name[store.i18n.locale],
 		    		datasets: [{

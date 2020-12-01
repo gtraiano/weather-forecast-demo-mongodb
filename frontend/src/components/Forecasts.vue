@@ -39,9 +39,9 @@
             <b-col/>
             
             <b-col cols="10">
-                <!-- forecasts table renders only if allCityData is populated -->
-                <ForecastsTable v-if="allCityData && allCityData.length"
-                    :forecastData="allCityData"
+                <!-- forecasts table renders only if cityData is populated -->
+                <ForecastsTable v-if="cityData && cityData.length"
+                    :forecastData="cityData"
                     :tableItems="tableCells"
                     :tableFields="tableHeader"
                     :selectedRow="selectedCity"
@@ -79,8 +79,8 @@
               
               <b-col cols="10">
                   <DetailedForecast
-                      :lat="allCityData[selectedCity].coords.lat"
-                      :lon="allCityData[selectedCity].coords.lon"
+                      :lat="cityData[selectedCity].coords.lat"
+                      :lon="cityData[selectedCity].coords.lon"
                       :perPage=6
                   />
               </b-col>
@@ -103,7 +103,7 @@
                 
                 <b-col cols="8">
                     <h4>
-                        {{ $t('plot for') }} {{ allCityData[selectedCity].name[$i18n.locale] }}
+                        {{ $t('plot for') }} {{ cityData[selectedCity].name[$i18n.locale] }}
                     </h4>
                 </b-col>
                 
@@ -147,7 +147,7 @@ export default {
   data() {
       return {
           selectedVar: 'temperature',
-          selectedCity: -1, // index of city in allCityData
+          selectedCity: -1, // index of city in cityData
           endHours: 48, // timeline duration in hours for plot
           tableSortBy: null, // field name to sort forecasts table by
           tableSorted: null, // forecasts table is sorted (null: no, true: desc, false: asc)
@@ -168,7 +168,7 @@ export default {
   methods: {
       findCityIndex (coords) {
       /* find city index */
-          return this.allCityData.findIndex(city => {
+          return this.cityData.findIndex(city => {
               return city.coords.lat == coords.lat && city.coords.lon == coords.lon
           })
       },
@@ -184,7 +184,7 @@ export default {
 
       findSelectedCityIndexSorted() {
       /* return selected city index in sorted names table */
-          return this.sortedCityNames.findIndex(name => name === this.allCityData[this.selectedCity].name[this.$i18n.locale]);
+          return this.sortedCityNames.findIndex(name => name === this.cityData[this.selectedCity].name[this.$i18n.locale]);
       },
 
       sortCompare(aRow, bRow, key = 'city', sortDesc) {
@@ -203,7 +203,7 @@ export default {
           let now = Date.now();
           let nowIndex = null;
           
-          this.allCityData.forEach(city => {
+          this.cityData.forEach(city => {
               nowIndex = city.forecast.hourlyDt.findIndex(dt => hoursPassed(now, dt) === 0) // find closest datetime to now + first column hours
               let curr_data = {
                   'city' : { name: city.name[this.$i18n.locale], coords: city.coords } // city column
@@ -256,7 +256,7 @@ export default {
 
       sortedCityNames() {
       /* returns sorted city names table according to locale & table sorting (asc or desc) */
-          return this.allCityData.map(row => row.name[this.$i18n.locale]).sort(
+          return this.cityData.map(row => row.name[this.$i18n.locale]).sort(
               (a, b) => {
                   if(this.tableSorted)
                       return b >= a;
@@ -267,14 +267,8 @@ export default {
       },
 
       ...mapGetters({
-          allCityData: 'allCityData/getAllCityData'
-      }),
-
-      ...mapGetters({
-          chartData: 'chartData/getChartData'
-      }),
-
-      ...mapGetters({
+          cityData: 'allCityData/getAllCityData',
+          chartData: 'chartData/getChartData',
           locale: 'locale/getLocale'
       })
   },
@@ -316,10 +310,14 @@ export default {
   },
   
   async created() {
-      if(!this.$store.getters['allCityData/getAllCityData'].length) {
+      if(!this.cityData.length){
         console.log('Load our data first');
         await this.$store.dispatch('allCityData/setAllCityDataAsync');
       }
+  },
+
+  mounted() {
+       //event listeners
       this.$on('selectedRowUpdate', (index, coords) => { this.selectedCity = this.findCityIndex(coords); });
       this.$on('sortingChanged', ({ sortBy, sortDesc }) => {
           this.tableSortBy = sortBy;

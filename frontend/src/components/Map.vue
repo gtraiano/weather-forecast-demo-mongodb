@@ -27,7 +27,7 @@
                 :center="center"
                 :mapUrl="mapUrl"
                 :mapIconScale="iconScale"
-                :markerData="allCityData"
+                :markerData="cityData"
                 :chartData="chartData"
                 :openWeatherOptions="options"
                 :openWeatherTileUrls="generateOpenWeatherTileLayers"
@@ -119,7 +119,7 @@ export default {
     },
 
     async created() {
-        if(!this.$store.getters['allCityData/getAllCityData'].length) {
+        if(!this.cityData.length) {
             console.log('Load our data first');
             await this.$store.dispatch('allCityData/setAllCityDataAsync');
         }
@@ -206,11 +206,9 @@ export default {
         },
 
         // map store state to computed properties
-        ...mapGetters('allCityData', {
-            allCityData: 'getAllCityData'
-        }),
-        ...mapGetters('chartData', {
-            chartData: 'getChartData'
+        ...mapGetters({ 
+            cityData: 'allCityData/getAllCityData',
+            chartData: 'chartData/getChartData'
         })
     }
 }

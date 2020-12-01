@@ -75,7 +75,7 @@
 			</li>
 		</div>
 		
-		<div class="text-left mt-3">
+		<div class="text-left mt-5">
 			<h2>{{ $t('forecasts') }}</h2>
 			<!--h5>{{ $t('forecasts.header2', [$t('actions'), $t('overview')]) }}</h5-->
 			<li>
@@ -155,7 +155,7 @@
 			</li>
 		</div>
 
-		<div class="text-left mt-3">
+		<div class="text-left mt-5">
 			<h2>{{ $t('meteomap') }}</h2>
 			<li>
 				<ul>

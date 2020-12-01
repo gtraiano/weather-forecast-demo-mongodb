@@ -1,13 +1,10 @@
 import store from './'
-//import { fetchAllCities, fetchCity } from '../utils/OpenWeatherOneCall'
-//import searchCity from '../utils/NominatimSearch'
 import { 
 	getAllCities,
 	updateAllCities,
 	postCityLatLon,
 	deleteCityLatLon,
-	updateCityLatLon,
-	openWeatherSarch
+	updateCityLatLon
 } from '../controllers/backend'
 
 /*
@@ -31,7 +28,7 @@ city weather forecast object
 */
 
 const extractName = entry => {
-	//console.log(entry.location['en'].address, entry.location['el'].address);
+/* extracts city name for all avalable locales */
 	return Object.assign(
 		{},
 		...store.i18n.availableLocales.map(
@@ -47,6 +44,7 @@ const extractName = entry => {
 }
 
 const extractForecastData = entry => {
+/* extracts hourly forecast data from OpenWeather API response */
 	return {
 		hourlyWeatherIcon: entry.hourly.map(hour => `http://openweathermap.org/img/wn/${hour.weather[0].icon}@2x.png`),
 		hourlyDt: entry.hourly.map(hour => hour.dt*1000), // unix to js datetime
@@ -90,14 +88,6 @@ const actions = {
 		if(typeof forceRefetch !== 'undefined') {
 			refetch = forceRefetch;
 		}
-		/*else {
-			refetch = window.localStorage.getItem('allCityData') == null || // no data in local storage
-					  window.localStorage.getItem('allCityData') == '[]' ||
-					  //upToDate < Date.now() + 24*3600*1000 // data in local storage older than 24hrs
-					  Math.floor((upToDate - Date.now())/3600000) <= 12
-				? true
-				: false
-		}*/
 
 		let data = refetch ? await updateAllCities() : await getAllCities();
 		data = data.map(city => transformDatabaseData(city));
