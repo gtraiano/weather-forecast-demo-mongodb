@@ -21,7 +21,7 @@
 					<b-nav-item><router-link class="regular" to="/" exact>{{$t('meteomap')}}</router-link></b-nav-item>
 					<b-nav-item><router-link class="regular" to="/forecasts" exact>{{$t('forecasts')}}</router-link></b-nav-item>
 					<b-nav-item><router-link class="regular" to="/about" exact>{{$t('about')}}</router-link></b-nav-item>
-					<LanguageSwitcher></LanguageSwitcher>
+					<LanguageSwitcher />
 					<div>
 					 	<b-input-group>
 					    	<!--template #prepend>
@@ -33,12 +33,12 @@
 					    		:placeholder="$t('add city')"
 					    		trim
 					    		@input="$store.dispatch('search/setSearchTerm', $event);"
-					    		@keydown.enter="$store.dispatch('search/searchCity'); $store.dispatch('search/setShowResults', true);"
+					    		@keydown.enter="searchCity()"
 					    	/>
 					    	<template #append>
 					      		<b-button
 					      			:title="$t('search forecast data')"
-					      			@click="$store.dispatch('search/searchCity'); $store.dispatch('search/setShowResults', true);"
+					      			@click="searchCity()"
 					      		>
 					      			<b-icon-search/>
 					      		</b-button>
@@ -48,9 +48,16 @@
 					<b-button
 						type="dark"
 						variant="dark"
-						@click="$store.dispatch('allCityData/setAllCityDataAsync', true)"
+						@click="refreshForecastData()"
 					>
 			        	<b-icon-arrow-clockwise
+			        		v-if="refreshing"
+			          		:title="$t('refresh forecast data')"
+			          		icon="arrow-clockwise"
+			          		animation="spin"
+			          	/>
+			          	<b-icon-arrow-clockwise
+			        		v-else
 			          		:title="$t('refresh forecast data')"
 			          		icon="arrow-clockwise"
 			          	/>
@@ -64,16 +71,35 @@
 <script type = "text/javascript" >
 import Vue from 'vue';
 import LanguageSwitcher from './LanguageSwitcher.vue';
-import { BButton, BInputGroup } from 'bootstrap-vue'
-import { BIconArrowClockwise, BIconSearch } from 'bootstrap-vue'
+import { 
+	BIconArrowClockwise,
+	BIconSearch
+} from 'bootstrap-vue';
 
 export default {
 	components: {
 		LanguageSwitcher,
-		BButton,
-		BInputGroup,
 		BIconArrowClockwise,
 		BIconSearch
+	},
+
+	data() {
+		return {
+			refreshing: false
+		}
+	},
+
+	methods: {
+		async refreshForecastData() {
+			this.refreshing = true;
+			await this.$store.dispatch('allCityData/setAllCityDataAsync', true);
+			this.refreshing = false;
+		},
+
+		async searchCity() {
+			this.$store.dispatch('search/setShowResults', true);
+			await this.$store.dispatch('search/searchCity');
+		}
 	}
 }
 </script>

@@ -1,7 +1,7 @@
 import store from './'
 
 /*
-confirm
+  confirmation dialog
 */
 const state = () => ({
 	message: null, // confirmation window message
@@ -73,14 +73,13 @@ const actions = {
 	delete: (context, city) => {
 		context.commit('setTitle', store.i18n.t('deleteTitle'));
 		context.commit('setMessage', store.i18n.t('deleteMessage', [city.name[store.i18n.locale], `(lat: ${city.coords.lat} lon: ${city.coords.lon})`]));
-		context.commit('setCommand', `delete ${JSON.stringify(city.coords)}`); // delete { Lat: latitude lon: longitude }
+		context.commit('setCommand', { command: 'delete', args: city.coords }); // delete { Lat: latitude lon: longitude }
 		context.commit('setShow', true);
 	},
 
 	add: (context, city) => {
 		context.commit('setTitle', store.i18n.t('addTitle'));
 		context.commit('setMessage', store.i18n.t('addMessage', [city.name, `(lat: ${city.lat} lon: ${city.lon})`]));
-		//context.commit('setCommand', `add ${JSON.stringify({name: city.name[store.i18n.locale], lat: city.lat, lon: city.lon})}`); // add { name: translatedName, lat: latitude, lon: longitude }
 		context.commit('setCommand', {
 			command: 'add',
 			args: {

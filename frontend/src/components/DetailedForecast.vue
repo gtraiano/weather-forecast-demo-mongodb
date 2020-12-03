@@ -23,7 +23,7 @@
 			:title="day(item.dt*1000)"
 		>
 			<b-card-sub-title>
-				{{ date(item.dt*1000 )}}
+				{{ date(item.dt*1000)}}
 			</b-card-sub-title>
 			<b-card-img
 				:src="`http://openweathermap.org/img/wn/${item.weather[0].icon}@4x.png`"
@@ -32,21 +32,6 @@
 				style="scale: 0.75"
 			>
 			</b-card-img>
-	    	<!--b-card-text class="text-left">
-				{{$t('temperature')}} {{`${item.temp}\u2103`}}
-				<br>
-				{{$t('humidity')}} {{item.humidity}}%
-				<br>
-				{{$t('pressure')}} {{item.pressure}}&nbsp;hPa
-				<br>
-				{{$t('cloudiness')}} {{item.clouds}}%
-				<br>
-				{{$t('dew point')}} {{`${item.dew_point}\u2103`}}
-				<br>
-				{{$t('visibility')}} {{item.visibility}} m
-				<br>
-				{{$t('wind')}} {{`${windDirection(item.wind_deg)} ${item.wind_speed} km/h`}}
-			</b-card-text-->
 			<b-card-text>
 				<b-container fluid class="m-0 p-0">
 					<b-row>
@@ -97,25 +82,6 @@
 					</b-row>
 				</b-container>
 			</b-card-text>
-			<!--b-card-text>
-				<b-table stacked borderless small responsive
-					tbody-class="small"
-					:items="[ 
-						{ 
-							[$t('temperature')]: `${item.temp}\u2103`,
-							[$t('humidity')]: `${item.humidity}%`,
-							[$t('pressure')]: `${item.pressure} hPa`,
-							[$t('cloudiness')]: `${item.clouds}%`,
-							[$t('dew point')]: `${item.dew_point}\u2103`,
-							[$t('visibility')]: `${item.visibility} m`,
-							[$t('wind')]: `${windDirection(item.wind_deg)} ${item.wind_speed} km/h`
-						} 
-					]"
-				/>
-			</b-card-text-->
-			<!--template #footer>
-				<small class="text-muted">Last updated 3 mins ago</small>
-			</template-->
 		</b-card>
 	</b-card-group>
 	<span v-else>. . .</span>

@@ -10,7 +10,6 @@
 
 
 <template>
-<!--div-->
     <b-container fluid>
         <br/>
         <b-row align-v="center">
@@ -18,7 +17,7 @@
             
             <b-col cols="1" :style="{textAlign: 'left'}">
                 <Controls
-                    :variables="['temperature', 'humidity', 'pressure']"
+                    :variables="variables"
                     :selectedVariable="selectedVar"
                     v-on:selected_var="selectedVar = $event;"
                 />
@@ -127,7 +126,6 @@
         </b-container>
 
     </b-container>
-<!--/div-->
 </template>
 
 <script>
@@ -146,6 +144,7 @@ export default {
 
   data() {
       return {
+          variables: ['temperature', 'humidity', 'pressure'],
           selectedVar: 'temperature',
           selectedCity: -1, // index of city in cityData
           endHours: 48, // timeline duration in hours for plot

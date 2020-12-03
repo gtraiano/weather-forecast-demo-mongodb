@@ -21,11 +21,8 @@
         >
             <template #overlay>
                 <h3> {{ $t('search for')}} <i>"{{ $store.getters['search/getSearchTerm'] }}"</i></h3>
-                <div v-if="$store.getters['search/getSearchResults'].length">
+                <div v-if="$store.getters['search/getShowResults']">
                     <SearchResults :results="$store.getters['search/getSearchResults']" />
-                </div>
-                <div v-else>
-                    <h4>{{ $t('no results') }}</h4>
                 </div>
                 <br>
                 <b-button @click="$store.dispatch('search/clear')">
@@ -70,14 +67,6 @@ export default {
     BButton,
     BModal,
     SearchResults
-	},
-
-	data () {
-		return {
-			msg: 'Welcome to Weather Forecast App',
-			counter: 1,
-			max: 10,
-		}
 	}
 }
 </script>

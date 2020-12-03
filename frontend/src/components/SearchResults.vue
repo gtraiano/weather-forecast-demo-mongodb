@@ -1,7 +1,10 @@
 <template>
-	<b-list-group :style="{ maxHeight: '500px', overflow: 'auto'}">
+	<!-- render results if they exist -->
+	<b-list-group
+		v-if="results.length"
+		:style="{ maxHeight: '500px', overflow: 'auto'}"
+	>
 		<b-list-group-item
-			v-if="results.length"
 			v-for="(result, index) in results"
 			:key="index"
 			active
@@ -25,22 +28,33 @@
 		    	{{ result.region }}, {{ result.postCode }}, {{ result.country }}
 		    </p>
 		</b-list-group-item>
-		<p v-else>
-			{{ $t('no results') }}
-		</p>
 	</b-list-group>
+	
+	<!-- show animation while searching -->
+	<div
+		v-else-if="$store.getters['search/getSearching']"
+	>
+		<b-icon-three-dots scale="8" animation="throb" />
+	</div>
+
+	<!-- no results -->
+	<div v-else>
+		<h4> {{ $t('no results') }}	</h4>
+	</div>
 </template>
 
 <script type="text/javascript">
-import { BListGroup, BIconCheck } from 'bootstrap-vue'
+import { BIconCheck, BIconThreeDots } from 'bootstrap-vue'
 import { mapGetters } from 'vuex'
 
 export default {
 	name: 'SearchResults',
+	
 	components: {
-		BListGroup,
-		BIconCheck
+		BIconCheck,
+		BIconThreeDots
 	},
+	
 	props: {
 		results: {
 			type: [Array, null],
@@ -49,13 +63,13 @@ export default {
 		},
 
 		onClick: {
+		/* add button function */
 			type: Function,
 			required: false
 		},
 
 		alreadyAdded: {
-		/* list of added results
-		for demo purposes only */
+		/* list of added results (for demo purposes only) */
 			type: Array,
 			required: false,
 			default: function() {
@@ -64,8 +78,7 @@ export default {
 		},
 
 		exists: {
-		/* list of results that already exist
-		for demo purposes only */
+		/* list of results that already exist (for demo purposes only) */
 			type: Array,
 			required: false,
 			default: function() {
@@ -73,16 +86,10 @@ export default {
 			}	
 		}
 	},
+
 	methods: {
-		/*isAdded(result) {
-			return this.addedCities.findIndex(city => {
-				return city.lat == Number.parseFloat(result.lat) && city.lon == Number.parseFloat(result.lon);
-			}) != -1;
-		},
-		alreadyExists(result) {
-			return this.citiesCoords.has(`${Number.parseFloat(result.lat)},${Number.parseFloat(result.lon)}`);
-		}*/
 		isAdded(result) {
+		/* returns true if result has been added */
 			if(this.alreadyAdded.length) {
 				return this.alreadyAdded.findIndex(city => {
 					return city.lat == Number.parseFloat(result.lat) && city.lon == Number.parseFloat(result.lon);	
@@ -94,7 +101,9 @@ export default {
 				}) !== -1;
 			}
 		},
+
 		alreadyExists(result) {
+		/* returns true if result already exists */
 			if(this.exists.length) {
 				return this.exists.findIndex(city => {
 					return city.lat === Number.parseFloat(result.lat) && city.lon === Number.parseFloat(result.lon)
@@ -105,12 +114,12 @@ export default {
 			}
 		}
 	},
+
 	computed: {
-		...mapGetters({ addedCities: 'search/getAddedCities' }),
-		...mapGetters({ citiesCoords: 'allCityData/getCitiesCoords' })
+		...mapGetters({
+			addedCities: 'search/getAddedCities',
+			citiesCoords: 'allCityData/getCitiesCoords'
+		})
 	}
 }
 </script>
-
-<style type="text/css" scoped>
-</style>
