@@ -54,6 +54,12 @@
 					</b-row>
 					<b-row>
 						<b-col cols="1" class="ml-0 mr-0 pl-0 pr-0" />
+						<b-col cols="7" class="ml-0 mr-0 pl-0 pr-0 text-left font-weight-bold">{{$t('feels like')}}</b-col>
+						<b-col cols="3" class="ml-0 mr-0 pl-0 pr-0 text-right">{{`${item.feels_like}\u2103`}}</b-col>
+						<b-col cols="1" class="ml-0 mr-0 pl-0 pr-0" />
+					</b-row>
+					<b-row>
+						<b-col cols="1" class="ml-0 mr-0 pl-0 pr-0" />
 						<b-col cols="5" class="ml-0 mr-0 pl-0 pr-0 text-left font-weight-bold">{{$t('cloudiness')}}</b-col>
 						<b-col cols="5" class="ml-0 mr-0 pl-0 pr-0 text-right">{{item.clouds}}%</b-col>
 						<b-col cols="1" class="ml-0 mr-0 pl-0 pr-0" />
