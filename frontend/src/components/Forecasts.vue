@@ -8,7 +8,6 @@
   @version 1.0
  -->
 
-
 <template>
     <b-container fluid>
         <br/>
@@ -16,11 +15,44 @@
             <b-col cols="1"/>
             
             <b-col cols="1" :style="{textAlign: 'left'}">
-                <Controls
-                    :variables="variables"
-                    :selectedVariable="selectedVar"
-                    v-on:selected_var="selectedVar = $event;"
-                />
+                <b-button-group>
+                    <!-- table varaible -->
+                    <Controls
+                        :variables="variables"
+                        :selectedVariable="selectedVar"
+                        v-on:selected_var="selectedVar = $event;"
+                    />
+                    <!-- table settings -->
+                    <b-dropdown size="sm">
+                        <template #button-content>
+                            {{$t('options')}}
+                        </template>
+                        <!-- forecast columns # -->
+                        <b-dropdown-form>
+                            <label class="text-nowrap">{{$t('table columns')}}</label>
+                            <b-form-spinbutton
+                                inline
+                                :value="overviewColumns"
+                                size="sm"
+                                min="1"
+                                max="48"
+                                @change="overviewColumns = $event"
+                            />
+                        </b-dropdown-form>
+                        <!-- forecast columns period -->
+                        <b-dropdown-form>
+                            <label class="text-nowrap">{{$t('period')}}</label>
+                            <b-form-spinbutton
+                                inline
+                                :value="overviewPeriod"
+                                size="sm"
+                                min="1"
+                                max="24"
+                                @change="overviewPeriod = $event"
+                            />
+                        </b-dropdown-form>
+                    </b-dropdown>
+                </b-button-group>
             </b-col>
 
             <b-col cols="8">
@@ -153,7 +185,8 @@ export default {
           tableStyle: { height: '70vh' }, // table css styling
           showPlot: false,
           showDetailedForecast: false,
-          overviewColumns: 6 // number of forecast columns in overview table
+          overviewColumns: 8, // number of forecast columns in overview table
+          overviewPeriod: 4 // hours between forecast columns
       }
   },
 
@@ -207,9 +240,9 @@ export default {
               let curr_data = {
                   'city' : { name: city.name[this.$i18n.locale], coords: city.coords } // city column
               }
-              for (let counter = 0; counter < this.overviewColumns && nowIndex !== -1; counter++) // if nowIndex === =1, there is no up to date forecast data to pass to the table
+              for (let counter = 0; counter < this.overviewColumns && nowIndex !== -1 && nowIndex + counter*this.overviewPeriod < city.forecast[this.selectedVar].length; counter++) // if nowIndex === =1, there is no up to date forecast data to pass to the table
               {
-                  curr_data[String(counter)] = city.forecast[this.selectedVar][nowIndex + counter*this.overviewColumns]; // hour forecast columns
+                  curr_data[String(counter)] = city.forecast[this.selectedVar][nowIndex + counter*this.overviewPeriod]; // hour forecast columns
               }
               data_for_table.push(curr_data);
           });
@@ -219,6 +252,7 @@ export default {
       tableHeader: function () {
       /* prepares table fields (i.e. column names) */
           let currentDate = new Date();
+          let now = Date.now();
           let options = { weekday: 'short', hour: '2-digit'};
           let fields = [
               {
@@ -230,7 +264,8 @@ export default {
 
           for (let counter = 0; counter < this.overviewColumns; counter++)
           {
-              currentDate.setHours(currentDate.getHours() + counter*this.overviewColumns)
+              //currentDate.setTime(currentDate.getTime() + counter*this.overviewPeriod*60*60*1000)
+              currentDate = new Date(now + counter*this.overviewPeriod*60*60*1000);
               let new_label = {
                   key: String(counter),
                   sortable: false,
@@ -305,6 +340,14 @@ export default {
                   this.$refs.table.scrollToRow(this.findSelectedCityIndexSorted()); // scroll table to correct selected city row when table is sorted
               }
           }
+      },
+
+      overviewColumns(newValue, oldValue) {
+          window.localStorage.setItem('overviewColumns', JSON.stringify(newValue))
+      },
+
+      overviewPeriod(newValue, oldValue) {
+          window.localStorage.setItem('overviewPeriod', JSON.stringify(newValue))
       }
   },
   
@@ -313,6 +356,9 @@ export default {
         console.log('Load our data first');
         await this.$store.dispatch('allCityData/setAllCityDataAsync');
       }
+
+      this.overviewColumns = JSON.parse(window.localStorage.getItem('overviewColumns')) || this.overviewColumns;
+      this.overviewPeriod = JSON.parse(window.localStorage.getItem('overviewPeriod')) || this.overviewPeriod;
   },
 
   mounted() {
