@@ -10,18 +10,57 @@
 
 <template>
 <div>
-	<b-navbar toggleable="lg" type="dark" variant="dark">
+	<b-navbar
+		toggleable="lg"
+		type="dark"
+		variant="dark"
+	>
 		<!--b-navbar-brand>
 			<img src="../assets/logo_rect.png" class="logo">
 		</b-navbar-brand-->
-		<b-navbar-toggle target="nav-collapse"/>
-			<b-collapse id="nav-collapse" is-nav>
+		<b-navbar-toggle
+			target="nav-collapse"
+		/>
+			<b-collapse
+				id="nav-collapse"
+				is-nav
+			>
 				<!-- Right aligned nav items -->
-				<b-navbar-nav class="ml-auto" style="z-index: 9999;"><!-- draw dropdown menu on top of all other elements -->
-					<b-nav-item><router-link class="regular" to="/" exact>{{$t('meteomap')}}</router-link></b-nav-item>
-					<b-nav-item><router-link class="regular" to="/forecasts" exact>{{$t('forecasts')}}</router-link></b-nav-item>
-					<b-nav-item><router-link class="regular" to="/about" exact>{{$t('about')}}</router-link></b-nav-item>
+				<b-navbar-nav
+					class="ml-auto"
+					style="z-index: 9999;"
+				><!-- draw dropdown menu on top of all other elements -->
+					<b-nav-item><!-- meteorological map -->
+						<router-link
+							class="regular"
+							to="/"
+							exact
+						>
+							{{$t('meteomap')}}
+						</router-link>
+					</b-nav-item>
+					<b-nav-item><!-- forecasts -->
+						<router-link
+							class="regular"
+							to="/forecasts"
+							exact
+						>
+							{{$t('forecasts')}}
+						</router-link>
+					</b-nav-item>
+					<b-nav-item><!-- about -->
+						<router-link
+							class="regular"
+							to="/about"
+							exact
+						>
+							{{$t('about')}}
+						</router-link>
+					</b-nav-item>
+					
 					<LanguageSwitcher />
+					
+					<!-- search city -->
 					<div>
 					 	<b-input-group>
 					    	<!--template #prepend>
@@ -45,11 +84,13 @@
 					    	</template>
 					  	</b-input-group>
 					</div>
+					<!-- refresh meteorological data -->
 					<b-button
 						type="dark"
 						variant="dark"
 						@click="refreshForecastData()"
 					>
+						<!-- spin icon while fetching data -->
 			        	<b-icon-arrow-clockwise
 			        		v-if="refreshing"
 			          		:title="$t('refresh forecast data')"
@@ -68,13 +109,10 @@
 </div>
 </template>
 
-<script type = "text/javascript" >
+<script type = "text/javascript">
 import Vue from 'vue';
 import LanguageSwitcher from './LanguageSwitcher.vue';
-import { 
-	BIconArrowClockwise,
-	BIconSearch
-} from 'bootstrap-vue';
+import { BIconArrowClockwise, BIconSearch } from 'bootstrap-vue';
 
 export default {
 	components: {
