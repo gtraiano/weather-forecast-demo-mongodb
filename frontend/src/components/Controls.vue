@@ -9,7 +9,7 @@
  -->
 
 <template>
-    <b-button-toolbar class="d-sm-inline-flex">
+    <!--b-button-toolbar class="d-sm-inline-flex"-->
         <b-dropdown class="mx-1" :text="$t('variable')" size="sm">
             <b-dropdown-item
                 v-for="variable in variables"
@@ -22,7 +22,7 @@
             </b-dropdown-item>
 
         </b-dropdown>
-    </b-button-toolbar>
+    <!--/b-button-toolbar-->
 </template>
 
 <script type = "text/javascript" >
