@@ -74,6 +74,15 @@
 				</ul>
 			</li>
 		</div>
+
+		<div class="text-left mt-5">
+			<h2>{{$t('refresh forecast')}}</h2>
+			<li>
+				<ul>
+					{{$t('click on')}} <b-icon-arrow-clockwise class="ml-1 mr-1" scale="1.5" /> {{$t('refetch data')}}
+				</ul>
+			</li>
+		</div>
 		
 		<div class="text-left mt-5">
 			<h2>{{ $t('forecasts') }}</h2>
@@ -86,7 +95,38 @@
 						:variables="['temperature', 'humidity', 'pressure']"
 						@selected_var="variable => { selectedVar = variable }"
 					/>
-					{{$t('forecasts.step0')}}
+					{{$t('forecasts.step0.0')}}
+				</ul>
+				<ul>
+					{{$t('click on')}}
+					<b-dropdown size="sm" class="ml-1 mr-1">
+                        <template #button-content>
+                            <!--b-icon-gear/--> {{$t('options')}}
+                        </template>
+                        <!-- forecast columns # -->
+                        <b-dropdown-form>
+                            <label class="text-nowrap">{{$t('table columns')}}</label>
+                            <b-form-spinbutton
+                                inline
+                                size="sm"
+                                :value="4"
+                                min="1"
+                                max="48"
+                            />
+                        </b-dropdown-form>
+                        <!-- forecast columns period -->
+                        <b-dropdown-form>
+                            <label class="text-nowrap">{{$t('period')}}</label>
+                            <b-form-spinbutton
+                                inline
+                                size="sm"
+                                :value="4"
+                                min="1"
+                                max="24"
+                            />
+                        </b-dropdown-form>
+                    </b-dropdown>
+                    {{$t('forecasts.step0.1')}}
 				</ul>
 				<ul>
 					<b-table
@@ -178,6 +218,7 @@ import Vue from 'vue'
 
 export default {
 	name: 'About',
+	
 	components: {
 		BIconSearch,
 		SearchResults,
@@ -186,6 +227,7 @@ export default {
     	BIconGraphUp,
     	Controls
 	},
+	
 	data() {
 		return {
 			selectedVar: null
