@@ -10,8 +10,12 @@
 
 <template>
 <div>
-	<b-navbar
+	<!--b-navbar
 		toggleable="lg"
+		type="dark"
+		variant="dark"
+	-->
+	<b-navbar
 		type="dark"
 		variant="dark"
 	>
