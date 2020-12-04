@@ -20,15 +20,19 @@
     @sort-changed="sortingChanged"
     @click.native.right.prevent
     id="table"
+    class="text-nowrap"
 >
-	<template v-if="tableTitle" #thead-top="data">
+	<!-- table title (above header) -->
+  <template v-if="tableTitle" #thead-top="data">
 		<b-tr>
 			<b-th :colspan="data.columns" :style="{fontSize: '125%'}">
 				{{ tableTitle }}
 			</b-th>
 		</b-tr>
 	</template>
-	<template v-slot:head()="data"><!-- header custom rendering-->
+	
+  <!-- table header -->
+  <template v-slot:head()="data"><!-- header custom rendering-->
 		<!-- on sortable field, clear sorting on right click -->
 		<span v-if="data.field.sortable"
 			@click.right.prevent="sortingChanged({ sortBy: null, sortDesc: null })"
@@ -40,6 +44,8 @@
     		{{ data.label }}
     	</span>
     </template>
+    
+    <!-- city name column -->
     <template v-slot:cell(city)="data">
         <!-- clickable city name to load plot -->
         <a href="" 
@@ -60,7 +66,10 @@
             </span>
         </a>
     </template>
+    
+    <!-- actions column -->
     <template v-slot:cell(actions)="data">
+        <!-- plot icon -->
         <a
             class="ml-1 mr-1"
             href=""
@@ -69,6 +78,7 @@
         >
           <b-icon-graph-up :title="$t('plot')" />
         </a>
+        <!-- refresh forecast data icon -->
       	<a
             class="ml-1 mr-1"
       		  href=""
@@ -77,6 +87,7 @@
       	>
       		  <b-icon-arrow-clockwise :title="$t('refresh forecast data')" />
       	</a>
+        <!-- remove city icon -->
       	<a
             class="ml-1 mr-1"
       		  href=""
@@ -85,6 +96,12 @@
       	>
       		  <b-icon-trash :title="$t('delete')" />
       	</a>
+    </template>
+    
+    <!-- forecast values column -->
+    <template v-slot:cell()="data">
+        <span v-if="!['city', 'actions'].includes(data.field) && !data.value">&mdash;</span><!-- em dash on empty cells -->
+        <span v-else>{{data.value}}</span>
     </template>
 </b-table>
 </template>
