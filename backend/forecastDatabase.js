@@ -52,7 +52,7 @@ const close = async () => {
 	if(!client) return;
 	
 	await client.close();
-	client - null;
+	client = null;
 	database = null;
 	collection = null;
 }
