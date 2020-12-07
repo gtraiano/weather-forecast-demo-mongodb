@@ -48,7 +48,11 @@ Make sure you have passed the correct values for the following variables
 BACKEND_API_URL=backend path (e.g. /)
 OW_USER_TOKEN=OpenWeather user token
 EXPRESS_SERVER_PORT=Express server port
-MONGODB_PORT=MongoDB port
+MONGODB_PORT=MongoDB server port
+
+# HTTPS certificate
+PRIVATE_KEY=private key file path
+CERTIFICATE=certificate file path
 ```
 
 ### Frontend
