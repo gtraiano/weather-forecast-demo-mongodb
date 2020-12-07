@@ -60,7 +60,6 @@
             </b-col>
             
             <b-col cols="1"/>
-            <!--b-col :style="{textAlign: 'center'}"><b>{{ tableTitle }}</b></b-col-->
         </b-row>
         
         <b-row>    
@@ -70,6 +69,7 @@
             <b-col/>
             
             <b-col cols="10">
+                <h5 v-if="cityData && cityData.length">{{tableTitle}}</h5>
                 <!-- forecasts table renders only if cityData is populated -->
                 <ForecastsTable v-if="cityData && cityData.length"
                     :forecastData="cityData"
@@ -79,7 +79,6 @@
                     :sortBy="tableSortBy"
                     :sortDesc="tableSorted"
                     :tableStyle="tableStyle"
-                    :tableTitle="tableTitle"
                     :sortCompare="sortCompare"
                     @selectedRowUpdate="(index, value) => { $emit('selectedRowUpdate', index, value); }"
                     @sortingChanged="value => { $emit('sortingChanged', value) }"
@@ -127,7 +126,13 @@
                 
                 <b-col cols="1" :style="{textAlign: 'left'}">
                     <!-- plot timeline duration control -->
-                    <b-form-spinbutton id="endHours" :value="endHours" min="1" max="48" size="sm" inline @change="endHours = $event"
+                    <b-form-spinbutton
+                        :value="endHours"
+                        min="1"
+                        max="48"
+                        size="sm"
+                        inline
+                        @change="endHours = $event"
                     />
                     <span>{{ $t('hours') }}</span>
                 </b-col>
