@@ -23,13 +23,13 @@
     class="text-nowrap"
 >
 	<!-- table title (above header) -->
-  <template v-if="tableTitle" #thead-top="data">
+  <!--template v-if="tableTitle" #thead-top="data">
 		<b-tr>
 			<b-th :colspan="data.columns" :style="{fontSize: '125%'}">
 				{{ tableTitle }}
 			</b-th>
 		</b-tr>
-	</template>
+	</template-->
 	
   <!-- table header -->
   <template v-slot:head()="data"><!-- header custom rendering-->
@@ -160,10 +160,10 @@ export default {
     			 }
     		},
 
-    		tableTitle: {
+    		/*tableTitle: {
     			 type: String,
     			 required: false
-    		},
+    		},*/
 
     		sortCompare: {
     			 type: Function,
