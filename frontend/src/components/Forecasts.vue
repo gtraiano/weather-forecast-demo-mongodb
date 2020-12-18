@@ -312,20 +312,17 @@ export default {
       selectedCity(newValue, oldValue) {
           this.tableStyle.height = newValue === -1 ? '70vh' : '25vh';
           
-          if (newValue === -1) { // plot was just closed
+          if (newValue === -1) { // plot was closed
               this.$refs.table.scrollToRow(0);
           }
-          else if (oldValue === -1 && this.tableSorted !== 0) { // plot was just opened and table is sorted
+          else if (oldValue === -1 && this.tableSorted !== 0) { // plot is opened and table is sorted
               this.$refs.table.scrollToRow(this.selectedCityIndexSorted);
           }
       },
 
       tableSorted(newValue, oldValue) {
           if(this.selectedCity !== -1) { // scroll sorted table to follow selected city
-              this.$refs.table.scrollToRow(this.selectedCityIndexSorted);
-          }
-          if(newValue === 0) { // scroll unsorted table to follow selected city
-              this.$refs.table.scrollToRow(this.selectedCity);
+              this.$refs.table.scrollToRow(this.selectedCityIndexSorted); // when table unsorted, selectedCity == selectedCityIndexSorted
           }
       },
   },
