@@ -35,7 +35,7 @@ store.watch(
 )
 
 store.watch(
-	(state, getters) => getters['allCityData/getLastChangedOn'], // after forecast data has been fetched & saved
+	(state, getters) => getters['allCityData/getLastChangedOn'], // after forecast data has been fetched
 	(newValue, oldValue) => {
 		store.dispatch('chartData/generateChartData', store.getters['allCityData/getAllCityData']); // generate plot data
 		if (debug) {
