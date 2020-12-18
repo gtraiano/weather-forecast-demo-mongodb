@@ -163,13 +163,39 @@
 						striped hover borderless sticky-header small head-variant="light"
 						:fields="[
 							{ key: 'actions', label: $t('actions'), sortable: false },
-							{ key: 'city', label: $t('city'), sortable: true },
+							{ key: 'index', label:'#', sortable: false },
+							{ key: 'city', label: $t('city'), sortable: true, thStyle: {'background-image': 'none'}, sort: null },
+							{ key: 'country', label: $t('country'), sortable: true, thStyle: {'background-image': 'none'}, sort: null },
+							{ key: 'continent', label: $t('continent'), sortable: true, thStyle: {'background-image': 'none'}, sort: null },
 							{ key: 'forecasts', label: $t('forecasts'), sortable: false }
 						]"
 						:items="[
-							{ 'city': 'City Name', 'forecasts': selectedVar ? $t(selectedVar) : '' }
+							{ index:'1', 'city': this.$i18n.locale === 'en' ? 'City Name' : 'Όνομα Πόλης', country: $t('country'), continent: $t('continent'), 'forecasts': selectedVar ? $t(selectedVar) : '' }
 						]"
 					>
+						<template v-slot:head()="data"><!-- header custom rendering-->
+					  		<!-- on sortable field, clear sorting on right clicking sorted field header -->
+					      <div 
+					          v-if="data.field.sortable"
+					          @click.left="data.field.sort = data.field.sort ? !data.field.sort : true"
+					          v-on:contextmenu.prevent=""
+					          @click.right="data.field.sort = null"
+					      >
+					          <div style="display: inline-block; position: relative;">{{ data.label }}</div>
+					          <div style="display: inline-block; position: relative;"><!-- custom sort icon -->
+					              <b-icon-chevron-up v-if="data.field.sort" />
+					              <b-icon-chevron-down v-else-if="data.field.sort === false" />  
+					          </div>
+					          
+					      </div>
+							<!-- on regular field, disable right click context menu -->
+					    	<span
+					          v-else
+					          @click.right.prevent
+					      >
+					    		  {{ data.label }}
+					    	</span>
+					    </template>
 						<template v-slot:cell(city)="data">
 							<a href="" @click.prevent>
 								{{data.item.city}}
@@ -244,7 +270,7 @@
 </template>
 
 <script>
-import { BIconSearch, BIconTrash, BIconArrowClockwise, BIconGraphUp } from 'bootstrap-vue'
+import { BIconSearch, BIconTrash, BIconArrowClockwise, BIconGraphUp, BIconChevronUp, BIconChevronDown } from 'bootstrap-vue'
 import SearchResults from './SearchResults.vue'
 import Controls from './Controls.vue'
 import Vue from 'vue'
@@ -258,6 +284,8 @@ export default {
 		BIconTrash,
 		BIconArrowClockwise,
     	BIconGraphUp,
+    	BIconChevronUp,
+    	BIconChevronDown,
     	Controls
 	},
 	
