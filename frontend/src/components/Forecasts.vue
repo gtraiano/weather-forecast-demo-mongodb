@@ -64,22 +64,20 @@
         
         <b-row>    
         </b-row>
-        
+
+        <!-- forecast overview table -->
         <b-row md="12" class="mt-4">
             <b-col/>
             
             <b-col cols="10">
                 <h5 v-if="cityData && cityData.length">{{tableTitle}}</h5>
                 <!-- forecasts table renders only if cityData is populated -->
-                <ForecastsTable v-if="cityData && cityData.length"
+                <ForecastsTableCustom v-if="cityData && cityData.length"
                     :forecastData="cityData"
                     :tableItems="tableCells"
                     :tableFields="tableHeader"
                     :selectedRow="selectedCity"
-                    :sortBy="tableSortBy"
-                    :sortDesc="tableSorted"
                     :tableStyle="tableStyle"
-                    :sortCompare="sortCompare"
                     @selectedRowUpdate="(index, value) => { $emit('selectedRowUpdate', index, value); }"
                     @sortingChanged="value => { $emit('sortingChanged', value) }"
                     @showPlot="$emit('showPlot');"
@@ -93,15 +91,19 @@
             <b-col/>
         </b-row>
         
+        <!-- detailed forecast -->
         <b-container v-if="selectedCity !== -1 && showDetailedForecast" fluid>
           <b-row>
-            <b-col/>
+              <b-col/>
 
-            <b-col cols="10">
-                  <b-button-close @click="showPlot ? showDetailedForecast = false : selectedCity = -1; showDetailedForecast = false;" />
-            </b-col>
-            
-            <b-col/>
+              <b-col cols="9">
+                  <h4>{{cityData[selectedCity].name[this.$i18n.locale]}}</h4>
+              </b-col>
+              <b-col cols="1">
+                    <b-button-close @click="showPlot ? showDetailedForecast = false : selectedCity = -1; showDetailedForecast = false;" />
+              </b-col>
+              
+              <b-col/>
           </b-row>
           
           <b-row>
@@ -155,7 +157,8 @@
               <b-col/>
               
               <b-col cols="10">
-                  <LineChart :chart-data="preparePlotData(endHours, selectedVar)" />
+                  <!--LineChart :chart-data="preparePlotData(endHours, selectedVar)" /-->
+                  <LineChartAsync :chartData="preparePlotData(endHours, selectedVar)" />
               </b-col>
               
               <b-col/>
@@ -171,6 +174,8 @@ import LineChart from './LineChart.vue'
 import { mapGetters } from 'vuex'
 import ForecastsTable from './ForecastsTable.vue'
 import DetailedForecast from './DetailedForecast.vue'
+import LineChartAsync from './LineChartAsync.vue'
+import ForecastsTableCustom from './ForecastsTableCustom.vue'
 
 const hoursPassed = (end, start) => {
     return Math.floor((end - start)/3600000);
@@ -184,9 +189,9 @@ export default {
           variables: ['temperature', 'humidity', 'pressure'],
           selectedVar: 'temperature',
           selectedCity: -1, // index of city in cityData
+          selectedCityIndexSorted: -1,
           endHours: 48, // timeline duration in hours for plot
-          tableSortBy: null, // field name to sort forecasts table by
-          tableSorted: null, // forecasts table is sorted (null: no, true: desc, false: asc)
+          tableSorted: false, // forecasts table is sorted
           tableStyle: { height: '70vh' }, // table css styling
           showPlot: false,
           showDetailedForecast: false,
@@ -199,7 +204,9 @@ export default {
       Controls,
       LineChart,
       ForecastsTable,
-      DetailedForecast
+      DetailedForecast,
+      LineChartAsync,
+      ForecastsTableCustom
   },
 
   methods: {
@@ -210,26 +217,13 @@ export default {
           })
       },
 
-      preparePlotData: function (endHours, variable) {
+      preparePlotData: async function (endHours, variable) {
       /* prepares dataset for plot */
-          let chartdata = this.chartData[this.selectedCity].variables[this.selectedVar] // get selected variable measurements
+          let chartdata = (await this.chartData[this.selectedCity]).variables[this.selectedVar];
           delete chartdata.title // remove plot title
           chartdata = {...chartdata, labels: chartdata.labels.slice(0, endHours)} // x-axis points for endHours hours
 
           return chartdata
-      },
-
-      findSelectedCityIndexSorted() {
-      /* return selected city index in sorted names table */
-          return this.sortedCityNames.findIndex(name => name === this.cityData[this.selectedCity].name[this.$i18n.locale]);
-      },
-
-      sortCompare(aRow, bRow, key = 'city', sortDesc) {
-      /* sort function to be used in table for city column */
-          const a = aRow[key]
-          const b = bRow[key]
-          
-          return a.name < b.name ? -1 : a.name > b.name ? 1 : 0
       }
   },
 
@@ -243,7 +237,9 @@ export default {
           this.cityData.forEach(city => {
               nowIndex = city.forecast.hourlyDt.findIndex(dt => hoursPassed(now, dt) === 0) // find closest datetime to now + first column hours
               let curr_data = {
-                  'city' : { name: city.name[this.$i18n.locale], coords: city.coords } // city column
+                  'city' : { name: city.name[this.$i18n.locale], coords: city.coords }, // city column
+                  'country': city.country[this.$i18n.locale],
+                  'continent': this.$t(city.continent.toLowerCase())
               }
               for (let counter = 0; counter < this.overviewColumns && nowIndex !== -1 && nowIndex + counter*this.overviewPeriod < city.forecast[this.selectedVar].length; counter++) // if nowIndex === =1, there is no up to date forecast data to pass to the table
               {
@@ -261,8 +257,18 @@ export default {
           let options = { weekday: 'short', hour: '2-digit'};
           let fields = [
               {
-                key: 'city', // key name according to locale
+                key: 'city',
                 label: this.$t('city'),
+                sortable: true
+              },
+              {
+                key: 'country',
+                label: this.$t('country'),
+                sortable: true
+              },
+              {
+                key: 'continent',
+                label: this.$t('continent'),
                 sortable: true
               }
           ];
@@ -274,9 +280,6 @@ export default {
               let new_label = {
                   key: String(counter),
                   sortable: false,
-                  /*label: this.$i18n.locale === 'en' // dates according to locale
-                      ? currentDate.toLocaleDateString("en-US",options)
-                      : currentDate.toLocaleDateString("el-GR",options)*/
                   label: currentDate.toLocaleDateString(this.$i18n.locale, options)
               }
               fields.push(new_label);
@@ -293,73 +296,26 @@ export default {
           return `${this.$t(this.selectedVar)} ${this.$t('in')} ${unit_map[this.selectedVar]}`;
       },
 
-      sortedCityNames() {
-      /* returns sorted city names table according to locale & table sorting (asc or desc) */
-          return this.cityData.map(row => row.name[this.$i18n.locale]).sort(
-              (a, b) => {
-                  if(this.tableSorted)
-                      return b >= a;
-                  else
-                      return b < a;
-              }
-          );
-      },
-
       ...mapGetters({
           cityData: 'allCityData/getAllCityData',
-          chartData: 'chartData/getChartData',
-          locale: 'locale/getLocale'
+          chartData: 'chartData/getChartData'
       })
   },
 
   watch: {
-      selectedCity(newValue, oldValue) {
-          this.tableStyle.height = newValue === -1 ? '70vh' : '25vh';
-          
-          if (newValue === -1) { // plot is closed
-              this.$refs.table.scrollToRow(0);
-          }
-          else if (oldValue === -1) { // plot is opened
-              if (this.tableSorted === null) {
-                  this.$refs.table.scrollToRow(newValue); // scroll to index directly
-              }
-              else {
-                  this.$refs.table.scrollToRow(this.findSelectedCityIndexSorted());
-              }
-          }
+      overviewColumns() {
+          window.localStorage.setItem('overviewColumns', JSON.stringify(this.overviewColumns))
       },
 
-      tableSorted(newValue, oldValue) {
-          if(this.selectedCity !== -1) { // scroll sorted table to follow selected city
-              this.$refs.table.scrollToRow(this.findSelectedCityIndexSorted());
-          }
-          if(newValue === null) { // scroll unsorted table to follow selected city
-              this.$refs.table.scrollToRow(this.selectedCity);
-          }
-      },
-
-      locale() {
-          if(this.tableSortBy) {
-              this.tableSortBy = this.$t('city'); // translate sort key
-              if(this.selectedCity !== -1) {
-                  this.$refs.table.scrollToRow(this.findSelectedCityIndexSorted()); // scroll table to correct selected city row when table is sorted
-              }
-          }
-      },
-
-      overviewColumns(newValue, oldValue) {
-          window.localStorage.setItem('overviewColumns', JSON.stringify(newValue))
-      },
-
-      overviewPeriod(newValue, oldValue) {
-          window.localStorage.setItem('overviewPeriod', JSON.stringify(newValue))
+      overviewPeriod() {
+          window.localStorage.setItem('overviewPeriod', JSON.stringify(this.overviewPeriod))
       }
   },
   
   async created() {
-      if(!this.cityData.length){
-        console.log('Load our data first');
-        await this.$store.dispatch('allCityData/setAllCityDataAsync');
+      if(!this.cityData.length) {
+          console.log('Load our data first');
+          await this.$store.dispatch('allCityData/setAllCityDataAsync');
       }
 
       this.overviewColumns = JSON.parse(window.localStorage.getItem('overviewColumns')) || this.overviewColumns;
@@ -367,13 +323,27 @@ export default {
   },
 
   mounted() {
-       //event listeners
-      this.$on('selectedRowUpdate', (index, coords) => { this.selectedCity = this.findCityIndex(coords); });
-      this.$on('sortingChanged', ({ sortBy, sortDesc }) => {
-          this.tableSortBy = sortBy;
-          this.tableSorted = sortDesc;
+      this.$on('selectedRowUpdate', (index, coords) => {
+          this.selectedCity = this.findCityIndex(coords);
+          this.selectedCityIndexSorted = index;
+          
+          this.tableStyle.height = this.selectedCity === -1 ? '70vh' : '25vh';
+          console.log('tableSorted', this.tableSorted, 'selectedCity', this.selectedCity, 'selectedCityIndexSorted', this.selectedCityIndexSorted);
+          if(this.tableSorted) {
+              //this.selectedCity !== -1 ? this.$refs.table.scrollToRow(this.selectedCityIndexSorted) : null;
+              this.selectedCity ? this.$refs.table.scrollToRow(this.selectedCityIndexSorted) : null;
+          }
+          else if(!this.tableSorted) {
+              this.selectedCity === -1 ? this.$refs.table.scrollToRow(0) : null;
+          }
       });
+
+      this.$on('sortingChanged', value => {
+          this.tableSorted = value;
+      });
+
       this.$on('showPlot', () => { this.showPlot = true; });
+      
       this.$on('showDetailedForecast', () => { this.showDetailedForecast = true; });
   }
 }
