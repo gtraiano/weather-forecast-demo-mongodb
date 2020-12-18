@@ -175,11 +175,8 @@ export default {
     		},
 
         sortingChanged() {
-            const isSorted = Object.values(this.sortFields).some(value => value != null);
-            if(!isSorted && this.selectedRow !== -1) { // emit original selected row index when sorting cleared
-                this.$emit('selectedRowUpdate', this.selectedRow, this.forecastData[this.selectedRow].coords);
-            }
-            this.$emit('sortingChanged', isSorted);
+            const sortSum = Object.values(this.sortFields).reduce((acc, curr) => curr !== null ? curr ? acc + 2 : acc + 1 : acc, 0); // sum sort order fields (null -> 0, true -> 2, false -> 1)
+            this.$emit('sortingChanged', sortSum);
         },
 
     		scrollToRow(index) {
@@ -226,7 +223,7 @@ export default {
 
         sortCompare(a, b, key, asc) {
         // key: sort key
-        // asc: true if ascending
+        // asc: sort order, true if ascending
             return key !== 'city' // city needs to be sorted by city.name
                 ? b[key].localeCompare(a[key], this.$i18n.locale, { sensitivity: 'base', ignorePunctuation: true } ) * (asc ? -1 : 1)
                 : b.city.name.localeCompare(a.city.name, this.$i18n.locale, { sensitivity: 'base', ignorePunctuation: true } ) * (asc ? -1 : 1)
