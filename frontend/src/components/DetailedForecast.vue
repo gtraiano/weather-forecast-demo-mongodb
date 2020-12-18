@@ -26,10 +26,10 @@
 				{{ date(item.dt*1000)}}
 			</b-card-sub-title>
 			<b-card-img
-				:src="`http://openweathermap.org/img/wn/${item.weather[0].icon}@4x.png`"
+				:src="`https://openweathermap.org/img/wn/${item.weather[0].icon}@4x.png`"
 				img-alt="Card image"
 				img-top
-				style="scale: 0.75"
+				style="object-fit: contain; min-height: calc(0.8*200px); max-height: calc(0.8*200px)"
 			>
 			</b-card-img>
 			<b-card-text>
