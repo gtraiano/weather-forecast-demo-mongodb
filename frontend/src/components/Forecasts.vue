@@ -172,7 +172,6 @@
 import Controls from './Controls.vue'
 import LineChart from './LineChart.vue'
 import { mapGetters } from 'vuex'
-import ForecastsTable from './ForecastsTable.vue'
 import DetailedForecast from './DetailedForecast.vue'
 import LineChartAsync from './LineChartAsync.vue'
 import ForecastsTableCustom from './ForecastsTableCustom.vue'
@@ -191,7 +190,7 @@ export default {
           selectedCity: -1, // index of city in cityData
           selectedCityIndexSorted: -1,
           endHours: 48, // timeline duration in hours for plot
-          tableSorted: false, // forecasts table is sorted
+          tableSorted: 0, // forecasts table is sorted
           tableStyle: { height: '70vh' }, // table css styling
           showPlot: false,
           showDetailedForecast: false,
@@ -203,7 +202,6 @@ export default {
   components: {
       Controls,
       LineChart,
-      ForecastsTable,
       DetailedForecast,
       LineChartAsync,
       ForecastsTableCustom
@@ -309,7 +307,27 @@ export default {
 
       overviewPeriod() {
           window.localStorage.setItem('overviewPeriod', JSON.stringify(this.overviewPeriod))
-      }
+      },
+
+      selectedCity(newValue, oldValue) {
+          this.tableStyle.height = newValue === -1 ? '70vh' : '25vh';
+          
+          if (newValue === -1) { // plot was just closed
+              this.$refs.table.scrollToRow(0);
+          }
+          else if (oldValue === -1 && this.tableSorted !== 0) { // plot was just opened and table is sorted
+              this.$refs.table.scrollToRow(this.selectedCityIndexSorted);
+          }
+      },
+
+      tableSorted(newValue, oldValue) {
+          if(this.selectedCity !== -1) { // scroll sorted table to follow selected city
+              this.$refs.table.scrollToRow(this.selectedCityIndexSorted);
+          }
+          if(newValue === 0) { // scroll unsorted table to follow selected city
+              this.$refs.table.scrollToRow(this.selectedCity);
+          }
+      },
   },
   
   async created() {
@@ -326,16 +344,6 @@ export default {
       this.$on('selectedRowUpdate', (index, coords) => {
           this.selectedCity = this.findCityIndex(coords);
           this.selectedCityIndexSorted = index;
-          
-          this.tableStyle.height = this.selectedCity === -1 ? '70vh' : '25vh';
-          console.log('tableSorted', this.tableSorted, 'selectedCity', this.selectedCity, 'selectedCityIndexSorted', this.selectedCityIndexSorted);
-          if(this.tableSorted) {
-              //this.selectedCity !== -1 ? this.$refs.table.scrollToRow(this.selectedCityIndexSorted) : null;
-              this.selectedCity ? this.$refs.table.scrollToRow(this.selectedCityIndexSorted) : null;
-          }
-          else if(!this.tableSorted) {
-              this.selectedCity === -1 ? this.$refs.table.scrollToRow(0) : null;
-          }
       });
 
       this.$on('sortingChanged', value => {
