@@ -58,6 +58,18 @@
   "city": "City",
   "add city": "Add a city",
 
+  "continent": "Continent",
+  "africa": "Africa",
+  "asia": "Asia",
+  "europe": "Europe",
+  "america": "America",
+  "australia": "Australia",
+  "arctic": "Arctic Ocean",
+  "atlantic": "Atlantic Ocean",
+  "indian": "Indian Ocean",
+  "pacific": "Pacific Ocean",
+  "southern": "Southern Ocean",
+
   "map date": "Map date",
   "map prompt": "City weather conditions. Select a city to view more",
   "forecast prompt": "Choose one of the variables to view detailed forecast",
