@@ -26,7 +26,7 @@
                 :zoom="zoom"
                 :center="center"
                 :mapUrl="mapUrl"
-                :mapIconScale="iconScale"
+                :iconScale="(zoom/18)*1.5"
                 :markerData="cityData"
                 :chartData="chartData"
                 :openWeatherOptions="options"
@@ -95,6 +95,10 @@
 import { mapGetters } from 'vuex'
 import GeneralMap from './GeneralMap.vue'
 
+const hoursPassed = (end, start) => {
+    return Math.floor((end - start)/3600000);
+}
+
 export default {
     name: 'Map',
 
@@ -105,11 +109,11 @@ export default {
     data () {
         return {
             // map url and options
-            mapUrl: 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+            mapUrl: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
             zoom: 6,
             center: { lat: 38.436111, lng: 26.112442 },
             bounds: null,
-            iconScale: 1.0,
+            //iconScale: 1.0,
 
             activeCityPopup: -1, // city id of displayed popup
           
@@ -127,10 +131,10 @@ export default {
         this.options = this.populateOptions();
 
         if(window.localStorage.getItem('activeLayers')) { // load control panel options from local storage
-            this.activeLayers = JSON.parse(window.localStorage.getItem('activeLayers'))
+            this.activeLayers = JSON.parse(window.localStorage.getItem('activeLayers'));
         }
         else {
-            this.activeLayers = ['temp_new', 'clouds_new'] // default values
+            this.activeLayers = ['temp_new', 'clouds_new']; // default values
         }
     },
 
@@ -171,9 +175,8 @@ export default {
 
         currentWeatherIcon(city) {
         /* returns weather icon for current datetime hour */
-            //let index = city.forecast.hourlyDt.findIndex(dt => dt >= Date.now());
-            let index = city.forecast.hourlyDt.findIndex( dt => Math.floor(Date.now() - dt)/(3600*1000) );
-            return city.forecast.hourlyWeatherIcon[index];
+            let index = city.forecast.hourlyDt.findIndex( dt => hoursPassed(Date.now(), dt) == 0 );
+            return index !== -1 ? city.forecast.hourlyWeatherIcon[index] : null;
         }
     },
 
