@@ -16,6 +16,10 @@ city weather forecast object
 	
 	name 						object 		city name in locales
 		locale={en, el}			string 		name translation in locale (en, el)
+
+	country
+
+	continent
 	
 	id 							int			id
 	
@@ -43,10 +47,17 @@ const extractName = entry => {
 	)
 }
 
+const extractCountry = entry => {
+	return Object.assign(
+		{},
+		...store.i18n.availableLocales.map( locale => ({ [locale]: entry.location[locale].address.country || entry.location[locale].address.country_code  }) )
+	)
+}
+
 const extractForecastData = entry => {
 /* extracts hourly forecast data from OpenWeather API response */
 	return {
-		hourlyWeatherIcon: entry.hourly.map(hour => `http://openweathermap.org/img/wn/${hour.weather[0].icon}@2x.png`),
+		hourlyWeatherIcon: entry.hourly.map(hour => `https://openweathermap.org/img/wn/${hour.weather[0].icon}@2x.png`),
 		hourlyDt: entry.hourly.map(hour => hour.dt*1000), // unix to js datetime
 		temperature: entry.hourly.map(hour => hour.temp),
 		humidity: entry.hourly.map(hour => hour.humidity),
@@ -59,6 +70,8 @@ const transformDatabaseData = entry => {
 	return {
 		coords: { lat: entry.lat, lon: entry.lon },
 		name: extractName(entry),
+		country: extractCountry(entry),
+		continent: entry.timezone.substring(0, entry.timezone.indexOf('/')),
 		id: entry.location.en.place_id,
 		forecast: extractForecastData(entry)
 	};
