@@ -1,6 +1,8 @@
 import axios from 'axios';
 
-const baseUrl = `${process.env.BACKEND_DOMAIN}:${process.env.BACKEND_PORT}${process.env.BACKEND_PATH}`;
+const protocol = process.env.EXPRESS_SERVER_PROTOCOLS.split(',').map(p => p.trim().toLowerCase()).includes('https') ? 'https' : 'http';
+const backendPort = protocol === 'https' ? process.env.EXPRESS_SERVER_HTTPS_PORT : EXPRESS_SERVER_HTTP_PORT;
+const baseUrl = `${protocol}://${process.env.BACKEND_DOMAIN}:${backendPort}${process.env.BACKEND_API_ENDPOINT}`;
 
 // Nominatim calls
 const nominatimSearchName = async (name, locale) => {
