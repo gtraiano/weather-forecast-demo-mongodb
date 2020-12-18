@@ -11,6 +11,7 @@
 <template>
 <l-map
     :options="{
+        worldCopyJump: true,
         attributionControl: false,
         preferCanvas: true,
         wheelPxPerZoomLevel: activeCityPopup !== -1 ? Number.MAX_VALUE : 60 // prevent wheel zooming when popup is displayed
@@ -80,12 +81,11 @@
                 offset: [iconOptions.iconAnchor[0], 0]
             }"
         >
-            <PopupViewChart
+            <PopupChart
                 :chartData="chartData[index]"
                 :active="activeCityPopup === city.id"
                 :ref="index"
-            >
-            </PopupViewChart>
+            />
         </l-popup>
     </l-marker>
 </l-map>
@@ -95,8 +95,8 @@
 import { LMap, LTileLayer, LMarker, LPopup, LControlAttribution, LTooltip, LControl } from 'vue2-leaflet'
 import { Icon }  from 'leaflet'
 import 'leaflet/dist/leaflet.css'
-import PopupViewChart from './PopupViewChart.vue'
 import { mapGetters } from 'vuex'
+import PopupChart from './PopupChart.vue'
 
 // this part resolve an issue where the markers would not appear
 delete Icon.Default.prototype._getIconUrl;
@@ -116,9 +116,9 @@ export default {
         LMarker,
         LPopup,
         LControlAttribution,
-        PopupViewChart,
         LTooltip,
-        LControl
+        LControl,
+        PopupChart
     },
 
     props: {
@@ -172,7 +172,7 @@ export default {
         mapUrl: {
             type: String,
             required: true,
-            default: 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+            default: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
         },
 
         // OpenWeather tiles urls
@@ -256,20 +256,17 @@ export default {
         resetZoom(cityIndex) {
             /* resets zoom for all tabs of popup */
             this.$refs[cityIndex][0].reset([0,1,2])
-        },
-        
-        calculateIconOptions(scale = this.iconScale) {
-            return {
-                iconSize:     [Math.round(64*scale), Math.round(64*scale)], // size of the icon
-                shadowSize:   [Math.round(50*scale), Math.round(64*scale)], // size of the shadow
-                iconAnchor:   [Math.round(16*scale), Math.round(32*scale)], // point of the icon which will correspond to marker's location
-            }
         }
     },
 
     computed: {
         iconOptions() {
-            return this.calculateIconOptions()
+            const scale = this.iconScale
+            return {
+                iconSize:     [Math.round(64*scale), Math.round(64*scale)], // size of the icon
+                shadowSize:   [Math.round(50*scale), Math.round(64*scale)], // size of the shadow
+                iconAnchor:   [Math.round(16*scale), Math.round(32*scale)], // point of the icon which will correspond to marker's location
+            }
 
         },
 
@@ -285,7 +282,7 @@ export default {
 
         openStreet() {
             /* determines if OpenStreet map is used */
-            return this.mapUrl === 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+            return this.mapUrl === 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
         },
 
         openWeather() {
