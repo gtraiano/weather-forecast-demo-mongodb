@@ -175,7 +175,7 @@ export default {
 
         currentWeatherIcon(city) {
         /* returns weather icon for current datetime hour */
-            let index = city.forecast.hourlyDt.findIndex( dt => hoursPassed(Date.now(), dt) == 0 );
+            const index = city.forecast.hourlyDt.findIndex( dt => hoursPassed(Date.now(), dt) == 0 );
             return index !== -1 ? city.forecast.hourlyWeatherIcon[index] : null;
         }
     },
@@ -205,7 +205,7 @@ export default {
 
         generateOpenWeatherTileLayers() {
             /* creates urls for active OpenWeather map layers */
-            return this.activeLayers.map(layer => `https://tile.openweathermap.org/map/${layer}/{z}/{x}/{y}.png?appid=${process.env.OW_USER_TOKEN}`)
+            return this.activeLayers.map(layer => `https://tile.openweathermap.org/map/${layer}/{z}/{x}/{y}.png?appid=${process.env.OW_API_KEY}`)
         },
 
         // map store state to computed properties
