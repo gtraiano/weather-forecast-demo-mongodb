@@ -167,18 +167,18 @@
 							{ key: 'city', label: $t('city'), sortable: true, thStyle: {'background-image': 'none'}, sort: null },
 							{ key: 'country', label: $t('country'), sortable: true, thStyle: {'background-image': 'none'}, sort: null },
 							{ key: 'continent', label: $t('continent'), sortable: true, thStyle: {'background-image': 'none'}, sort: null },
-							{ key: 'forecasts', label: $t('forecasts'), sortable: false }
+							{ key: 'forecasts', label: $t('forecasts'), sortable: true, thStyle: {'background-image': 'none'}, sort: null }
 						]"
 						:items="[
 							{ index:'1', 'city': this.$i18n.locale === 'en' ? 'City Name' : 'Όνομα Πόλης', country: $t('country'), continent: $t('continent'), 'forecasts': selectedVar ? $t(selectedVar) : '' }
 						]"
+						@contextmenu.native.prevent
 					>
 						<template v-slot:head()="data"><!-- header custom rendering-->
 					  		<!-- on sortable field, clear sorting on right clicking sorted field header -->
 					      <div 
 					          v-if="data.field.sortable"
 					          @click.left="data.field.sort = data.field.sort ? !data.field.sort : true"
-					          v-on:contextmenu.prevent=""
 					          @click.right="data.field.sort = null"
 					      >
 					          <div style="display: inline-block; position: relative;">{{ data.label }}</div>
