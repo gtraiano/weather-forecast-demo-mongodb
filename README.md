@@ -39,7 +39,7 @@ npm run build
 ```
 
 ## Environment
-A single .env file must reside at the project's root folder.
+A single .env file must reside at the project's root folder. A sample .env file is provided in `.env.sample`.
 
 ### Express server config
 `EXPRESS_SERVER_PROTOCOLS` Comma separated list including HTTP and/or HTTPS protocols. If HTTPS is included, the frontend will prefer it over HTTP.
@@ -48,9 +48,9 @@ A single .env file must reside at the project's root folder.
 
 `EXPRESS_SERVER_HTTPS_PORT` HTTPS server port
 #### SSL credentials
-`EXPRESS_SERVER_PRIVATE_KEY` SSL private key
+`EXPRESS_SERVER_PRIVATE_KEY` SSL private key file absolute path
 
-`EXPRESS_SERVER_CERTIFICATE` SSL public key
+`EXPRESS_SERVER_CERTIFICATE` SSL public key file absolute path
 
 `EXPRESS_SERVER_CA` SSL certification authority (optional)
 
@@ -61,7 +61,7 @@ A single .env file must reside at the project's root folder.
 
 `BACKEND_API_ENDPOINT` Backend endpoint
 
-`OW_USER_TOKEN` OpenWeather API key
+`OW_API_KEY` OpenWeather API key
 
 ### Webpack Dev Server config
 `WEBPACK_DEV_SERVER_HTTPS` Set to 1 to run server with HTTPS protocol
@@ -69,9 +69,9 @@ A single .env file must reside at the project's root folder.
 #### SSL credentials
 If not provided, Webpack Dev Server will generate its own.
 
-`WEBPACK_DEV_SERVER_PRIVATE_KEY` SSL private key
+`WEBPACK_DEV_SERVER_PRIVATE_KEY` SSL private key absolute path
 
-`WEBPACK_DEV_SERVER_CERTIFICATE` SSL public key
+`WEBPACK_DEV_SERVER_CERTIFICATE` SSL public key absolute path
 
 `WEBPACK_DEV_SERVER_CA` SSL certification authority (optional)
 
