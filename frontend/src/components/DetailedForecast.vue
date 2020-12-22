@@ -36,52 +36,52 @@
 				<b-container fluid class="m-0 p-0">
 					<b-row>
 						<b-col cols="1" class="ml-0 mr-0 pl-0 pr-0" />
-						<b-col cols="6" class="ml-0 mr-0 pl-0 pr-0 text-left font-weight-bold">{{$t('temperature')}}</b-col>
-						<b-col cols="4" class="ml-0 mr-0 pl-0 pr-0 text-right">{{`${item.temp}\u2103`}}</b-col>
+						<b-col cols="6" class="ml-0 mr-0 pl-0 pr-0 text-left font-weight-bold text-truncate">{{$t('temperature')}}</b-col>
+						<b-col cols="4" class="ml-0 mr-0 pl-0 pr-0 text-right text-truncate">{{`${item.temp}\u2103`}}</b-col>
 						<b-col cols="1" class="ml-0 mr-0 pl-0 pr-0" />
 					</b-row>
 					<b-row>
 						<b-col cols="1" class="ml-0 mr-0 pl-0 pr-0" />
-						<b-col cols="5" class="ml-0 mr-0 pl-0 pr-0 text-left font-weight-bold">{{$t('humidity')}}</b-col>
-						<b-col cols="5" class="ml-0 mr-0 pl-0 pr-0 text-right">{{item.humidity}}%</b-col>
+						<b-col cols="5" class="ml-0 mr-0 pl-0 pr-0 text-left font-weight-bold text-truncate">{{$t('humidity')}}</b-col>
+						<b-col cols="5" class="ml-0 mr-0 pl-0 pr-0 text-right text-truncate">{{item.humidity}}%</b-col>
 						<b-col cols="1" class="ml-0 mr-0 pl-0 pr-0" />
 					</b-row>
 					<b-row>
 						<b-col cols="1" class="ml-0 mr-0 pl-0 pr-0" />
-						<b-col cols="5" class="ml-0 mr-0 pl-0 pr-0 text-left font-weight-bold">{{$t('pressure')}}</b-col>
-						<b-col cols="5" class="ml-0 mr-0 pl-0 pr-0 text-right">{{item.pressure}}&nbsp;hPa</b-col>
+						<b-col cols="5" class="ml-0 mr-0 pl-0 pr-0 text-left font-weight-bold text-truncate">{{$t('pressure')}}</b-col>
+						<b-col cols="5" class="ml-0 mr-0 pl-0 pr-0 text-right text-truncate">{{item.pressure}}&nbsp;hPa</b-col>
 						<b-col cols="1" class="ml-0 mr-0 pl-0 pr-0" />
 					</b-row>
 					<b-row>
 						<b-col cols="1" class="ml-0 mr-0 pl-0 pr-0" />
-						<b-col cols="7" class="ml-0 mr-0 pl-0 pr-0 text-left font-weight-bold">{{$t('feels like')}}</b-col>
-						<b-col cols="3" class="ml-0 mr-0 pl-0 pr-0 text-right">{{`${item.feels_like}\u2103`}}</b-col>
+						<b-col cols="7" class="ml-0 mr-0 pl-0 pr-0 text-left font-weight-bold text-truncate">{{$t('feels like')}}</b-col>
+						<b-col cols="3" class="ml-0 mr-0 pl-0 pr-0 text-right text-truncate">{{`${item.feels_like}\u2103`}}</b-col>
 						<b-col cols="1" class="ml-0 mr-0 pl-0 pr-0" />
 					</b-row>
 					<b-row>
 						<b-col cols="1" class="ml-0 mr-0 pl-0 pr-0" />
-						<b-col cols="5" class="ml-0 mr-0 pl-0 pr-0 text-left font-weight-bold">{{$t('cloudiness')}}</b-col>
-						<b-col cols="5" class="ml-0 mr-0 pl-0 pr-0 text-right">{{item.clouds}}%</b-col>
+						<b-col cols="5" class="ml-0 mr-0 pl-0 pr-0 text-left font-weight-bold text-truncate">{{$t('cloudiness')}}</b-col>
+						<b-col cols="5" class="ml-0 mr-0 pl-0 pr-0 text-right text-truncate">{{item.clouds}}%</b-col>
 						<b-col cols="1" class="ml-0 mr-0 pl-0 pr-0" />
 					</b-row>
 					<b-row>
 						<b-col cols="1" class="ml-0 mr-0 pl-0 pr-0" />
-						<b-col cols="7" class="ml-0 mr-0 pl-0 pr-0 text-left font-weight-bold">{{$t('dew point')}}</b-col>
-						<b-col cols="3" class="ml-0 mr-0 pl-0 pr-0 text-right">{{`${item.dew_point}\u2103`}}</b-col>
+						<b-col cols="7" class="ml-0 mr-0 pl-0 pr-0 text-left font-weight-bold text-truncate">{{$t('dew point')}}</b-col>
+						<b-col cols="3" class="ml-0 mr-0 pl-0 pr-0 text-right text-truncate">{{`${item.dew_point}\u2103`}}</b-col>
 						<b-col cols="1" class="ml-0 mr-0 pl-0 pr-0" />
 					</b-row>
 					<b-row>
 						<b-col cols="1" class="ml-0 mr-0 pl-0 pr-0" />
-						<b-col cols="5" class="ml-0 mr-0 pl-0 pr-0 text-left font-weight-bold">{{$t('visibility')}}</b-col>
-						<b-col cols="5" class="ml-0 mr-0 pl-0 pr-0 text-right">{{item.visibility}} m</b-col>
+						<b-col cols="5" class="ml-0 mr-0 pl-0 pr-0 text-left font-weight-bold text-truncate">{{$t('visibility')}}</b-col>
+						<b-col cols="5" class="ml-0 mr-0 pl-0 pr-0 text-right text-truncate">{{item.visibility}} m</b-col>
 						<b-col cols="1" class="ml-0 mr-0 pl-0 pr-0" />
 					</b-row>
 					<b-row>
 						<b-col cols="1" class="ml-0 mr-0 pl-0 pr-0" />
-						<b-col cols="3" class="ml-0 mr-0 pl-0 pr-0 text-left font-weight-bold">
+						<b-col cols="3" class="ml-0 mr-0 pl-0 pr-0 text-left font-weight-bold text-truncate">
 							{{$t('wind')}}
 						</b-col>
-						<b-col cols="7" class="ml-0 mr-0 pl-0 pr-0 text-right">
+						<b-col cols="7" class="ml-0 mr-0 pl-0 pr-0 text-right text-truncate">
 							{{`${windDirection(item.wind_deg)} ${item.wind_speed} km/h`}}
 						</b-col>
 						<b-col cols="1" class="ml-0 mr-0 pl-0 pr-0" />
