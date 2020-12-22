@@ -221,40 +221,47 @@ export default {
             this.sortFields = { ...this.sortFields, [key]: null };
         },
 
-        sortCompare(a, b, key, asc) {
+        sortCompareString(a, b, key, asc) {
         // key: sort key
         // asc: sort order, true if ascending
             return key !== 'city' // city needs to be sorted by city.name
                 ? b[key].localeCompare(a[key], this.$i18n.locale, { sensitivity: 'base', ignorePunctuation: true } ) * (asc ? -1 : 1)
                 : b.city.name.localeCompare(a.city.name, this.$i18n.locale, { sensitivity: 'base', ignorePunctuation: true } ) * (asc ? -1 : 1)
+        },
+
+        sortCompareNumber(a, b, key, asc) {
+        // key: sort key
+        // asc: sort order, true if ascending
+            return (b[key] - a[key]) * (asc ? -1 : 1)
+        },
+
+        sortedTable() {
+        // returns a copy of tableItems sorted according to criteria set in sortFields
+            let table = [...this.tableItems];
+            Object.entries(this.sortFields).forEach(([key, order]) => {
+                let type = typeof table[0][key];
+                if(order !== null)
+                    type && type === 'number' ? table.sort((a,b) => this.sortCompareNumber(a, b, key, order)) : table.sort((a,b) => this.sortCompareString(a, b, key, order));
+            });
+            return table;
         }
     },
 
     watch: {
         sortFields() {
             // sort local rows copy
-            let table = [...this.tableItems];
-            Object.entries(this.sortFields).forEach(([key, order]) => {
-                if(order !== null)
-                    table.sort((a,b) => this.sortCompare(a, b, key, order));
-            });
-            this.rows = table;
+            this.rows = this.sortedTable();
             
-            // send events
-            this.sortingChanged();
-            if(this.selectedRow !== -1) {
+            // emit events
+            this.sortingChanged(); // emit sorting changed
+            if(this.selectedRow !== -1) { // updated selected city sorted index
                 const index = this.rows.findIndex(row => row.city.coords.lon === this.forecastData[this.selectedRow].coords.lon && row.city.coords.lat === this.forecastData[this.selectedRow].coords.lat)
                 this.selectedRowUpdate(index, this.forecastData[this.selectedRow].coords);
             }
         },
 
         tableItems() {
-            let table = [...this.tableItems];
-            Object.entries(this.sortFields).forEach(([key, order]) => {
-                if(order !== null)
-                    table.sort((a,b) => this.sortCompare(a, b, key, order));
-            });
-            this.rows = table;
+            this.rows = this.sortedTable();
 
             if(this.selectedRow !== -1) {
                 const index = this.rows.findIndex(row => row.city.coords.lon === this.forecastData[this.selectedRow].coords.lon && row.city.coords.lat === this.forecastData[this.selectedRow].coords.lat)

@@ -277,7 +277,7 @@ export default {
               currentDate = new Date(now + counter*this.overviewPeriod*60*60*1000);
               let new_label = {
                   key: String(counter),
-                  sortable: false,
+                  sortable: true,
                   label: currentDate.toLocaleDateString(this.$i18n.locale, options)
               }
               fields.push(new_label);
