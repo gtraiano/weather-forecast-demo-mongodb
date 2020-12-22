@@ -69,7 +69,7 @@
         <l-tooltip
             :options="{
                 direction: 'bottom',
-                offset: [iconOptions.iconAnchor[0], iconOptions.iconAnchor[1]/2],
+                offset: markerCurrentWeatherIcon(city) ? [iconOptions.iconAnchor[0], iconOptions.iconAnchor[1]/2] : [Math.round((25/4)*iconScale), Math.round((41/2)*iconScale)],
                 opacity: activeCityPopup !== city.id ? 0.9 : 0 // hide active city popup tooltip
             }"
         >
@@ -247,10 +247,14 @@ export default {
         },
         
         l_icon(icon) {
-            return L.icon({
-                iconUrl: icon,
-                ...this.iconOptions
-            })
+            return icon
+                ? L.icon({ iconUrl: icon, ...this.iconOptions })
+                : L.icon({ // fallback icon
+                    iconUrl: require('leaflet/dist/images/marker-icon-2x.png'),
+                    iconSize: [Math.round(25*this.iconScale), Math.round(41*this.iconScale)], // size of the icon
+                    //shadowSize:   [Math.round(36*this.iconScale), Math.round(41*this.iconScale)], // size of the shadow
+                    iconAnchor: [Math.round((25/4)*this.iconScale), Math.round((41/2)*this.iconScale)], // point of the icon which will correspond to marker's location
+                })
         },
         
         resetZoom(cityIndex) {
