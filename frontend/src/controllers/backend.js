@@ -4,6 +4,16 @@ const protocol = process.env.EXPRESS_SERVER_PROTOCOLS.split(',').map(p => p.trim
 const backendPort = protocol === 'https' ? process.env.EXPRESS_SERVER_HTTPS_PORT : EXPRESS_SERVER_HTTP_PORT;
 const baseUrl = `${protocol}://${process.env.BACKEND_DOMAIN}:${backendPort}${process.env.BACKEND_API_ENDPOINT}`;
 
+// ping
+const ping = async () => {
+	try {
+		return await axios.get(`${baseUrl}ping`)
+	}
+	catch(error) {
+		console.log(error.message);
+	}
+}
+
 // Nominatim calls
 const nominatimSearchName = async (name, locale) => {
 	try {
@@ -143,5 +153,6 @@ export {
 	deleteCityLatLon,
 	postCityLatLon,
 	postCity,
-	getDetailedForecastLatLon
+	getDetailedForecastLatLon,
+	ping
 };
