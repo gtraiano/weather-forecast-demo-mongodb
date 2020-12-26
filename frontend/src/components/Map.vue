@@ -155,6 +155,10 @@ export default {
         this.options = this.populateOptions();
     },
 
+    destroyed() {
+        this.$off()
+    },
+
     methods: {
         populateOptions() {
         // switch box options

@@ -222,6 +222,10 @@ export default {
     mounted() {
         /* listen to wheel events for zooming */
         this.$on('wheel', (event, index) => { this.zoom(Math.sign(-event.deltaY)*0.2, index); });
+    },
+
+    destroyed() {
+        this.$off();
     }
 };
 </script>

@@ -350,6 +350,10 @@ export default {
       this.$on('showPlot', () => { this.showPlot = true; });
       
       this.$on('showDetailedForecast', () => { this.showDetailedForecast = true; });
+  },
+
+  destroyed() {
+      this.$off();
   }
 }
 </script>
