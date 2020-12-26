@@ -7,18 +7,17 @@
   @version 1.0
  -->
 <template>
-<div v-if="!loading">
+<div v-if="!loading" id="deck-cards">
 	<b-card-group deck v-if="!loading">
 		<b-card
-			v-for="item in forecastData.hourly.slice(perPage*(currentPage - 1), currentPage*perPage)"
+			v-for="item in forecastData.hourly.slice(cardsPerPage*(currentPage - 1), currentPage*cardsPerPage)"
 			:key="item.dt"
 			class="text-center"
-			
 			:style="{
-				'max-width': `${(100/perPage)-2}%`,
-				'min-width': `${(100/perPage)-2}%`,
-				'max-height': `${(100/perPage)-2}%`,
-				'min-height': `${(100/perPage)-2}%`
+				'max-width': `${(100/cardsPerPage)-2}%`,
+				'min-width': `${(100/cardsPerPage)-2}%`,
+				'max-height': `${(100/cardsPerPage)-2}%`,
+				'min-height': `${(100/cardsPerPage)-2}%`
 			}"
 			:title="day(item.dt*1000)"
 		>
@@ -32,6 +31,7 @@
 				style="object-fit: contain; min-height: calc(0.8*200px); max-height: calc(0.8*200px)"
 			>
 			</b-card-img>
+			<b-card-text>{{$t(item.weather[0].description)}}</b-card-text>
 			<b-card-text>
 				<b-container fluid class="m-0 p-0">
 					<b-row>
@@ -96,7 +96,7 @@
 			v-if="!loading"
 			v-model="currentPage"
 			:total-rows="forecastData.hourly.length"
-			:per-page="perPage"
+			:per-page="cardsPerPage"
 			size="sm"
 			align="center"
 			first-class="m-0"
@@ -136,7 +136,9 @@ export default {
 		return {
 			currentPage: 1,
 			loading: true,
-			forecastData: []
+			forecastData: [],
+			deckWidth: 0, // used to watch card deck width
+			cardsPerPage: 0 // cards per page adjusted to card deck width
 		}
 	},
 
@@ -162,6 +164,12 @@ export default {
 				el: ["Β","ΒΒΑ","ΒΑ","ΑΒΑ","Α","ΑΝΑ","ΝΑ","ΝΝΑ","Ν","ΝΝΔ","ΝΔ","ΔΝΔ","Δ","ΔΒΔ","ΒΔ","ΒΒΔ","Β"]
 			};
 			return windDir[this.$i18n.locale][Math.round((degrees % 360) / 22.5)];
+ 		},
+
+ 		resized() {
+ 			const el = document.getElementById('deck-cards');
+ 			//this.cardWidth = el.children[0].children[0].clientWidth;
+ 			this.deckWidth = el.clientWidth
  		}
 	},
 
@@ -171,20 +179,41 @@ export default {
 		}
 	},
 
+	created() {
+		window.addEventListener('resize', this.resized)
+	},
+
+	destroyed() {
+		window.removeEventListener('resize', this.resized)
+	},
+
 	async mounted() {
 		this.loading = true;
-		const data = await getCityLatLon(this.lat, this.lon);
-		this.forecastData = data;
-		this.loading = false;	
+		this.forecastData = await getCityLatLon(this.lat, this.lon);
+		this.loading = false;
+		this.cardsPerPage = this.perPage;
+
+		await this.$nextTick();
+		this.resized()
 	},
 
 	watch: {
 		async coords(newValue, oldValue) {
 			this.loading = true;
 			this.currentPage = 1;
-			const data = await getCityLatLon(newValue.lat, newValue.lon);
-			this.forecastData = data;
+			this.forecastData = await getCityLatLon(newValue.lat, newValue.lon);
 			this.loading = false;	
+		},
+
+		deckWidth(newValue, oldValue) {
+		// change number of cards per page when card deck is resized
+			if(newValue !== 0 && oldValue !== 0) {
+				let dw = (newValue - oldValue) / oldValue;
+				let adjusted = ( (this.cardsPerPage*(1 + dw) + Number.EPSILON) * 100 ) / 100;
+				this.cardsPerPage = adjusted < this.perPage ? adjusted : this.perPage;
+
+				//console.log(dw > 0 ? 'expanded' : 'shrinked', 'adjusted perPage', this.cardsPerPage);
+			}
 		}
 	}
 }
