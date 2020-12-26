@@ -57,6 +57,7 @@
 import TopHeader from './components/TopHeader.vue';
 import { BOverlay, BButton, BModal } from 'bootstrap-vue'
 import SearchResults from './components/SearchResults.vue';
+import { ping } from './controllers/backend.js';
 
 export default {
 	name: 'app',
@@ -67,7 +68,13 @@ export default {
     BButton,
     BModal,
     SearchResults
-	}
+	},
+
+  async created() {
+    const res = await ping();
+    console.log('Ping backend server');
+    console.log(`Backend server response: '${res.data}' (${res.status} ${res.statusText})`);
+  }
 }
 </script>
 
