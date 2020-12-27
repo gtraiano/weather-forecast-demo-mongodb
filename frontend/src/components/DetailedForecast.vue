@@ -7,17 +7,17 @@
   @version 1.0
  -->
 <template>
-<div v-if="!loading" id="deck-cards">
-	<b-card-group deck v-if="!loading">
+<div v-if="!loading">
+	<b-card-group deck v-if="!loading" id="deck-cards">
 		<b-card
-			v-for="item in forecastData.hourly.slice(cardsPerPage*(currentPage - 1), currentPage*cardsPerPage)"
+			v-for="item in forecastData.hourly.slice(Math.trunc(cardsPerPage)*(currentPage - 1), currentPage*Math.trunc(cardsPerPage))"
 			:key="item.dt"
 			class="text-center"
 			:style="{
-				'max-width': `${(100/cardsPerPage)-2}%`,
-				'min-width': `${(100/cardsPerPage)-2}%`,
-				'max-height': `${(100/cardsPerPage)-2}%`,
-				'min-height': `${(100/cardsPerPage)-2}%`
+				'max-width': `${(100/Math.trunc(cardsPerPage))}%`,
+				'min-width': 'auto',
+				'max-height': `${(100/Math.trunc(cardsPerPage))}%`,
+				'min-height': `${(100/Math.trunc(cardsPerPage))}%`
 			}"
 			:title="day(item.dt*1000)"
 		>
@@ -96,7 +96,7 @@
 			v-if="!loading"
 			v-model="currentPage"
 			:total-rows="forecastData.hourly.length"
-			:per-page="cardsPerPage"
+			:per-page="Math.trunc(cardsPerPage)"
 			size="sm"
 			align="center"
 			first-class="m-0"
@@ -209,10 +209,12 @@ export default {
 		// change number of cards per page when card deck is resized
 			if(newValue !== 0 && oldValue !== 0) {
 				let dw = (newValue - oldValue) / oldValue;
-				let adjusted = ( (this.cardsPerPage*(1 + dw) + Number.EPSILON) * 100 ) / 100;
-				this.cardsPerPage = adjusted < this.perPage ? adjusted : this.perPage;
+				let adjusted = Math.round( (this.cardsPerPage*(1 + dw) + Number.EPSILON) * 10 ) / 10;
+				this.cardsPerPage = adjusted < this.perPage
+					? adjusted < 1 ? Math.round(1 + adjusted) : adjusted
+					: this.perPage;
 
-				//console.log(dw > 0 ? 'expanded' : 'shrinked', 'adjusted perPage', this.cardsPerPage);
+				//console.log(dw > 0 ? 'expanded' : 'shrinked', 'adjusted', adjusted, 'cardsPerPage', this.cardsPerPage, Math.trunc(this.cardsPerPage));
 			}
 		}
 	}
