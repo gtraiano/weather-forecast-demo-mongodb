@@ -31,7 +31,7 @@
 					:src="`https://openweathermap.org/img/wn/${item.weather[0].icon}@4x.png`"
 					img-alt="Card image"
 					img-top
-					style="object-fit: contain; min-height: calc(0.8*200px); max-height: calc(0.8*200px)"
+					style="object-fit: contain; min-height: 14vh; max-height: 14vh"
 				>
 				</b-card-img>
 				<b-card-text>{{$t(item.weather[0].description)}}</b-card-text>
@@ -117,7 +117,8 @@
 			:style="{
 				'overflow-x': 'auto',
 				'scrollbar-width': 'thin',
-				'flex-wrap': 'nowrap'
+				'flex-wrap': 'nowrap',
+				'margin-bottom': '2vh'
 			}"
 		>
 			<b-card
@@ -125,9 +126,9 @@
 				:key="item.dt"
 				class="text-center"
 				:style="{
-					'max-width': `${100/Math.trunc(cardsPerPage)}%`,
-					'min-width': `${100/Math.trunc(cardsPerPage)}%`,
-					'margin-bottom': '1vh',
+					'max-width': `${100 / Math.trunc(cardsPerPage)}%`,
+					'min-width': `${(100 - cardsPerPage*1.25) / Math.trunc(cardsPerPage)}%`,
+					'margin-bottom': '1vh', // space before scrollbar 
 					'margin-left': index == 0 ? '0px' : '', // 1st card
 					'margin-right': index == forecastData.hourly.length - 1 ? '0px' : '' // last card
 				}"
@@ -140,7 +141,7 @@
 					:src="`https://openweathermap.org/img/wn/${item.weather[0].icon}@4x.png`"
 					img-alt="Card image"
 					img-top
-					style="object-fit: contain; min-height: calc(0.8*200px); max-height: calc(0.8*200px)"
+					style="object-fit: contain; min-height: 14vh; max-height: 14vh;"
 				>
 				</b-card-img>
 				<b-card-text>{{$t(item.weather[0].description)}}</b-card-text>
