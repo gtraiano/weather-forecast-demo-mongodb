@@ -190,6 +190,13 @@ export default {
  			this.deckWidth = el.clientWidth;
  		},
 
+ 		resize() {
+ 		// When user resizes window manually (by dragging it), the resize event will be called numerous times. 
+ 		// By Introducing a delay, the number of calls of resized() is reduced
+ 		// https://stackoverflow.com/questions/5489946/how-to-wait-for-the-end-of-resize-event-and-only-then-perform-an-action
+ 			setTimeout(this.resized, 175);
+ 		},
+
  		cardStyle(index) {
  		// css style for cards
  			return {
@@ -231,13 +238,11 @@ export default {
 	},
 
 	created() {
-		if(this.paginated)
-			window.addEventListener('resize', this.resized);
+		window.addEventListener('resize', this.resize);
 	},
 
 	destroyed() {
-		if(this.paginated)
-			window.removeEventListener('resize', this.resized);
+		window.removeEventListener('resize', this.resize);
 	},
 
 	async mounted() {
@@ -246,10 +251,8 @@ export default {
 		this.loading = false;
 		this.cardsPerPage = this.perPage;
 
-		if(this.paginated) {
-			await this.$nextTick();
-			this.resized();
-		}
+		await this.$nextTick();
+		this.resized();
 	},
 
 	watch: {
@@ -262,14 +265,17 @@ export default {
 
 		deckWidth(newValue, oldValue) {
 		// change number of cards per page when card deck is resized
-			if(this.paginated && newValue !== 0 && oldValue !== 0) {
-				let dw = (newValue - oldValue) / oldValue;
-				let adjusted = Math.round( (this.cardsPerPage*(1 + dw) + Number.EPSILON) * 100 ) / 100;
-				this.cardsPerPage = adjusted < this.perPage
-					? adjusted < 1 ? Math.round(2 - adjusted) : adjusted
-					: this.perPage;
+			let dw = (newValue - oldValue) / oldValue;
+			let adjusted = (this.cardsPerPage*(1 + dw)).toFixed(1);
 
-				//console.log(dw > 0 ? 'expanded' : 'shrinked', 'adjusted', adjusted, 'cardsPerPage', this.cardsPerPage, Math.trunc(this.cardsPerPage));
+			if(window.innerWidth === screen.width || adjusted > this.perPage) {
+				this.cardsPerPage = this.perPage;
+			}
+			else if(adjusted <= 1) {
+				this.cardsPerPage = 1;
+			}
+			else {
+				this.cardsPerPage = adjusted;
 			}
 		}
 	}

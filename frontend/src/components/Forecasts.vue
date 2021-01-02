@@ -114,7 +114,7 @@
                       :lat="cityData[selectedCity].coords.lat"
                       :lon="cityData[selectedCity].coords.lon"
                       :perPage=6
-                      paginated
+                      
                   />
               </b-col>
               
