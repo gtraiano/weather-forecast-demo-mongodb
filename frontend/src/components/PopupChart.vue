@@ -1,9 +1,15 @@
 <template>
 <div class="popup">
     <b-card no-body>
-        <b-container v-if="status === 'error'" class="plot"><!-- no data to show -->
+        <!-- no data to show -->
+        <b-container
+            v-if="status === 'error'"
+            class="plot"
+        >
             <div class="row justify-content-center">
-                <div class="col-12 text-center"><h3>{{$t('no data')}}</h3></div>
+                <div class="col-12 text-center">
+                    <h3>{{$t('no data')}}</h3>
+                </div>
             </div>
             <div class="row justify-content-center align-items-end">
                 <div class="col-12 text-center align-self-end">
@@ -11,16 +17,36 @@
                 </div>
             </div>
         </b-container>
-        <b-container v-if="status === 'loading'" class="plot"><!-- loading -->
+        
+        <!-- loading -->
+        <b-container
+            v-else-if="status === 'loading'"
+            class="plot"
+        >
             <div class="row justify-content-center">
-                <div class="col-12 text-center"><h3>Loading</h3></div>
+                <div class="col-12 text-center">
+                    <h3>{{$t('loading')}}</h3>
+                </div>
             </div>
         </b-container>
-        <b-tabs v-if="status == 'ready' && active" pills><!-- render plot only if popup is active -->
-        	<b-tab no-body v-for="(variable, index) in forecastVariables" :title="$t(variable)" :key="index">
+        
+        <!-- render plot only if popup is active -->
+        <b-tabs
+            v-else-if="status === 'ready' && active"
+            pills
+            justified
+        >
+        	<b-tab
+                no-body
+                v-for="(variable, index) in forecastVariables"
+                :key="index"
+                :title="$t(variable)"
+            >
         		<b-container style="overflow: auto;">
         			<b-row class="p-0">
-                        <b-col md="12" class="p-0 m-0 b-0 plot"
+                        <b-col
+                            md="12"
+                            class="p-0 m-0 b-0 plot"
                             align="center"
                             v-bind:id="'container' + index"
                             @wheel.prevent="!openMenu && $emit('wheel', $event, index)"
@@ -37,16 +63,31 @@
                                 @mouseenter="showToolbar = 1 || openMenu;"
                                 @mouseleave="showToolbar = 0 || openMenu;"
                             >
-                                <b-button variant="light" @click="zoom(0.2, index);">
+                                <!-- zoom in-->
+                                <b-button
+                                    variant="light"
+                                    @click="zoom(0.2, index);"
+                                >
                                     <b-icon-zoom-in/>
                                 </b-button>
-                                <b-button variant="light" @click="zoom(-0.2, index);">
+                                <!-- zoom out-->
+                                <b-button
+                                    variant="light"
+                                    @click="zoom(-0.2, index);"
+                                >
                                     <b-icon-zoom-out/>
                                 </b-button>
-                                <b-button variant="light" @click="reset([index]);">
+                                <!-- reset zoom -->
+                                <b-button
+                                    variant="light"
+                                    @click="reset([index]);"
+                                >
                                     <b-icon-arrow-clockwise/>
                                 </b-button>
-                                <b-dropdown size="sm" variant="light"
+                                <!-- save plot image -->
+                                <b-dropdown
+                                    size="sm"
+                                    variant="light"
                                     @shown="openMenu = 1"
                                     @hidden="openMenu = 0"
                                 >
@@ -56,7 +97,8 @@
                                     <b-dropdown-header>
                                         {{$t('size')}}
                                     </b-dropdown-header>
-                                    <b-dropdown-item v-for="(size, index) in [$t('small'), $t('normal'), $t('large')]"
+                                    <b-dropdown-item
+                                        v-for="(size, index) in [$t('small'), $t('normal'), $t('large')]"
                                         :key="index"
                                         class="container-fluid p-0 m-0"
                                         size="sm"
