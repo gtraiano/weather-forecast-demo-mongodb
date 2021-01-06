@@ -13,6 +13,7 @@
 			deck
 			id="deck-cards"
 			:style="deckStyle"
+			@wheel.prevent="onWheel"
 		>
 			<b-card
 				v-for="(item, index) in cardSet"
@@ -190,7 +191,7 @@ export default {
  			this.deckWidth = el.clientWidth;
  		},
 
- 		resize() {
+ 		onResize() {
  		// When user resizes window manually (by dragging it), the resize event will be called numerous times. 
  		// By Introducing a delay, the number of calls of resized() is reduced
  		// https://stackoverflow.com/questions/5489946/how-to-wait-for-the-end-of-resize-event-and-only-then-perform-an-action
@@ -200,14 +201,28 @@ export default {
  		cardStyle(index) {
  		// css style for cards
  			return {
-	 			'max-width': `${100/Math.trunc(this.cardsPerPage)}%`,
+	 			'max-width': `${100 / Math.trunc(this.cardsPerPage)}%`,
 				'min-width': this.paginated ? 'auto' : `${(100 - this.cardsPerPage*1.25) / Math.trunc(this.cardsPerPage)}%`,
+				//'transition': 'all 0.05s',
+				'transition': 'all 0.01s',
 				...!this.paginated && {
 					'margin-bottom': '1vh', // space before scrollbar
 					'margin-left': index == 0 ? '0px' : '', // 1st card
 					'margin-right': index == this.forecastData.hourly.length - 1 ? '0px' : '' // last card
 				}
 			};
+ 		},
+
+ 		scrollCards(event) {
+ 			const el = document.getElementById('deck-cards');
+ 			if(event.type == 'wheel') {
+ 				const cardIndex = Math.round( (el.scrollLeft + Math.sign(-event.deltaY) * el.children[1].offsetLeft) / el.children[1].offsetLeft ) // estimate card index
+ 				el.scrollLeft = cardIndex > 0 ? el.children[cardIndex].offsetLeft : 0 // align scroll amount with card scroll offset
+ 			}
+ 		},
+
+ 		onWheel(event) {
+ 			setTimeout(this.scrollCards(event), 250);
  		}
 	},
 
@@ -231,18 +246,19 @@ export default {
  					'overflow-x': 'auto',
 					'scrollbar-width': 'thin',
 					'flex-wrap': 'nowrap',
-					'margin-bottom': '2vh'
+					'margin-bottom': '2vh',
+					'scroll-behavior': 'smooth',
 				};
 			}
  		}
 	},
 
 	created() {
-		window.addEventListener('resize', this.resize);
+		window.addEventListener('resize', this.onResize);
 	},
 
 	destroyed() {
-		window.removeEventListener('resize', this.resize);
+		window.removeEventListener('resize', this.onResize);
 	},
 
 	async mounted() {
@@ -266,7 +282,7 @@ export default {
 		deckWidth(newValue, oldValue) {
 		// change number of cards per page when card deck is resized
 			let dw = (newValue - oldValue) / oldValue;
-			let adjusted = (this.cardsPerPage*(1 + dw)).toFixed(1);
+			let adjusted = new Number((this.cardsPerPage*(1 + dw)).toFixed(1));
 
 			if(window.innerWidth === screen.width || adjusted > this.perPage) {
 				this.cardsPerPage = this.perPage;
