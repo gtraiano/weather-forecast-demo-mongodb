@@ -233,6 +233,10 @@ export default {
 
         saveImage(variable, scale = 1) {
             window.open(this.$refs[variable][0].exportImage(scale));
+        },
+
+        onWheel: function(event, index) {
+            this.zoom(Math.sign(-event.deltaY)*0.2, index);
         }
     },
 
@@ -263,7 +267,8 @@ export default {
 
     mounted() {
         /* listen to wheel events for zooming */
-        this.$on('wheel', (event, index) => { this.zoom(Math.sign(-event.deltaY)*0.2, index); });
+        //this.$on('wheel', (event, index) => { this.zoom(Math.sign(-event.deltaY)*0.2, index); });
+        this.$on('wheel', this.onWheel);
     },
 
     destroyed() {
