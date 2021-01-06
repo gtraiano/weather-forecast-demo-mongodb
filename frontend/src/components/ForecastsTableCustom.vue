@@ -19,6 +19,8 @@
     @click.native.right.prevent
     id="table"
     class="text-nowrap"
+    :filter="tableFilter"
+    @filtered="filtered"
 >	
   <!-- table header -->
   <template v-slot:head()="data"><!-- header custom rendering-->
@@ -152,7 +154,13 @@ export default {
     			 default: function() {
     				  return { height: '70vh' };
     			 }
-    		}
+    		},
+
+        tableFilter: {
+            type: String,
+            required: false,
+            default: null
+        }
   	},
 
     data() {
@@ -244,6 +252,16 @@ export default {
                     type && type === 'number' ? table.sort((a,b) => this.sortCompareNumber(a, b, key, order)) : table.sort((a,b) => this.sortCompareString(a, b, key, order));
             });
             return table;
+        },
+
+        filtered(filteredItems) {
+            // if selected city is not in filtered items, unselect city row
+            if(
+                this.selectedRow !== -1 && 
+                filteredItems.findIndex(item => item.city.coords.lat === this.forecastData[this.selectedRow].coords.lat && item.city.coords.lon === this.forecastData[this.selectedRow].coords.lon)
+            ) {
+                  this.selectedRowUpdate(-1, {});
+            }
         }
     },
 
