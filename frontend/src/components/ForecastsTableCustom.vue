@@ -257,8 +257,8 @@ export default {
         filtered(filteredItems) {
             // if selected city is not in filtered items, unselect city row
             if(
-                this.selectedRow !== -1 && 
-                filteredItems.findIndex(item => item.city.coords.lat === this.forecastData[this.selectedRow].coords.lat && item.city.coords.lon === this.forecastData[this.selectedRow].coords.lon)
+                this.selectedRow !== -1 &&
+                filteredItems.findIndex(item => item.city.coords.lat === this.forecastData[this.selectedRow].coords.lat && item.city.coords.lon === this.forecastData[this.selectedRow].coords.lon) === -1
             ) {
                   this.selectedRowUpdate(-1, {});
             }
