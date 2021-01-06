@@ -176,25 +176,25 @@
 					>
 						<template v-slot:head()="data"><!-- header custom rendering-->
 					  		<!-- on sortable field, clear sorting on right clicking sorted field header -->
-					      <div 
-					          v-if="data.field.sortable"
-					          @click.left="data.field.sort = data.field.sort ? !data.field.sort : true"
-					          @click.right="data.field.sort = null"
-					      >
-					          <div style="display: inline-block; position: relative;">{{ data.label }}</div>
-					          <div style="display: inline-block; position: relative;"><!-- custom sort icon -->
-					              <b-icon-chevron-up v-if="data.field.sort" />
-					              <b-icon-chevron-down v-else-if="data.field.sort === false" />  
-					          </div>
-					          
-					      </div>
+						    <div 
+						        v-if="data.field.sortable"
+						        @click.left="data.field.sort = data.field.sort ? !data.field.sort : true"
+						        @click.right="data.field.sort = null"
+						    >
+						        <div style="display: inline-block; position: relative;">{{ data.label }}</div>
+						        <div style="display: inline-block; position: relative;"><!-- custom sort icon -->
+						            <b-icon-chevron-up v-if="data.field.sort" />
+						            <b-icon-chevron-down v-else-if="data.field.sort === false" />  
+						        </div>
+						          
+						    </div>
 							<!-- on regular field, disable right click context menu -->
-					    	<span
-					          v-else
-					          @click.right.prevent
-					      >
-					    		  {{ data.label }}
-					    	</span>
+						    <span
+						        v-else
+						        @click.right.prevent
+						    >
+						    	{{ data.label }}
+						    </span>
 					    </template>
 						<template v-slot:cell(city)="data">
 							<a href="" @click.prevent>
@@ -298,12 +298,12 @@ export default {
 </script>
 
 <style scoped>
-ul {
+ul, >>> ul {
   list-style-type: none;
   padding: 0;
 }
 
-li {
+li, >>> li {
   display: inline-block;
   margin: 0 10px;
 }
