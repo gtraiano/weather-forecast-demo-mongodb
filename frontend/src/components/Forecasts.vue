@@ -69,23 +69,52 @@
         <b-row md="12" class="mt-4">
             <b-col/>
             
-            <b-col cols="10">
-                <h5 v-if="cityData && cityData.length">{{tableTitle}}</h5>
-                <!-- forecasts table renders only if cityData is populated -->
-                <ForecastsTableCustom v-if="cityData && cityData.length"
+            <!-- forecasts table renders only if cityData is populated -->
+            <b-col v-if="cityData && cityData.length" cols="10">
+                <b-row>
+                    <!-- filter input -->
+                    <b-col cols="2">
+                        <div>
+                            <b-input-group size="sm" class="mb-1">
+                                <b-form-input
+                                    :value="tableFilter"
+                                    :placeholder="$t('filter')"
+                                    debounce="250"
+                                    trim
+                                    @update="tableFilter = $event"
+                                    style="border-right: none;"
+                                />
+                                <b-input-group-append>
+                                    <b-input-group-text style="background-color: white; border-left: none;">
+                                        <b-icon-x @click="tableFilter = null" />
+                                    </b-input-group-text>
+                                </b-input-group-append>
+                            </b-input-group>
+                        </div>
+                    </b-col>
+                    <!-- table title -->
+                    <b-col cols="8" style="vertical-align: middle">
+                        <h5>{{tableTitle}}</h5>
+                    </b-col>
+                </b-row>
+                <!-- forecasts table -->
+                <ForecastsTableCustom
                     :forecastData="cityData"
                     :tableItems="tableCells"
                     :tableFields="tableHeader"
                     :selectedRow="selectedCity"
                     :tableStyle="tableStyle"
+                    :tableFilter="tableFilter"
                     @selectedRowUpdate="(index, value) => { $emit('selectedRowUpdate', index, value); }"
                     @sortingChanged="value => { $emit('sortingChanged', value) }"
                     @showPlot="$emit('showPlot');"
                     @showDetailedForecast="$emit('showDetailedForecast')"
                     ref="table"
                 />
-                <!-- otherwise display no forecasts message -->
-                <h3 v-else>{{ $t('no forecasts') }}</h3>
+            </b-col>
+            <!-- otherwise display no forecasts message -->
+            <b-col v-else>
+                <h3>{{ $t('no forecasts') }}</h3>
             </b-col>
             
             <b-col/>
@@ -93,33 +122,32 @@
         
         <!-- detailed forecast -->
         <b-container v-if="selectedCity !== -1 && showDetailedForecast" fluid>
-          <b-row>
-              <b-col/>
+            <b-row>
+                <b-col/>
 
-              <b-col cols="9">
-                  <h4>{{cityData[selectedCity].name[this.$i18n.locale]}}</h4>
-              </b-col>
-              <b-col cols="1">
-                    <b-button-close @click="showPlot ? showDetailedForecast = false : selectedCity = -1; showDetailedForecast = false;" />
-              </b-col>
-              
-              <b-col/>
-          </b-row>
-          
-          <b-row>
-              <b-col/>
-              
-              <b-col cols="10">
-                  <DetailedForecast
-                      :lat="cityData[selectedCity].coords.lat"
-                      :lon="cityData[selectedCity].coords.lon"
-                      :perPage=6
-                      
-                  />
-              </b-col>
-              
-              <b-col/>
-          </b-row>
+                <b-col cols="9">
+                    <h4>{{cityData[selectedCity].name[this.$i18n.locale]}}</h4>
+                </b-col>
+                <b-col cols="1">
+                      <b-button-close @click="showPlot ? showDetailedForecast = false : selectedCity = -1; showDetailedForecast = false;" />
+                </b-col>
+                
+                <b-col/>
+            </b-row>
+            
+            <b-row>
+                <b-col/>
+                
+                <b-col cols="10">
+                    <DetailedForecast
+                        :lat="cityData[selectedCity].coords.lat"
+                        :lon="cityData[selectedCity].coords.lon"
+                        :perPage=6
+                    />
+                </b-col>
+                
+                <b-col/>
+            </b-row>
         </b-container>
 
         <!-- plot renders only if a city is selected -->
@@ -176,6 +204,7 @@ import { mapGetters } from 'vuex'
 import DetailedForecast from './DetailedForecast.vue'
 import LineChartAsync from './LineChartAsync.vue'
 import ForecastsTableCustom from './ForecastsTableCustom.vue'
+import { BIconX } from 'bootstrap-vue'
 
 const hoursPassed = (end, start) => {
     return Math.floor((end - start)/3600000);
@@ -196,7 +225,8 @@ export default {
           showPlot: false,
           showDetailedForecast: false,
           overviewColumns: 8, // number of forecast columns in overview table
-          overviewPeriod: 4 // hours between forecast columns
+          overviewPeriod: 4, // hours between forecast columns
+          tableFilter: null
       }
   },
 
@@ -205,7 +235,8 @@ export default {
       LineChart,
       DetailedForecast,
       LineChartAsync,
-      ForecastsTableCustom
+      ForecastsTableCustom,
+      BIconX
   },
 
   methods: {
