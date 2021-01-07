@@ -92,7 +92,7 @@
 					<b-button
 						type="dark"
 						variant="dark"
-						@click="refreshForecastData()"
+						@click="!refreshing ? refreshForecastData() : null"
 					>
 						<!-- spin icon while fetching data -->
 			        	<b-icon-arrow-clockwise
