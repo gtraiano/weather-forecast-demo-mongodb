@@ -14,7 +14,10 @@
         <b-row align-v="center">
             <b-col cols="1"/>
             
-            <b-col cols="1" :style="{textAlign: 'left'}">
+            <b-col
+                cols="1"
+                :style="{textAlign: 'left'}"
+            >
                 <b-button-group>
                     <!-- table varaible -->
                     <Controls
@@ -66,26 +69,35 @@
         </b-row>
 
         <!-- forecast overview table -->
-        <b-row md="12" class="mt-4">
+        <b-row
+            md="12"
+            class="mt-4 mb-4"
+        >
             <b-col/>
             
             <!-- forecasts table renders only if cityData is populated -->
-            <b-col v-if="cityData && cityData.length" cols="10">
+            <b-col
+                v-if="cityData && cityData.length"
+                cols="10"
+            >
                 <b-row>
                     <!-- filter input -->
                     <b-col cols="2">
                         <div>
-                            <b-input-group size="sm" class="mb-1">
+                            <b-input-group
+                                size="sm"
+                                class="mb-1"
+                            >
                                 <b-form-input
                                     :value="tableFilter"
                                     :placeholder="$t('filter')"
                                     debounce="250"
                                     trim
                                     @update="tableFilter = $event"
-                                    style="border-right: none;"
+                                    :style="{ 'border-right': !tableFilter ? '' : 'none' }"
                                 />
-                                <b-input-group-append>
-                                    <b-input-group-text style="background-color: white; border-left: none;">
+                                <b-input-group-append v-if="tableFilter">
+                                    <b-input-group-text style="background-color: white; border-left: none; cursor: pointer;">
                                         <b-icon-x @click="tableFilter = null" />
                                     </b-input-group-text>
                                 </b-input-group-append>
@@ -93,24 +105,32 @@
                         </div>
                     </b-col>
                     <!-- table title -->
-                    <b-col cols="8" style="vertical-align: middle">
+                    <b-col
+                        cols="8"
+                        style="vertical-align: middle"
+                    >
                         <h5>{{tableTitle}}</h5>
                     </b-col>
                 </b-row>
                 <!-- forecasts table -->
-                <ForecastsTableCustom
-                    :forecastData="cityData"
-                    :tableItems="tableCells"
-                    :tableFields="tableHeader"
-                    :selectedRow="selectedCity"
-                    :tableStyle="tableStyle"
-                    :tableFilter="tableFilter"
-                    @selectedRowUpdate="(index, value) => { $emit('selectedRowUpdate', index, value); }"
-                    @sortingChanged="value => { $emit('sortingChanged', value) }"
-                    @showPlot="$emit('showPlot');"
-                    @showDetailedForecast="$emit('showDetailedForecast')"
-                    ref="table"
-                />
+                <b-row :style="tableStyle">
+                    <b-col cols="12" :style="tableStyle">
+                        <ForecastsTableCustom
+                            :forecastData="cityData"
+                            :tableItems="tableCells"
+                            :tableFields="tableHeader"
+                            :selectedRow="selectedCity"
+                            :tableStyle="tableStyle"
+                            :tableFilter="tableFilter"
+                            @selectedRowUpdate="(index, value) => { $emit('selectedRowUpdate', index, value); }"
+                            @sortingChanged="value => { $emit('sortingChanged', value) }"
+                            @showPlot="$emit('showPlot');"
+                            @showDetailedForecast="$emit('showDetailedForecast')"
+                            @filterChanged="index => $emit('filterChanged', index)"
+                            ref="table"
+                        />
+                    </b-col>
+                </b-row>
             </b-col>
             <!-- otherwise display no forecasts message -->
             <b-col v-else>
@@ -121,7 +141,10 @@
         </b-row>
         
         <!-- detailed forecast -->
-        <b-container v-if="selectedCity !== -1 && showDetailedForecast" fluid>
+        <b-container
+            v-if="selectedCity !== -1 && showDetailedForecast"
+            fluid
+        >
             <b-row>
                 <b-col/>
 
@@ -151,11 +174,17 @@
         </b-container>
 
         <!-- plot renders only if a city is selected -->
-        <b-container v-if="selectedCity !== -1 && showPlot" fluid>
+        <b-container
+            v-if="selectedCity !== -1 && showPlot"
+            fluid
+        >
             <b-row>
                 <b-col/>
                 
-                <b-col cols="1" :style="{textAlign: 'left'}">
+                <b-col
+                    cols="1"
+                    :style="{textAlign: 'left'}"
+                >
                     <!-- plot timeline duration control -->
                     <b-form-spinbutton
                         :value="endHours"
@@ -221,7 +250,7 @@ export default {
           selectedCityIndexSorted: -1,
           endHours: 48, // timeline duration in hours for plot
           tableSorted: 0, // forecasts table is sorted
-          tableStyle: { height: '70vh' }, // table css styling
+          tableStyle: { minHeight: '70vh', maxHeight: '70vh' }, // table css styling
           showPlot: false,
           showDetailedForecast: false,
           overviewColumns: 8, // number of forecast columns in overview table
@@ -342,13 +371,15 @@ export default {
       },
 
       selectedCity(newValue, oldValue) {
-          this.tableStyle.height = newValue === -1 ? '70vh' : '25vh';
+          this.tableStyle.maxHeight = this.tableStyle.minHeight = newValue === -1 ? '70vh' : '25vh';
           
-          if (newValue === -1) { // plot was closed
+          if (newValue === -1) { // plot was closed, no city selected
               this.$refs.table.scrollToRow(0);
           }
-          else if (oldValue === -1 && this.tableSorted !== 0) { // plot is opened and table is sorted
-              this.$refs.table.scrollToRow(this.selectedCityIndexSorted);
+          else { // plot is opened
+              oldValue >= 0
+                  ? null // city is already selected manually, no need to scroll
+                  : this.$refs.table.scrollToRow(this.selectedCityIndexSorted); // scroll to selected row
           }
       },
 
@@ -357,6 +388,10 @@ export default {
               this.$refs.table.scrollToRow(this.selectedCityIndexSorted); // when table unsorted, selectedCity == selectedCityIndexSorted
           }
       },
+
+      tableFilter(newValue, oldValue) {
+          this.$refs.table.scrollToRow(0); // reset scroll from previous filtering
+      }
   },
   
   async created() {
@@ -382,6 +417,10 @@ export default {
       this.$on('showPlot', () => { this.showPlot = true; });
       
       this.$on('showDetailedForecast', () => { this.showDetailedForecast = true; });
+
+      this.$on('filterChanged', index => {
+          this.$refs.table.scrollToRow(index !== -1 ? index : 0);
+      });
   },
 
   destroyed() {
