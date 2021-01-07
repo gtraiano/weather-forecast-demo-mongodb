@@ -79,7 +79,7 @@
         <a
             class="ml-1 mr-1"
             href=""
-            @click.prevent="plotCity(data.item['city'])"
+            @click.prevent="plotCity(data.index, data.item['city'])"
             style="color: unset"
         >
           <b-icon-graph-up :title="$t('plot')" />
@@ -188,15 +188,12 @@ export default {
         },
 
     		scrollToRow(index) {
-            let table = this.$el.querySelector("#table");
-      		  
-            if(this.selectedRow === -1) { // first scroll on table shrink
-      			   // do not scroll from 1st "page" if not necessary
-               table.parentElement.scrollTop = table.rows[index].offsetTop < table.parentElement.clientHeight ? 0 : table.rows[index].offsetTop;
-      		  }
-      		  else { // scroll while table shrinked
-      			   table.parentElement.scrollTop = table.rows[index].offsetTop;
-      		  }
+            this.$nextTick(() => { // ensure DOM has been updated
+                let table = this.$el.querySelector("#table");
+                table.parentElement.scrollTop = table.rows[0].scrollHeight + table.rows[index + 1].offsetTop < table.parentElement.clientHeight // sticky header + next row offset (i.e. bottom of row[index])
+                    ? 0 // do not scroll from 1st "page" if not necessary
+                    : table.rows[index].offsetTop;
+            })
       	},
 
       	addActionsField() {
@@ -216,8 +213,8 @@ export default {
       		  await this.$store.dispatch('allCityData/updateCityForecastDataAsync', city);
       	},
 
-        plotCity(city) {
-            this.selectedRowUpdate(city.index, city.coords);
+        plotCity(index, city) {
+            this.selectedRowUpdate(index, city.coords);
             this.$emit('showPlot');
         },
 
@@ -256,12 +253,16 @@ export default {
 
         filtered(filteredItems) {
             // if selected city is not in filtered items, unselect city row
-            if(
-                this.selectedRow !== -1 &&
-                filteredItems.findIndex(item => item.city.coords.lat === this.forecastData[this.selectedRow].coords.lat && item.city.coords.lon === this.forecastData[this.selectedRow].coords.lon) === -1
-            ) {
-                  this.selectedRowUpdate(-1, {});
+            if(this.selectedRow !== -1) {
+                const filteredIndex = filteredItems.findIndex(item => item.city.coords.lat === this.rows[this.selectedRow].city.coords.lat && item.city.coords.lon === this.rows[this.selectedRow].city.coords.lon);
+                if(filteredIndex === -1) {
+                    this.selectedRowUpdate(-1, {});
+                }
+                this.$emit('filterChanged', filteredIndex);
             }
+            // TODO
+            // sorting does not work when table is filtered
+            //setTimeout(() => { this.rows = [...filteredItems] }, 300);
         }
     },
 
@@ -285,6 +286,11 @@ export default {
                 const index = this.rows.findIndex(row => row.city.coords.lon === this.forecastData[this.selectedRow].coords.lon && row.city.coords.lat === this.forecastData[this.selectedRow].coords.lat)
                 this.selectedRowUpdate(index, this.forecastData[this.selectedRow].coords);
             }
+        },
+
+        tableFilter(newValue, oldValue) {
+            console.log('Filter:', newValue);
+            //setTimeout(() => { this.rows = this.sortedTable() }, 350); // restore original table state
         }
     }
 }
