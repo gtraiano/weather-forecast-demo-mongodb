@@ -9,7 +9,6 @@
 
 <template>
 <b-table
-    v-if="rows && rows.length"
     striped hover borderless sticky-header
     small head-variant="light"
     no-local-sorting
@@ -19,8 +18,6 @@
     @click.native.right.prevent
     id="table"
     class="text-nowrap"
-    :filter="tableFilter"
-    @filtered="filtered"
 >	
   <!-- table header -->
   <template v-slot:head()="data"><!-- header custom rendering-->
@@ -166,7 +163,9 @@ export default {
     data() {
         return {
             rows: [], // local copy of table items
-            sortFields: {} // sortable fields order (true: asc, false: desc, null: none)
+            sortFields: {}, // sortable fields order (true: asc, false: desc, null: none)
+            filteredRows: [],
+            sortSum: 0
         }
     },
 
@@ -178,21 +177,28 @@ export default {
     },
 
   	methods: {
-    		selectedRowUpdate(index, value) {
-    		    this.$emit('selectedRowUpdate', index, value);
+    		selectedRowUpdate(index, coords) {
+    		    this.$emit('selectedRowUpdate', { index: index, coords: coords });
     		},
 
         sortingChanged() {
             const sortSum = Object.values(this.sortFields).reduce((acc, curr) => curr !== null ? curr ? acc + 2 : acc + 1 : acc, 0); // sum sort order fields (null -> 0, true -> 2, false -> 1)
+            this.sortSum = sortSum;
             this.$emit('sortingChanged', sortSum);
         },
 
     		scrollToRow(index) {
             this.$nextTick(() => { // ensure DOM has been updated
                 let table = this.$el.querySelector("#table");
-                table.parentElement.scrollTop = table.rows[0].scrollHeight + table.rows[index + 1].offsetTop < table.parentElement.clientHeight // sticky header + next row offset (i.e. bottom of row[index])
-                    ? 0 // do not scroll from 1st "page" if not necessary
-                    : table.rows[index].offsetTop;
+                table = table.parentElement.children[0]; // get the actual table from DOM
+                if(table.rows.length > 1) {// header + 1 row at least
+                    table.parentElement.scrollTop = table.rows[0].scrollHeight + table.rows[index + 1].offsetTop < table.parentElement.clientHeight // sticky header + next row offset (i.e. bottom of row[index])
+                        ? 0 // do not scroll from 1st "page" if not necessary
+                        : table.rows[index].offsetTop;
+                }
+                else {
+                    table.parentElement.scrollTop = 0;
+                }
             })
       	},
 
@@ -240,9 +246,9 @@ export default {
             return (b[key] - a[key]) * (asc ? -1 : 1)
         },
 
-        sortedTable() {
-        // returns a copy of tableItems sorted according to criteria set in sortFields
-            let table = [...this.tableItems];
+        sortedTable(rows = this.tableItems) {
+        // returns a copy of rows (or tableItems if rows is not provided) sorted according to criteria set in sortFields
+            let table = [...rows];
             Object.entries(this.sortFields).forEach(([key, order]) => {
                 let type = typeof table[0][key];
                 if(order !== null)
@@ -251,46 +257,68 @@ export default {
             return table;
         },
 
-        filtered(filteredItems) {
-            // if selected city is not in filtered items, unselect city row
-            if(this.selectedRow !== -1) {
-                const filteredIndex = filteredItems.findIndex(item => item.city.coords.lat === this.rows[this.selectedRow].city.coords.lat && item.city.coords.lon === this.rows[this.selectedRow].city.coords.lon);
-                if(filteredIndex === -1) {
+        filterTable() {
+            function toString(value) {
+                if (value === null || typeof value === 'undefined') {
+                    return ''
+                }
+                else if (value instanceof Object) {
+                    return Object.keys(value)
+                      .sort()
+                      .map(key => toString(value[key]))
+                      .join(' ')
+                }
+                else {
+                    return String(value)
+                }
+            }
+
+            this.filteredRows = this.rows.filter(row => toString(row).toLowerCase().includes(this.tableFilter.toLowerCase()));
+             //this.filteredRows = this.tableItems.filter(row => toString(row).toLowerCase().includes(this.tableFilter.toLowerCase()));
+        },
+
+        emitEvents() {
+            if(this.selectedRow !== -1) { // updated selected city sorted index
+                const index = this.rows.findIndex(row => row.city.coords.lon === this.forecastData[this.selectedRow].coords.lon && row.city.coords.lat === this.forecastData[this.selectedRow].coords.lat)
+                
+                if(index !== -1) {
+                    this.selectedRowUpdate(index, this.forecastData[this.selectedRow].coords);
+                }
+                else {
                     this.selectedRowUpdate(-1, {});
                 }
-                this.$emit('filterChanged', filteredIndex);
             }
-            // TODO
-            // sorting does not work when table is filtered
-            //setTimeout(() => { this.rows = [...filteredItems] }, 300);
         }
     },
 
     watch: {
         sortFields() {
-            // sort local rows copy
-            this.rows = this.sortedTable();
-            
-            // emit events
             this.sortingChanged(); // emit sorting changed
-            if(this.selectedRow !== -1) { // updated selected city sorted index
-                const index = this.rows.findIndex(row => row.city.coords.lon === this.forecastData[this.selectedRow].coords.lon && row.city.coords.lat === this.forecastData[this.selectedRow].coords.lat)
-                this.selectedRowUpdate(index, this.forecastData[this.selectedRow].coords);
+            if(this.sortSum) { // sort local rows copy or filtered rows copy
+                this.rows = this.sortedTable(this.tableFilter ? this.rows : this.tableItems);
             }
+            else {
+                this.rows = this.tableFilter ? this.filteredRows : this.tableItems;
+            }
+            this.emitEvents();
         },
 
         tableItems() {
             this.rows = this.sortedTable();
-
-            if(this.selectedRow !== -1) {
-                const index = this.rows.findIndex(row => row.city.coords.lon === this.forecastData[this.selectedRow].coords.lon && row.city.coords.lat === this.forecastData[this.selectedRow].coords.lat)
-                this.selectedRowUpdate(index, this.forecastData[this.selectedRow].coords);
-            }
+            this.emitEvents();
         },
 
         tableFilter(newValue, oldValue) {
-            console.log('Filter:', newValue);
-            //setTimeout(() => { this.rows = this.sortedTable() }, 350); // restore original table state
+            this.$nextTick(() => {
+                this.rows = this.sortedTable(); // restore original table on filter change
+                if(newValue) {
+                    this.filteredRows = [];
+                    this.filterTable();
+                    this.rows = this.filteredRows;
+                }
+                this.emitEvents();    
+            })
+            
         }
     }
 }
