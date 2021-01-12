@@ -103,13 +103,16 @@
   "refetch data": "to fetch fresh forecast data for all cities",
   
   "forecasts.header2": "Under column {0} in {1} table",
+  "forecasts.header3": "Under any column in {0} table",
   "forecasts.step0.0": "to select a variable",
   "forecasts.step0.1": "to adjust the number of table columns and the time period in hours between them",
+  "forecasts.step0.2": "Use the 'Filter' text box to apply filtering on table rows",
   "forecasts.step1": "Click on city name to display a 2-day period detailed hourly forecast",
   "forecasts.step2": "Click on to display a plot for the selected variable",
   "click on": "Click on",
   "forecasts.step3": "to remove a city",
   "forecasts.step4":  "to refresh meteorological data",
+  "forecasts.step5": "Left click to set or change sorting order, right click to clear sorting by this column",
 
   "map.step1": "Click on a city marker to display a popup",
   "map.step2": "Right-click on a city marker to remove it",

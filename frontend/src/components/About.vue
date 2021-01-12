@@ -159,6 +159,29 @@
                     {{$t('forecasts.step0.1')}}
 				</ul>
 				<ul>
+					{{$t('forecasts.step0.2')}}
+					<div style="max-width: 50%; min-width: 50%; margin-top: 1vh;">
+                        <b-input-group
+                            size="sm"
+                            class="mb-1"
+                        >
+                            <b-form-input
+                                :value="tableFilter"
+                                :placeholder="$t('filter')"
+                                debounce="250"
+                                trim
+                                @update="tableFilter = $event"
+                                :style="{ 'border-right': !tableFilter ? '' : 'none' }"
+                            />
+                            <b-input-group-append v-if="tableFilter">
+                                <b-input-group-text style="background-color: white; border-left: none; cursor: pointer;">
+                                    <b-icon-x @click="tableFilter = null" />
+                                </b-input-group-text>
+                            </b-input-group-append>
+                        </b-input-group>
+                    </div>
+				</ul>
+				<ul>
 					<b-table
 						striped hover borderless sticky-header small head-variant="light"
 						:fields="[
@@ -172,6 +195,7 @@
 						:items="[
 							{ index:'1', 'city': this.$i18n.locale === 'en' ? 'City Name' : 'Όνομα Πόλης', country: $t('country'), continent: $t('continent'), 'forecasts': selectedVar ? $t(selectedVar) : '' }
 						]"
+						:filter="tableFilter"
 						@contextmenu.native.prevent
 					>
 						<template v-slot:head()="data"><!-- header custom rendering-->
@@ -248,6 +272,10 @@
 				<ul>
 					{{ $t('forecasts.step1') }}
 				</ul>
+				<ul>
+					<h5>{{ $t('forecasts.header3', [$t('overview')]) }}</h5>
+				</ul>
+				<ul>{{$t('forecasts.step5')}}</ul>
 			</li>
 		</div>
 
@@ -270,7 +298,7 @@
 </template>
 
 <script>
-import { BIconSearch, BIconTrash, BIconArrowClockwise, BIconGraphUp, BIconChevronUp, BIconChevronDown } from 'bootstrap-vue'
+import { BIconSearch, BIconTrash, BIconArrowClockwise, BIconGraphUp, BIconChevronUp, BIconChevronDown, BIconX } from 'bootstrap-vue'
 import SearchResults from './SearchResults.vue'
 import Controls from './Controls.vue'
 import Vue from 'vue'
@@ -286,12 +314,14 @@ export default {
     	BIconGraphUp,
     	BIconChevronUp,
     	BIconChevronDown,
+    	BIconX,
     	Controls
 	},
 	
 	data() {
 		return {
-			selectedVar: null
+			selectedVar: null,
+			tableFilter: null
 		}
 	}
 }
