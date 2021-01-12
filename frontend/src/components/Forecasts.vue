@@ -76,152 +76,172 @@
             <b-col/>
             
             <!-- forecasts table renders only if cityData is populated -->
-            <b-col
-                v-if="cityData && cityData.length"
-                cols="10"
-            >
-                <b-row>
-                    <!-- filter input -->
-                    <b-col cols="2">
-                        <div>
-                            <b-input-group
-                                size="sm"
-                                class="mb-1"
-                            >
-                                <b-form-input
-                                    :value="tableFilter"
-                                    :placeholder="$t('filter')"
-                                    debounce="250"
-                                    trim
-                                    @update="tableFilter = $event"
-                                    :style="{ 'border-right': !tableFilter ? '' : 'none' }"
+            <transition name="fade-overview-table">
+                <b-col
+                    v-if="cityData && cityData.length"
+                    cols="10"
+                    key="overviewTable"
+                >
+                    <b-row>
+                        <!-- filter input -->
+                        <b-col cols="2">
+                            <div>
+                                <b-input-group
+                                    size="sm"
+                                    class="mb-1"
+                                >
+                                    <b-form-input
+                                        :value="tableFilter"
+                                        :placeholder="$t('filter')"
+                                        debounce="250"
+                                        trim
+                                        @update="tableFilter = $event"
+                                        :style="{ 'border-right': !tableFilter ? '' : 'none' }"
+                                    />
+                                    <b-input-group-append v-if="tableFilter">
+                                        <b-input-group-text style="background-color: white; border-left: none; cursor: pointer;">
+                                            <b-icon-x @click="tableFilter = null" />
+                                        </b-input-group-text>
+                                    </b-input-group-append>
+                                </b-input-group>
+                            </div>
+                        </b-col>
+                        <!-- table title -->
+                        <b-col
+                            cols="8"
+                            style="vertical-align: middle"
+                        >
+                            <h5>{{tableTitle}}</h5>
+                        </b-col>
+                    </b-row>
+                    <!-- forecasts table -->
+                    <transition name="resize">
+                        <b-row :style="tableStyle">
+                            <b-col cols="12" :style="tableStyle">
+                                <ForecastsTableCustom
+                                    :forecastData="cityData"
+                                    :tableItems="tableCells"
+                                    :tableFields="tableHeader"
+                                    :selectedRow="selectedCity"
+                                    :tableStyle="tableStyle"
+                                    :tableFilter="tableFilter"
+                                    @selectedRowUpdate="(index, value) => { $emit('selectedRowUpdate', index, value); }"
+                                    @sortingChanged="value => { $emit('sortingChanged', value) }"
+                                    @showPlot="$emit('showPlot');"
+                                    @showDetailedForecast="$emit('showDetailedForecast')"
+                                    @filterChanged="index => $emit('filterChanged', index)"
+                                    ref="table"
                                 />
-                                <b-input-group-append v-if="tableFilter">
-                                    <b-input-group-text style="background-color: white; border-left: none; cursor: pointer;">
-                                        <b-icon-x @click="tableFilter = null" />
-                                    </b-input-group-text>
-                                </b-input-group-append>
-                            </b-input-group>
-                        </div>
-                    </b-col>
-                    <!-- table title -->
-                    <b-col
-                        cols="8"
-                        style="vertical-align: middle"
-                    >
-                        <h5>{{tableTitle}}</h5>
-                    </b-col>
-                </b-row>
-                <!-- forecasts table -->
-                <b-row :style="tableStyle">
-                    <b-col cols="12" :style="tableStyle">
-                        <ForecastsTableCustom
-                            :forecastData="cityData"
-                            :tableItems="tableCells"
-                            :tableFields="tableHeader"
-                            :selectedRow="selectedCity"
-                            :tableStyle="tableStyle"
-                            :tableFilter="tableFilter"
-                            @selectedRowUpdate="(index, value) => { $emit('selectedRowUpdate', index, value); }"
-                            @sortingChanged="value => { $emit('sortingChanged', value) }"
-                            @showPlot="$emit('showPlot');"
-                            @showDetailedForecast="$emit('showDetailedForecast')"
-                            @filterChanged="index => $emit('filterChanged', index)"
-                            ref="table"
-                        />
-                    </b-col>
-                </b-row>
-            </b-col>
-            <!-- otherwise display no forecasts message -->
-            <b-col v-else>
-                <h3>{{ $t('no forecasts') }}</h3>
-            </b-col>
+                            </b-col>
+                        </b-row>
+                    </transition>
+                </b-col>
+                <!-- otherwise display no forecasts message -->
+                <b-col
+                    v-else
+                    key="noForecast"
+                    cols="10"
+                >
+                    <h3>{{ $t('no forecasts') }}</h3>
+                </b-col>
+            </transition>
             
             <b-col/>
         </b-row>
         
         <!-- detailed forecast -->
-        <b-container
-            v-if="selectedCity !== -1 && showDetailedForecast"
-            fluid
+        <transition name="fade"
+            v-on:before-leave="beforeLeave"
+            v-on:after-leave="afterLeave"
         >
-            <b-row>
-                <b-col/>
+            <b-container
+                v-if="selectedCity !== -1 && showDetailedForecast"
+                fluid
+            >
+                <b-row>
+                    <b-col/>
 
-                <b-col cols="9">
-                    <h4>{{cityData[selectedCity].name[this.$i18n.locale]}}</h4>
-                </b-col>
-                <b-col cols="1">
-                      <b-button-close @click="showPlot ? showDetailedForecast = false : selectedCity = -1; showDetailedForecast = false;" />
-                </b-col>
+                    <b-col cols="9">
+                        <h4>{{cityData[selectedCity].name[this.$i18n.locale]}}</h4>
+                    </b-col>
+                    <b-col cols="1">
+                          <b-button-close @click="showPlot ? showDetailedForecast = false : selectedCity = -1; showDetailedForecast = false;" />
+                    </b-col>
+                    
+                    <b-col/>
+                </b-row>
                 
-                <b-col/>
-            </b-row>
-            
-            <b-row>
-                <b-col/>
-                
-                <b-col cols="10">
-                    <DetailedForecast
-                        :lat="cityData[selectedCity].coords.lat"
-                        :lon="cityData[selectedCity].coords.lon"
-                        :perPage=6
-                    />
-                </b-col>
-                
-                <b-col/>
-            </b-row>
-        </b-container>
+                <b-row>
+                    <b-col/>
+                    
+                    <b-col cols="10">
+                        <DetailedForecast
+                            :lat="cityData[selectedCity].coords.lat"
+                            :lon="cityData[selectedCity].coords.lon"
+                            :perPage=6
+                        />
+                    </b-col>
+                    
+                    <b-col/>
+                </b-row>
+            </b-container>
+        </transition>
 
         <!-- plot renders only if a city is selected -->
-        <b-container
-            v-if="selectedCity !== -1 && showPlot"
-            fluid
+        <transition
+            name="fade"
+            v-on:before-leave="beforeLeave"
+            v-on:after-leave="afterLeave"
         >
-            <b-row>
-                <b-col/>
+            <b-container
+                v-if="selectedCity !== -1 && showPlot"
+                fluid
+            >
+                <b-row>
+                    <b-col/>
+                    
+                    <b-col
+                        cols="1"
+                        :style="{textAlign: 'left'}"
+                    >
+                        <!-- plot timeline duration control -->
+                        <b-form-spinbutton
+                            :value="endHours"
+                            min="1"
+                            max="48"
+                            size="sm"
+                            inline
+                            @change="endHours = $event"
+                        />
+                        <span>{{ $t('hours') }}</span>
+                    </b-col>
+                    
+                    <b-col cols="8">
+                        <h4>
+                            {{ $t('plot for') }} {{ cityData[selectedCity].name[$i18n.locale] }}
+                        </h4>
+                    </b-col>
+                    
+                    <b-col>
+                        <!-- container close button -->
+                        <b-button-close @click="showDetailedForecast ? showPlot = false : selectedCity = -1; showPlot = false;" />
+                    </b-col>
+                    
+                    <b-col/>
+                </b-row>
                 
-                <b-col
-                    cols="1"
-                    :style="{textAlign: 'left'}"
-                >
-                    <!-- plot timeline duration control -->
-                    <b-form-spinbutton
-                        :value="endHours"
-                        min="1"
-                        max="48"
-                        size="sm"
-                        inline
-                        @change="endHours = $event"
-                    />
-                    <span>{{ $t('hours') }}</span>
-                </b-col>
-                
-                <b-col cols="8">
-                    <h4>
-                        {{ $t('plot for') }} {{ cityData[selectedCity].name[$i18n.locale] }}
-                    </h4>
-                </b-col>
-                
-                <b-col>
-                    <!-- container close button -->
-                    <b-button-close @click="showDetailedForecast ? showPlot = false : selectedCity = -1; showPlot = false;" />
-                </b-col>
-                
-                <b-col/>
-            </b-row>
-            
-            <b-row>
-              <b-col/>
-              
-              <b-col cols="10">
-                  <!--LineChart :chart-data="preparePlotData(endHours, selectedVar)" /-->
-                  <LineChartAsync :chartData="preparePlotData(endHours, selectedVar)" />
-              </b-col>
-              
-              <b-col/>
-            </b-row>
-        </b-container>
+                <b-row>
+                  <b-col/>
+                  
+                  <b-col cols="10">
+                      <!--LineChart :chart-data="preparePlotData(endHours, selectedVar)" /-->
+                      <LineChartAsync :chartData="preparePlotData(endHours, selectedVar)" />
+                  </b-col>
+                  
+                  <b-col/>
+                </b-row>
+            </b-container>
+        </transition>
 
     </b-container>
 </template>
@@ -283,7 +303,15 @@ export default {
           chartdata = {...chartdata, labels: chartdata.labels.slice(0, endHours)} // x-axis points for endHours hours
 
           return chartdata
-      }
+      },
+
+      beforeLeave: function (el) {
+          document.getElementById("app").style.overflow = "hidden"; // temporarily disable while transitioning
+      },
+
+      afterLeave: function (el) {
+          document.getElementById("app").style.overflow = "auto"; // enable after transition
+      },
   },
 
   computed: {
@@ -372,14 +400,25 @@ export default {
 
       selectedCity(newValue, oldValue) {
           this.tableStyle.maxHeight = this.tableStyle.minHeight = newValue === -1 ? '70vh' : '25vh';
-          
-          if (newValue === -1) { // plot was closed, no city selected
+
+          /*if (newValue === -1) { // plot was closed, no city selected
               this.$refs.table.scrollToRow(0);
           }
           else { // plot is opened
               oldValue >= 0
-                  ? null // city is already selected manually, no need to scroll
+                  ? 0 // city is already selected manually, no need to scroll
                   : this.$refs.table.scrollToRow(this.selectedCityIndexSorted); // scroll to selected row
+          }*/
+          //console.log('should scroll to', newValue)
+      },
+
+      selectedCityIndexSorted(newValue, oldValue) {
+          if(newValue === -1) { // plot was closed, no city selected
+              this.$refs.table.scrollToRow(0);
+          }
+          else {
+              if(!this.tableFilter) // restore scroll on filter clear
+                  this.$refs.table.scrollToRow(this.selectedCityIndexSorted);
           }
       },
 
@@ -390,7 +429,13 @@ export default {
       },
 
       tableFilter(newValue, oldValue) {
-          this.$refs.table.scrollToRow(0); // reset scroll from previous filtering
+          this.tableStyle.maxHeight = 'auto';
+          if(this.selectedCity === -1) {
+              this.$refs.table.scrollToRow(0);
+          }
+          else {
+              this.$refs.table.scrollToRow(this.selectedCityIndexSorted);
+          }
       }
   },
   
@@ -405,7 +450,7 @@ export default {
   },
 
   mounted() {
-      this.$on('selectedRowUpdate', (index, coords) => {
+      this.$on('selectedRowUpdate', ({index, coords}) => {
           this.selectedCity = this.findCityIndex(coords);
           this.selectedCityIndexSorted = index;
       });
@@ -417,10 +462,6 @@ export default {
       this.$on('showPlot', () => { this.showPlot = true; });
       
       this.$on('showDetailedForecast', () => { this.showDetailedForecast = true; });
-
-      this.$on('filterChanged', index => {
-          this.$refs.table.scrollToRow(index !== -1 ? index : 0);
-      });
   },
 
   destroyed() {
@@ -428,3 +469,27 @@ export default {
   }
 }
 </script>
+
+<style type="text/css" scoped>
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .25s linear;
+}
+.fade-enter, .fade-leave-to {
+  opacity: 0;
+}
+
+.fade-overview-table-enter-active, .fade-overview-table-leave-active {
+  transition: opacity .5s;
+  display: none;
+}
+.fade-overview-table-enter, .fade-overview-table-leave-to {
+  opacity: 0;
+}
+
+.resize-enter-active, .resize-leave-active {
+  transition: max-height 1s ease-in;
+}
+.resize-enter, .resize-leave-to {
+  transition: max-height 1s ease-out;
+}
+</style>
