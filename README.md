@@ -37,6 +37,7 @@ npm run dev
 # build for production with minification
 npm run build
 ```
+The build will be found under `./frontend/dist/`.
 
 ## Environment
 A single .env file must reside at the project's root folder. A sample .env file is provided in `.env.sample`.
