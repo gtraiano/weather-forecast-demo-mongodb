@@ -7,7 +7,7 @@ const baseUrl = `${protocol}://${process.env.BACKEND_DOMAIN}:${backendPort}${pro
 // ping
 const ping = async () => {
 	try {
-		return await axios.get(`${baseUrl}ping`)
+		return await axios.get(`${baseUrl}ping`, { headers: { 'Access-Control-Allow-Origin': true } })
 	}
 	catch(error) {
 		console.log(error.message);

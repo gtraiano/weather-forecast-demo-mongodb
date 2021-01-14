@@ -9,6 +9,7 @@
 
 <template>
     <div 
+        v-if="backendStatus"
         id="app"
         tabindex="0"
         @keydown.esc="$store.dispatch('search/clear')"
@@ -51,6 +52,9 @@
             </b-modal>
         </b-overlay>
     </div>
+    <div id="app" tabindex="0" v-else>
+        <h2 style="margin-top: 50vh">{{$t('await backend')}}</h2>
+    </div>
 </template>
 
 <script>
@@ -70,10 +74,45 @@ export default {
     SearchResults
 	},
 
+  data() {
+      return {
+          backendStatus: null,
+          handle: null
+      }
+  },
+
+  methods: {
+      async checkBackendStatus() {
+          try {
+              const res = await ping();
+              this.backendStatus = res ? res.status == 200 : false;
+          }
+          catch(error) {
+              //this.backendStatus = 0;
+          }
+          
+          
+      }
+  },
+
+  /*watchers: {
+      backendStatus() {
+          //console.log('Backend status is', this.backendStatus ? 'online' : 'offline');
+          //this.backendStatus ? clearInterval(this.handle) : this.handle = setInterval(this.checkBackendStatus, 3000); // reset interval if necessary
+      }
+  },*/
+
   async created() {
-    const res = await ping();
-    console.log('Ping backend server');
-    console.log(`Backend server response: '${res.data}' (${res.status} ${res.statusText})`);
+      try {
+          await this.checkBackendStatus();
+      }
+      catch(error) {
+          console.log('Backend status is', this.backendStatus ? 'online' : 'offline'); 
+      }
+  },
+
+  updated() {
+      this.backendStatus ? clearInterval(this.handle) : this.handle = setInterval(this.checkBackendStatus, 3000); // reset interval if necessary
   }
 }
 </script>

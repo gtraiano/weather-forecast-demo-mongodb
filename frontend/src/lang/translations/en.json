@@ -10,6 +10,7 @@
   "search forecast data": "search forecast data",
   "search for": "Search for",
   "loading": "Loading",
+  "await backend": "Awaiting backend server to become available",
 
   "add": "Add",
   "already added": "already added",
