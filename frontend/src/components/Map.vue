@@ -144,13 +144,13 @@ export default {
         this.$on('centerUpdated', value => { this.center = value; });
         this.$on('boundsUpdated', value => { this.bounds = value; });
         this.$on('activeCityPopupUpdated', value => { this.activeCityPopup = value; });
-        this.$on('activeOpenWeatherLayersUpdated', value => { this.activeLayers = value; });
+        this.$on('activeOpenWeatherLayersUpdated', value => {
+            this.activeLayers = value;
+            window.localStorage.setItem('activeLayers', JSON.stringify(this.activeLayers)); // save control panel options
+        });
     },
 
     beforeUpdate() {
-        // save control panel options
-        window.localStorage.setItem('activeLayers', JSON.stringify(this.activeLayers));
-
         // update switch box labels on languange change
         this.options = this.populateOptions();
     },
