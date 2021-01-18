@@ -93,7 +93,7 @@
                                     <b-form-input
                                         :value="tableFilter"
                                         :placeholder="$t('filter')"
-                                        debounce="250"
+                                        :debounce="filterDebounce"
                                         trim
                                         @update="tableFilter = $event"
                                         :style="{ 'border-right': !tableFilter ? '' : 'none' }"
@@ -187,7 +187,7 @@
             </b-container>
         </transition>
 
-        <!-- plot renders only if a city is selected -->
+        <!-- forecast variable plot -->
         <transition
             name="fade"
             v-on:before-leave="beforeLeave"
@@ -231,14 +231,14 @@
                 </b-row>
                 
                 <b-row>
-                  <b-col/>
-                  
-                  <b-col cols="10">
-                      <!--LineChart :chart-data="preparePlotData(endHours, selectedVar)" /-->
-                      <LineChartAsync :chartData="preparePlotData(endHours, selectedVar)" />
-                  </b-col>
-                  
-                  <b-col/>
+                    <b-col/>
+                    
+                    <b-col cols="10">
+                        <!-- actual plot -->
+                        <LineChartAsync :chartData="preparePlotData(endHours, selectedVar)" />
+                    </b-col>
+                    
+                    <b-col/>
                 </b-row>
             </b-container>
         </transition>
@@ -275,7 +275,8 @@ export default {
           showDetailedForecast: false,
           overviewColumns: 8, // number of forecast columns in overview table
           overviewPeriod: 4, // hours between forecast columns
-          tableFilter: null
+          tableFilter: null, // string to filter table by
+          filterDebounce: 250 // filter input debounce (in ms)
       }
   },
 
@@ -400,25 +401,18 @@ export default {
 
       selectedCity(newValue, oldValue) {
           this.tableStyle.maxHeight = this.tableStyle.minHeight = newValue === -1 ? '70vh' : '25vh';
-
-          /*if (newValue === -1) { // plot was closed, no city selected
+          if (newValue === -1) { // plot was closed, no city selected
               this.$refs.table.scrollToRow(0);
+              this.selectedCityIndexSorted = -1;
           }
-          else { // plot is opened
-              oldValue >= 0
-                  ? 0 // city is already selected manually, no need to scroll
-                  : this.$refs.table.scrollToRow(this.selectedCityIndexSorted); // scroll to selected row
-          }*/
-          //console.log('should scroll to', newValue)
       },
 
       selectedCityIndexSorted(newValue, oldValue) {
           if(newValue === -1) { // plot was closed, no city selected
               this.$refs.table.scrollToRow(0);
           }
-          else {
-              if(!this.tableFilter) // restore scroll on filter clear
-                  this.$refs.table.scrollToRow(this.selectedCityIndexSorted);
+          else if(oldValue === -1) { // plot was closed, city selected
+              this.$refs.table.scrollToRow(this.selectedCityIndexSorted);
           }
       },
 
@@ -434,7 +428,9 @@ export default {
               this.$refs.table.scrollToRow(0);
           }
           else {
-              this.$refs.table.scrollToRow(this.selectedCityIndexSorted);
+              setTimeout(() => { // wait for index to be updated
+                  this.$refs.table.scrollToRow(this.selectedCityIndexSorted);
+              }, this.filterDebounce + 50);
           }
       }
   },
