@@ -54,12 +54,13 @@
     </div>
     <div id="app" tabindex="0" v-else>
         <h2 style="margin-top: 50vh">{{$t('await backend')}}</h2>
+        <p><b-icon-lightning class="h1" animation="fade"/></p>
     </div>
 </template>
 
 <script>
 import TopHeader from './components/TopHeader.vue';
-import { BOverlay, BButton, BModal } from 'bootstrap-vue'
+import { BOverlay, BButton, BModal, BIconLightning } from 'bootstrap-vue'
 import SearchResults from './components/SearchResults.vue';
 import { ping } from './controllers/backend.js';
 
@@ -71,7 +72,8 @@ export default {
     BOverlay,
     BButton,
     BModal,
-    SearchResults
+    SearchResults,
+    BIconLightning
 	},
 
   data() {
@@ -95,12 +97,12 @@ export default {
       }
   },
 
-  /*watchers: {
+  watchers: {
       backendStatus() {
           //console.log('Backend status is', this.backendStatus ? 'online' : 'offline');
-          //this.backendStatus ? clearInterval(this.handle) : this.handle = setInterval(this.checkBackendStatus, 3000); // reset interval if necessary
+          this.backendStatus ? clearInterval(this.handle) : this.handle = setInterval(this.checkBackendStatus, 3000); // reset interval if necessary
       }
-  },*/
+  },
 
   async created() {
       try {
