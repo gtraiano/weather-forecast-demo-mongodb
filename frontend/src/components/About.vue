@@ -23,8 +23,16 @@
 	
 	<b-row>
 		<b-col />
+
+		<b-col cols="5">
+			<div style="text-align: left">
+				<h2>{{$t('the story')}}</h2>
+				<h3 v-html="$t('story')"></h3>
+			</div>
+		</b-col>
 		
-		<b-col cols="10">
+		<b-col cols="5">
+			<h2 style="text-align: left">{{$t('tools services')}}</h2>
 			<div style="text-align: left" v-html="$t('about info')"></div>
 		</b-col>
 
