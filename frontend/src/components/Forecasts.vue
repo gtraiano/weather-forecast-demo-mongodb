@@ -424,11 +424,11 @@ export default {
 
       tableFilter(newValue, oldValue) {
           this.tableStyle.maxHeight = 'auto';
-          if(this.selectedCity === -1) {
-              this.$refs.table.scrollToRow(0);
+          if(this.selectedCity === -1) { // when no city selected
+              this.$refs.table.scrollToRow(0); // reset table scroll between filter inputs
           }
           else {
-              setTimeout(() => { // wait for index to be updated
+              setTimeout(() => { // wait for selected city index to be updated
                   this.$refs.table.scrollToRow(this.selectedCityIndexSorted);
               }, this.filterDebounce + 50);
           }
