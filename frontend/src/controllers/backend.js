@@ -1,18 +1,63 @@
 import axios from 'axios';
 
-const protocol = process.env.EXPRESS_SERVER_PROTOCOLS.split(',').map(p => p.trim().toLowerCase()).includes('https') ? 'https' : 'http';
-const backendPort = protocol === 'https' ? process.env.EXPRESS_SERVER_HTTPS_PORT : EXPRESS_SERVER_HTTP_PORT;
-const baseUrl = `${protocol}://${process.env.BACKEND_DOMAIN}:${backendPort}${process.env.BACKEND_API_ENDPOINT}`;
+let protocol = process.env.EXPRESS_SERVER_PROTOCOLS.split(',').map(p => p.trim().toLowerCase()).includes('https') ? 'https' : 'http';
+let backendPort = protocol === 'https' ? process.env.EXPRESS_SERVER_HTTPS_PORT : process.env.EXPRESS_SERVER_HTTP_PORT;
+let baseUrl = `${protocol}://${process.env.BACKEND_DOMAIN}:${backendPort}${process.env.BACKEND_API_ENDPOINT}`;
 
-// ping
+const pingTimeout = 3000;
+// ping active protocol
 const ping = async () => {
 	try {
-		return await axios.get(`${baseUrl}ping`, { headers: { 'Access-Control-Allow-Origin': true } })
+		return await axios.get(
+			`${baseUrl}ping`,
+			{
+				timeout: pingTimeout,
+				headers: { 'Access-Control-Allow-Origin': true }
+			}
+		)
 	}
 	catch(error) {
 		console.log(error.message);
 	}
 }
+
+// ping specific protocol
+const pingProtocol = async protocol => {
+	try {
+		if(protocol.toLowerCase() === 'http') {
+			return await axios.get(
+				`http://${process.env.BACKEND_DOMAIN}:${process.env.EXPRESS_SERVER_HTTP_PORT}${process.env.BACKEND_API_ENDPOINT}ping`,
+				{
+					timeout: pingTimeout,
+					headers: { 'Access-Control-Allow-Origin': true } 
+				}
+			);
+		}
+		else if(protocol.toLowerCase() === 'https') {
+			return await axios.get(
+				`https://${process.env.BACKEND_DOMAIN}:${process.env.EXPRESS_SERVER_HTTPS_PORT}${process.env.BACKEND_API_ENDPOINT}ping`,
+				{
+					timeout: pingTimeout,
+					headers: { 'Access-Control-Allow-Origin': true } 
+				}
+			);
+		}
+	}
+	catch(error) {
+		console.error(error.message);
+		return null;
+	}
+}
+// get and set backend parameters
+const setActiveProtocol = value => {
+	protocol = value;
+	backendPort = protocol === 'https' ? process.env.EXPRESS_SERVER_HTTPS_PORT : process.env.EXPRESS_SERVER_HTTP_PORT;
+	baseUrl = `${protocol}://${process.env.BACKEND_DOMAIN}:${backendPort}${process.env.BACKEND_API_ENDPOINT}`;
+}
+
+const getActiveProtocol = () => protocol
+
+const getActivePort = () => backendPort
 
 // Nominatim calls
 const nominatimSearchName = async (name, locale) => {
@@ -154,5 +199,9 @@ export {
 	postCityLatLon,
 	postCity,
 	getDetailedForecastLatLon,
-	ping
+	ping,
+	pingProtocol,
+	setActiveProtocol,
+	getActiveProtocol,
+	getActivePort
 };
