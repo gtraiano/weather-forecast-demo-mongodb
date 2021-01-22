@@ -179,6 +179,7 @@
                             :lat="cityData[selectedCity].coords.lat"
                             :lon="cityData[selectedCity].coords.lon"
                             :perPage=6
+                            :paginated="preferences.frontend.detailedForecastStyle === 'paginated' ? true : false"
                         />
                     </b-col>
                     
@@ -386,7 +387,8 @@ export default {
 
       ...mapGetters({
           cityData: 'allCityData/getAllCityData',
-          chartData: 'chartData/getChartData'
+          chartData: 'chartData/getChartData',
+          preferences: 'preferences/getPreferences'
       })
   },
 
