@@ -192,8 +192,7 @@ export default {
  		},
 
  		onResize() {
- 		// When user resizes window manually (by dragging it), the resize event will be called numerous times. 
- 		// By Introducing a delay, the number of calls of resized() is reduced
+ 		// debounce resize event handler
  		// https://stackoverflow.com/questions/5489946/how-to-wait-for-the-end-of-resize-event-and-only-then-perform-an-action
  			setTimeout(this.resized, 175);
  		},
@@ -203,7 +202,6 @@ export default {
  			return {
 	 			'max-width': `${100 / Math.trunc(this.cardsPerPage)}%`,
 				'min-width': this.paginated ? 'auto' : `${(100 - this.cardsPerPage*1.25) / Math.trunc(this.cardsPerPage)}%`,
-				//'transition': 'all 0.05s',
 				'transition': 'all 0.01s',
 				...!this.paginated && {
 					'margin-bottom': '1vh', // space before scrollbar
@@ -214,14 +212,27 @@ export default {
  		},
 
  		scrollCards(event) {
+ 		// automatically scroll cards
  			const el = document.getElementById('deck-cards');
  			if(event.type == 'wheel') {
- 				const cardIndex = Math.round( (el.scrollLeft + Math.sign(-event.deltaY) * el.children[1].offsetLeft) / el.children[1].offsetLeft ) // estimate card index
- 				el.scrollLeft = cardIndex > 0 ? el.children[cardIndex].offsetLeft : 0 // align scroll amount with card scroll offset
+ 				if(this.paginated) { // paginated version
+ 					this.currentPage += Math.sign(-event.deltaY) > 0 ? 1 : -1;
+ 					if(this.currentPage < 1) { // up to first page
+ 						this.currentPage = 1;
+ 					}
+ 					else if(this.currentPage > Math.trunc( this.forecastData.hourly.length / Math.trunc(this.cardsPerPage) )) { // up to last page
+ 						this.currentPage = Math.trunc(this.forecastData.hourly.length / Math.trunc(this.cardsPerPage));
+ 					}
+ 				}
+ 				else { // scrollbar version
+ 					const cardIndex = Math.round( (el.scrollLeft + Math.sign(-event.deltaY) * el.children[1].offsetLeft) / el.children[1].offsetLeft ) // estimate card index
+ 					el.scrollLeft = cardIndex > 0 ? el.children[cardIndex].offsetLeft : 0 // align scroll amount with card scroll offset	
+ 				}
  			}
  		},
 
  		onWheel(event) {
+ 		// debounce wheel event handler
  			setTimeout(this.scrollCards(event), 250);
  		}
 	},
