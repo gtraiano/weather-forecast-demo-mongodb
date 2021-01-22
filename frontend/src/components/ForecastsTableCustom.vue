@@ -53,7 +53,8 @@
         <a
             href="" 
         	  v-on:click.prevent="selectedRowUpdate(data.index, data.value.coords); $emit('showDetailedForecast');"
-            :title="`lat: ${data.value.coords.lat} lon: ${data.value.coords.lon}`"
+            v-b-tooltip.bottom.html.ds500
+            :title="`<span>lat: ${data.value.coords.lat}<br>lon: ${data.value.coords.lon}</span>`"
         >
             <!-- no city selected, render all without formatting -->
             <span v-if="selectedRow === -1">
@@ -78,8 +79,10 @@
             href=""
             @click.prevent="plotCity(data.index, data.item['city'])"
             style="color: unset"
+            v-b-tooltip.bottom.ds500
+            :title="$t('plot')"
         >
-          <b-icon-graph-up :title="$t('plot')" />
+          <b-icon-graph-up/>
         </a>
         <!-- refresh forecast data icon -->
       	<a
@@ -87,8 +90,10 @@
       		  href=""
       		  @click.prevent="updateCityForecast(data.item['city'])"
       		  style="color: unset"
+            v-b-tooltip.bottom.ds500
+            :title="$t('refresh forecast data')"
       	>
-      		  <b-icon-arrow-clockwise :title="$t('refresh forecast data')" />
+      		  <b-icon-arrow-clockwise/>
       	</a>
         <!-- remove city icon -->
       	<a
@@ -96,8 +101,10 @@
       		  href=""
       		  @click.prevent="removeCity(data.item['city'])"
       		  style="color: unset"
+            v-b-tooltip.bottom.ds500
+            :title="$t('delete')"
       	>
-      		  <b-icon-trash :title="$t('delete')" />
+      		  <b-icon-trash/>
       	</a>
     </template>
     

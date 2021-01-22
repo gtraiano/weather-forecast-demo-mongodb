@@ -77,6 +77,7 @@
 					    	<template #append>
 					      		<b-button
 					      			:title="$t('search forecast data')"
+					      			v-b-tooltip.hover.bottom.ds500
 					      			@click="searchCity()"
 					      		>
 					      			<b-icon-search/>
@@ -90,10 +91,12 @@
 							type="dark"
 							variant="dark"
 							@click="!refreshing ? refreshForecastData() : null"
+							v-b-tooltip.hover.bottom.ds500
+							:title="$t('refresh forecast data')"
 						>
 							<!-- spin icon while fetching data -->
 				        	<b-icon-arrow-clockwise
-				          		:title="$t('refresh forecast data')"
+				          		
 				          		icon="arrow-clockwise"
 				          		:animation="refreshing ? 'spin' : ''"
 				          	/>
@@ -106,6 +109,8 @@
 			        		right
 			        		lazy
 			        		@show="$store.dispatch('preferences/initializeAvailableProtocols')"
+			        		v-b-tooltip.hover.bottom.ds500
+							:title="$t('preferences')"
 			        	>
 			        		<template #button-content>
         						<b-icon-gear/>
