@@ -10,12 +10,8 @@
 
 <template>
 <div>
-	<!--b-navbar
-		toggleable="lg"
-		type="dark"
-		variant="dark"
-	-->
 	<b-navbar
+		toggleable="md"
 		type="dark"
 		variant="dark"
 	>
@@ -89,24 +85,56 @@
 					  	</b-input-group>
 					</div>
 					<!-- refresh meteorological data -->
-					<b-button
-						type="dark"
-						variant="dark"
-						@click="!refreshing ? refreshForecastData() : null"
-					>
-						<!-- spin icon while fetching data -->
-			        	<b-icon-arrow-clockwise
-			        		v-if="refreshing"
-			          		:title="$t('refresh forecast data')"
-			          		icon="arrow-clockwise"
-			          		animation="spin"
-			          	/>
-			          	<b-icon-arrow-clockwise
-			        		v-else
-			          		:title="$t('refresh forecast data')"
-			          		icon="arrow-clockwise"
-			          	/>
-			        </b-button>
+					<div>
+						<b-button
+							type="dark"
+							variant="dark"
+							@click="!refreshing ? refreshForecastData() : null"
+						>
+							<!-- spin icon while fetching data -->
+				        	<b-icon-arrow-clockwise
+				          		:title="$t('refresh forecast data')"
+				          		icon="arrow-clockwise"
+				          		:animation="refreshing ? 'spin' : ''"
+				          	/>
+				        </b-button>
+			    	</div>
+			        <!-- dropdown menu-->
+			        <div>
+			        	<b-dropdown
+			        		variant="dark"
+			        		right
+			        		lazy
+			        		@show="$store.dispatch('preferences/initializeAvailableProtocols')"
+			        	>
+			        		<template #button-content>
+        						<b-icon-gear/>
+      						</template>
+      						<!-- backend protocol select -->
+      						<b-dropdown-form style="min-width: max-content; max-width: max-content;">
+      							<b-form-group
+      								:label="$t('backend protocol')"
+      								class="mb-2"
+      							>
+							         <b-form-select
+							         	:disabled="preferences.backend.availableProtocols.length === 1"
+								        :options="preferences.backend.availableProtocols.map(p => ({ text: p.protocol.toUpperCase(), value: p.protocol }) )"
+								        :value="preferences.backend.activeProtocol"
+								        @change="$event => $store.dispatch('preferences/setActiveProtocol', $event)"
+								     />
+								     <!--label>on port {{ preferences.backend.port }}</label-->
+						        </b-form-group>
+						        <!-- detailed forecast pagination/scrollbar select -->
+						        <b-form-group :label="$t('detailed forecast style')">
+						          <b-form-select
+							          :options="['paginated', 'scrollbar'].map(o => ({ text: $t(o), value: o}))"
+							          :value="preferences.frontend.detailedForecastStyle"
+							          @change="$event => $store.dispatch('preferences/setPreference', { preference: 'frontend.detailedForecastStyle', value: $event })"
+							      />
+						        </b-form-group>
+      						</b-dropdown-form>
+			        	</b-dropdown>
+			        </div>
 				</b-navbar-nav>
 			</b-collapse>
 	</b-navbar>
@@ -116,13 +144,16 @@
 <script type = "text/javascript">
 import Vue from 'vue';
 import LanguageSwitcher from './LanguageSwitcher.vue';
-import { BIconArrowClockwise, BIconSearch } from 'bootstrap-vue';
+import { BIconArrowClockwise, BIconSearch, BIconGear } from 'bootstrap-vue';
+import { pingProtocol } from '../controllers/backend';
+import { mapGetters } from 'vuex';
 
 export default {
 	components: {
 		LanguageSwitcher,
 		BIconArrowClockwise,
-		BIconSearch
+		BIconSearch,
+		BIconGear
 	},
 
 	data() {
@@ -139,9 +170,15 @@ export default {
 		},
 
 		async searchCity() {
-			this.$store.dispatch('search/setShowResults', true);
+			await this.$store.dispatch('search/setShowResults', true);
 			await this.$store.dispatch('search/searchCity');
 		}
+	},
+
+	computed: {
+		...mapGetters({
+			preferences: 'preferences/getPreferences'
+		})
 	}
 }
 </script>

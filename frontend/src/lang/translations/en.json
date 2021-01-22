@@ -11,6 +11,12 @@
   "search for": "Search for",
   "loading": "Loading",
   "await backend": "Awaiting backend server to become available",
+  "backend protocol": "Backend Protocol",
+  "detailed forecast style": "Detailed Forecast Style",
+  "scrollbar": "scrollbar",
+  "paginated": "paginated",
+  "or check other": "or check other",
+  "available options": "available options",
 
   "add": "Add",
   "already added": "already added",
