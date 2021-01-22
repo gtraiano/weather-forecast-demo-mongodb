@@ -111,6 +111,8 @@
 
   "refresh forecast": "Refresh forecast data",
   "refetch data": "to fetch fresh forecast data for all cities",
+  "preferences": "preferences",
+  "set preferences": "to set preferences (note: added for testing purposes)",
   
   "forecasts.header2": "Under column {0} in {1} table",
   "forecasts.header3": "Under any column in {0} table",

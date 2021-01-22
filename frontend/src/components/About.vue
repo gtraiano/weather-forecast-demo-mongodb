@@ -118,6 +118,12 @@
 						{{$t('click on')}} <b-icon-arrow-clockwise class="ml-1 mr-1" scale="1.5" /> {{$t('refetch data')}}
 					</ul>
 				</li>
+				<h2 class="text-capitalize">{{$t('preferences')}}</h2>
+				<li>
+					<ul>
+						{{$t('click on')}} <b-icon-gear class="ml-1 mr-1" scale="1.5" /> {{$t('set preferences')}}
+					</ul>
+				</li>
 			</div>
 		</b-col>
 
@@ -201,7 +207,8 @@
 							{ key: 'forecasts', label: $t('forecasts'), sortable: true, thStyle: {'background-image': 'none'}, sort: null }
 						]"
 						:items="[
-							{ index:'1', 'city': this.$i18n.locale === 'en' ? 'City Name' : 'Όνομα Πόλης', country: $t('country'), continent: $t('continent'), 'forecasts': selectedVar ? $t(selectedVar) : '' }
+							{ index:'1', 'city': this.$i18n.locale === 'en' ? 'City Name' : 'Όνομα Πόλης', country: $t('country'), continent: $t('continent'), 'forecasts': selectedVar ? $t(selectedVar) : '', coords: { lat: 0, lon: 1 } },
+							{ index:'2', 'city': this.$i18n.locale === 'en' ? 'Another City' : 'Άλλη Πόλη', country: $t('country'), continent: $t('continent'), 'forecasts': selectedVar ? $t(selectedVar) : '', coords: { lat: 1, lon: 0 } }
 						]"
 						:filter="tableFilter"
 						@contextmenu.native.prevent
@@ -229,7 +236,12 @@
 						    </span>
 					    </template>
 						<template v-slot:cell(city)="data">
-							<a href="" @click.prevent>
+							<a
+								href=""
+								@click.prevent
+								v-b-tooltip.bottom.html.ds500
+								:title="`<span>lat: ${data.item.coords.lat}<br>lon: ${data.item.coords.lon}</span>`"
+							>
 								{{data.item.city}}
 							</a>
 							
@@ -240,24 +252,30 @@
 					            href=""
 					            style="color: unset"
 					            @click.prevent
+					            v-b-tooltip.bottom.ds500
+					            :title="$t('plot')"
 					        >
-					          <b-icon-graph-up :title="$t('plot')" />
+					          <b-icon-graph-up/>
 					        </a>
 					      	<a
 					            class="ml-1 mr-1"
 					      		href=""
 					      		style="color: unset"
 					      		@click.prevent
+					      		v-b-tooltip.bottom.ds500
+					      		:title="$t('refresh forecast data')"
 					      	>
-					      		  <b-icon-arrow-clockwise :title="$t('refresh forecast data')" />
+					      		  <b-icon-arrow-clockwise/>
 					      	</a>
 					      	<a
 					            class="ml-1 mr-1"
 					      		href=""
 					      		style="color: unset"
 					      		@click.prevent
+					      		v-b-tooltip.bottom.ds500
+					      		:title="$t('delete')"
 					      	>
-					      		  <b-icon-trash :title="$t('delete')" />
+					      		  <b-icon-trash/>
 					      	</a>
 					    </template>
 					</b-table>
@@ -306,7 +324,7 @@
 </template>
 
 <script>
-import { BIconSearch, BIconTrash, BIconArrowClockwise, BIconGraphUp, BIconChevronUp, BIconChevronDown, BIconX } from 'bootstrap-vue'
+import { BIconSearch, BIconTrash, BIconArrowClockwise, BIconGraphUp, BIconChevronUp, BIconChevronDown, BIconX, BIconGear } from 'bootstrap-vue'
 import SearchResults from './SearchResults.vue'
 import Controls from './Controls.vue'
 import Vue from 'vue'
@@ -323,6 +341,7 @@ export default {
     	BIconChevronUp,
     	BIconChevronDown,
     	BIconX,
+    	BIconGear,
     	Controls
 	},
 	
