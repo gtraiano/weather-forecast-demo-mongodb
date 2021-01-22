@@ -21,7 +21,7 @@ const server = express();
 
 // middleware
 server.use(function timeLog (req, res, next) { // logging timestamp
-	console.log(`${new Date().toLocaleString()} ${req.method} ${req.path} ${res.statusCode}`);
+	console.log(`${new Date().toLocaleString()} ${req.protocol} ${req.method} ${req.path} ${res.statusCode}`);
 	next();
 });
 server.use(compression());
