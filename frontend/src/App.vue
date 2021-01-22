@@ -52,9 +52,31 @@
             </b-modal>
         </b-overlay>
     </div>
+    <!-- when backend is unaivalable -->
     <div id="app" tabindex="0" v-else>
+        <!-- message -->
         <h2 style="margin-top: 50vh">{{$t('await backend')}}</h2>
-        <p><b-icon-lightning class="h1" animation="fade"/></p>
+        <p>
+            <b-icon-lightning
+                class="h1"
+                animation="fade"
+            />
+        </p>
+        <!-- present alternatives on link click -->
+        <p v-if="$store.getters['preferences/getPreferences'].backend.availableProtocols.length">
+            {{$t('or check other')}} <a href="" @click.prevent = "showAvailable = !showAvailable">{{$t('available options')}}</a>
+        </p>
+        <!-- alternatives -->
+        <div v-if="showAvailable">
+            <a
+                v-for="available in $store.getters['preferences/getPreferences'].backend.availableProtocols"
+                href=""
+                @click.prevent="$store.dispatch('preferences/setActiveProtocol', available.protocol)"
+            >
+              {{ available.url }}
+            </a>
+            <br>
+        </div>
     </div>
 </template>
 
@@ -79,7 +101,8 @@ export default {
   data() {
       return {
           backendStatus: null,
-          handle: null
+          pingHandle: null,
+          showAvailable: false
       }
   },
 
@@ -92,29 +115,30 @@ export default {
           catch(error) {
               //this.backendStatus = 0;
           }
-          
-          
       }
   },
 
-  watchers: {
-      backendStatus() {
+  watch: {
+      async backendStatus() {
+          try {
+              await this.checkBackendStatus();
+          }
+          catch(error) {
+              console.log('Backend status is', this.backendStatus ? 'online' : 'offline'); 
+          }
           //console.log('Backend status is', this.backendStatus ? 'online' : 'offline');
-          this.backendStatus ? clearInterval(this.handle) : this.handle = setInterval(this.checkBackendStatus, 3000); // reset interval if necessary
+          this.backendStatus ? clearInterval(this.pingHandle) : this.pingHandle = setInterval(this.checkBackendStatus, 3000); // reset interval if necessary
       }
   },
 
   async created() {
       try {
+          await this.$store.dispatch('preferences/initializeAvailableProtocols');
           await this.checkBackendStatus();
       }
       catch(error) {
           console.log('Backend status is', this.backendStatus ? 'online' : 'offline'); 
       }
-  },
-
-  updated() {
-      this.backendStatus ? clearInterval(this.handle) : this.handle = setInterval(this.checkBackendStatus, 3000); // reset interval if necessary
   }
 }
 </script>
