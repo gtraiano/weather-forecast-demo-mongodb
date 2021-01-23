@@ -239,8 +239,8 @@
 							<a
 								href=""
 								@click.prevent
-								v-b-tooltip.bottom.html.ds500
-								:title="`<span>lat: ${data.item.coords.lat}<br>lon: ${data.item.coords.lon}</span>`"
+								v-b-tooltip.hover.bottom.ds500
+								:title="`lat: ${data.item.coords.lat} lon: ${data.item.coords.lon}`"
 							>
 								{{data.item.city}}
 							</a>
@@ -363,5 +363,10 @@ ul, >>> ul {
 li, >>> li {
   display: inline-block;
   margin: 0 10px;
+}
+
+>>> .tooltip-inner {
+  max-width: max-content;
+  min-width: max-content;
 }
 </style>
