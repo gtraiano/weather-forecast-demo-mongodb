@@ -98,7 +98,7 @@ const actions = {
 		let refetch = null;
 		let upToDate = JSON.parse(window.localStorage.getItem('upToDate')) || 0;
 		
-		if(typeof forceRefetch !== 'undefined') {
+		if(typeof forceRefetch !== 'undefined' || upToDate < Date.now() + 24*3600000) {
 			refetch = forceRefetch;
 		}
 
@@ -118,21 +118,11 @@ const actions = {
 	},
 
 	appendCityAsync: async (context, city) => {
-		// check if city already exists
-		/*let exists = context.state.allCityData.findIndex(entry => { // comparing lat & lon
-			return entry.coords.lat == Number.parseFloat(city.lat) && entry.coords.lon == Number.parseFloat(city.lon)
-		});
-		if(exists != -1) {
-			console.log(city.name, 'was not added because it already exists!');
-			return;
-		}*/
-		//console.log('Adding city', {...city});
 		let newCity = await postCityLatLon(city.lat, city.lon, store.i18n.availableLocales);
 
 		context.commit('appendCity', transformDatabaseData(newCity));
 		context.commit('setLastChangedOn', Date.now());
 		store.dispatch('search/setAddedCities', { lat: newCity.lat, lon: newCity.lon });
-		
 	},
 
 	updateCityForecastDataAsync: async (context, city) => {
@@ -158,7 +148,6 @@ const mutations = {
 	},
 
 	appendCity: (state, city) => {
-		//city.id = Math.max(...state.allCityData.map(city => city.id)) + 1;
 		state.allCityData = [...state.allCityData, city];
 	},
 
