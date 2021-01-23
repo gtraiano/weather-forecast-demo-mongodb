@@ -53,8 +53,8 @@
         <a
             href="" 
         	  v-on:click.prevent="selectedRowUpdate(data.index, data.value.coords); $emit('showDetailedForecast');"
-            v-b-tooltip.bottom.html.ds500
-            :title="`<span>lat: ${data.value.coords.lat}<br>lon: ${data.value.coords.lon}</span>`"
+            v-b-tooltip.hover.bottom.ds500
+            :title="`lat: ${data.value.coords.lat} lon: ${data.value.coords.lon}`"
         >
             <!-- no city selected, render all without formatting -->
             <span v-if="selectedRow === -1">
@@ -79,7 +79,7 @@
             href=""
             @click.prevent="plotCity(data.index, data.item['city'])"
             style="color: unset"
-            v-b-tooltip.bottom.ds500
+            v-b-tooltip.hover.bottom.ds500
             :title="$t('plot')"
         >
           <b-icon-graph-up/>
@@ -90,7 +90,7 @@
       		  href=""
       		  @click.prevent="updateCityForecast(data.item['city'])"
       		  style="color: unset"
-            v-b-tooltip.bottom.ds500
+            v-b-tooltip.hover.bottom.ds500
             :title="$t('refresh forecast data')"
       	>
       		  <b-icon-arrow-clockwise/>
@@ -101,7 +101,7 @@
       		  href=""
       		  @click.prevent="removeCity(data.item['city'])"
       		  style="color: unset"
-            v-b-tooltip.bottom.ds500
+            v-b-tooltip.hover.bottom.ds500
             :title="$t('delete')"
       	>
       		  <b-icon-trash/>
@@ -207,6 +207,7 @@ export default {
                     table.parentElement.scrollTop = 0;
                 }
             })
+            setTimeout(() => this.hideTooltips(), 250);
       	},
 
       	addActionsField() {
@@ -295,6 +296,11 @@ export default {
                     this.selectedRowUpdate(-1, {});
                 }
             }
+        },
+
+        hideTooltips() {
+        // hides all open tooltips
+            this.$root.$emit('bv::hide::tooltip');
         }
     },
 
@@ -334,5 +340,11 @@ export default {
 <style scoped>
 *:focus {
   outline: none;
+}
+
+/* make bootstrap tooltip width fit text */
+>>> .tooltip-inner {
+  max-width: max-content;
+  min-width: max-content;
 }
 </style>
