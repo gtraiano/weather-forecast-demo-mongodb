@@ -108,7 +108,8 @@ const actions = {
 		console.log('Fetched forecast data from', refetch ? 'OpenWeather' : 'backend');
 		
 		context.commit('setAllCityData', data); // save api data to state
-		window.localStorage.setItem('upToDate', JSON.stringify(data[0].forecast.hourlyDt[47]));
+		//window.localStorage.setItem('upToDate', JSON.stringify(data[0].forecast.hourlyDt[47]));
+		window.localStorage.setItem('upToDate', JSON.stringify( Math.min( ...data.map(d => d.forecast.hourlyDt[47]) ) ));
 
 		context.commit('setLastChangedOn', Date.now());
 	},
