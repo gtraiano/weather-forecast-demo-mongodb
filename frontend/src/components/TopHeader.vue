@@ -102,7 +102,7 @@
 				          	/>
 				        </b-button>
 			    	</div>
-			        <!-- dropdown menu-->
+			        <!-- preferences -->
 			        <div>
 			        	<b-dropdown
 			        		variant="dark"
