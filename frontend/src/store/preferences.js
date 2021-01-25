@@ -45,10 +45,11 @@ const actions = {
 	setActiveProtocol: async (context, value) => {
 		const ping = await pingProtocol(value); // ping to check if protocol is actually available
 		if(!ping || ping.status !== 200) {
+			console.log(protocol, 'backend server is not available');
 			return;
 		}
 		setActiveProtocol(value.toLowerCase());
-		context.commit('setPreference', { preference: 'backend.activeProtocol', value: value });
+		context.commit('setPreference', { preference: 'backend.activeProtocol', value: value.toLowerCase() });
 		context.commit('setPreference', { preference: 'backend.port', value: getActivePort() });
 	}
 }
