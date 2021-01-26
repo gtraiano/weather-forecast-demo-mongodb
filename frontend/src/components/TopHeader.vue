@@ -138,7 +138,7 @@
 							      />
 						        </b-form-group>
 						        <!-- theme -->
-						        <b-form-group label="Theme">
+						        <b-form-group :label="$t('theme')">
 						          <b-form-select
 							          :options="preferences.frontend.availableThemes"
 							          :value="preferences.frontend.activeTheme"
