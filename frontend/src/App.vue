@@ -69,7 +69,7 @@
         <!-- alternatives -->
         <div v-if="showAvailable">
             <a
-                v-for="available in $store.getters['preferences/getPreferences'].backend.availableProtocols"
+                v-for="available in $store.getters['preferences/getPreferences'].backend.availableProtocols.filter(p => p.status === true)"
                 href=""
                 @click.prevent="$store.dispatch('preferences/setActiveProtocol', available.protocol)"
             >

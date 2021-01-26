@@ -35,10 +35,17 @@ const actions = {
 		const protocols = await Promise.all(
 			['http', 'https'].map(async protocol => {
 				const ping = await pingProtocol(protocol);
+				let url;
+				let status;
 				if(ping && ping.status === 200) {
-					let url = ping.request.responseURL.match(/(.*:\d+)/g)[0]; // extract url of backend server
-					return { protocol, url };
+					url = ping.request.responseURL.match(/(.*:\d+)/g)[0]; // extract url of backend server
+					status = true;
 				}
+				else {
+					status = false;
+					url = '';
+				}
+				return { protocol, url, status };
 			})
 		);
 		context.commit('setPreference', { preference: 'backend.availableProtocols', value: protocols });

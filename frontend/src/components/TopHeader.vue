@@ -122,8 +122,8 @@
       								class="mb-2"
       							>
 							         <b-form-select
-							         	:disabled="preferences.backend.availableProtocols.length === 1"
-								        :options="preferences.backend.availableProtocols.map(p => ({ text: p.protocol.toUpperCase(), value: p.protocol }) )"
+							         	:disabled="preferences.backend.availableProtocols.filter(p => p.status === true).length === 1"
+								        :options="preferences.backend.availableProtocols.filter(p => p.status === true).map(p => ({ text: p.protocol.toUpperCase(), value: p.protocol }) )"
 								        :value="preferences.backend.activeProtocol"
 								        @change="$event => $store.dispatch('preferences/setActiveProtocol', $event)"
 								     />
