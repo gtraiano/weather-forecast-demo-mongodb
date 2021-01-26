@@ -98,8 +98,11 @@ const actions = {
 		let refetch = null;
 		let upToDate = JSON.parse(window.localStorage.getItem('upToDate')) || 0;
 		
-		if(typeof forceRefetch !== 'undefined' || upToDate < Date.now() + 24*3600000) {
+		if(typeof forceRefetch !== 'undefined') {
 			refetch = forceRefetch;
+		}
+		else if(upToDate < (Date.now() + 12*3600000)) { // if data older than 12 hours
+			refetch = true;
 		}
 
 		let data = refetch ? await updateAllCities() : await getAllCities();
@@ -108,7 +111,6 @@ const actions = {
 		console.log('Fetched forecast data from', refetch ? 'OpenWeather' : 'backend');
 		
 		context.commit('setAllCityData', data); // save api data to state
-		//window.localStorage.setItem('upToDate', JSON.stringify(data[0].forecast.hourlyDt[47]));
 		window.localStorage.setItem('upToDate', JSON.stringify( Math.min( ...data.map(d => d.forecast.hourlyDt[47]) ) ));
 
 		context.commit('setLastChangedOn', Date.now());
