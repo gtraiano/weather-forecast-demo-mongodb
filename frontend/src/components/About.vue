@@ -228,12 +228,12 @@
 						          
 						    </div>
 							<!-- on regular field, disable right click context menu -->
-						    <span
+						    <div
 						        v-else
 						        @click.right.prevent
 						    >
 						    	{{ data.label }}
-						    </span>
+						    </div>
 					    </template>
 						<template v-slot:cell(city)="data">
 							<a

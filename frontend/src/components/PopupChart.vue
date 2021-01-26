@@ -58,6 +58,7 @@
                             <!-- buttons functional only when mouse is hovering and/or no plot dragging occurs -->
                             <b-button-group
                                 v-if="!dragging || showToolbar"
+                                id="toolbar"
                                 size="sm" class="button-group smooth slow"
                                 v-bind:style="{opacity: showToolbar}"
                                 @mouseenter="showToolbar = 1 || openMenu;"
@@ -86,6 +87,7 @@
                                 </b-button>
                                 <!-- save plot image -->
                                 <b-dropdown
+                                    id="toolbar-save-image"
                                     size="sm"
                                     variant="light"
                                     @shown="openMenu = 1"

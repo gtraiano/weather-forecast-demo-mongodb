@@ -13,7 +13,9 @@ const state = () => ({
 	},
 
 	frontend: {
-		detailedForecastStyle: 'scrollbar'
+		detailedForecastStyle: JSON.parse(window.localStorage.getItem('frontend.detailedForecastStyle')) || 'scrollbar',
+		availableThemes: ['regular', 'dark', 'terminal'],
+		activeTheme: JSON.parse(window.localStorage.getItem('frontend.activeTheme')) || 'regular'
 	}
 });
 
@@ -26,6 +28,7 @@ const getters = {
 const actions = {
 	setPreference: (context, { preference, value }) => {
 		context.commit('setPreference', { preference, value });
+		window.localStorage.setItem(preference, JSON.stringify(value));
 	},
 
 	initializeAvailableProtocols: async context => {
@@ -61,7 +64,7 @@ const mutations = {
 		if(value instanceof Array) { // assume type of array elements is ok
 			state[path[0]][path[1]] = [...value];
 		}
-		else if(/^\d+$/.test(value.toString())) { // numeric
+		else if(/^-?\d+?.\d+$/.test(value.toString())) { // numeric
 			state[path[0]][path[1]] = Number.parseInt(value);
 		}
 		else if(/^[a-zA-Z]+$/.test(value.toString())) {

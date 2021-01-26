@@ -85,6 +85,7 @@ import TopHeader from './components/TopHeader.vue';
 import { BOverlay, BButton, BModal, BIconLightning } from 'bootstrap-vue'
 import SearchResults from './components/SearchResults.vue';
 import { ping } from './controllers/backend.js';
+import { mapGetters } from 'vuex'
 
 export default {
 	name: 'app',
@@ -118,6 +119,16 @@ export default {
       }
   },
 
+  computed: {
+      ...mapGetters({
+          preferences: 'preferences/getPreferences'
+      }),
+
+      theme() {
+          return this.preferences.frontend.activeTheme;
+      }
+  },
+
   watch: {
       async backendStatus() {
           try {
@@ -128,6 +139,11 @@ export default {
           }
           //console.log('Backend status is', this.backendStatus ? 'online' : 'offline');
           this.backendStatus ? clearInterval(this.pingHandle) : this.pingHandle = setInterval(this.checkBackendStatus, 3000); // reset interval if necessary
+      },
+
+      theme() {
+          document.documentElement.setAttribute('theme', this.theme);
+          //htmlElement.setAttribute('theme', this.theme)
       }
   },
 
@@ -139,6 +155,11 @@ export default {
       catch(error) {
           console.log('Backend status is', this.backendStatus ? 'online' : 'offline'); 
       }
+  },
+
+  mounted() {
+    //this.theme = this.preferences.frontend.activeTheme;
+    document.documentElement.setAttribute('theme', this.theme);
   }
 }
 </script>

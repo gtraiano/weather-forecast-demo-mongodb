@@ -137,6 +137,14 @@
 							          @change="$event => $store.dispatch('preferences/setPreference', { preference: 'frontend.detailedForecastStyle', value: $event })"
 							      />
 						        </b-form-group>
+						        <!-- theme -->
+						        <b-form-group label="Theme">
+						          <b-form-select
+							          :options="preferences.frontend.availableThemes"
+							          :value="preferences.frontend.activeTheme"
+							          @change="$event => $store.dispatch('preferences/setPreference', { preference: 'frontend.activeTheme', value: $event })"
+							      />
+						        </b-form-group>
       						</b-dropdown-form>
 			        	</b-dropdown>
 			        </div>
