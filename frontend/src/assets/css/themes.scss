@@ -15,11 +15,6 @@
     	color: var(--light);
     }
 
-    /*::selection {
-    	background-color: var(--blue);
-        color: var(--light); 
-    }*/
-
     input, input:focus {
     	color: var(--light);
     	background-color: var(--dark);
@@ -58,6 +53,10 @@
     	color: var(--white);
     }
 
+    .custom-select[disabled="disabled"] {
+    	opacity: 0.5;
+    }
+
     .table {
     	background-color: var(--secondary);
     }
@@ -75,8 +74,6 @@
     }
 
     .table tr td a span, .table tr td a:link, .table tr td a:focus, .table tr td a:active, .table tr td a:visited {
-    	//color: #007bff;
-    	//color: lightgreen;
     	color: var(--warning);
     }
 
@@ -167,10 +164,10 @@
 }
 
 [theme="terminal"] {
-	@import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,900;1,200;1,300;1,400;1,500;1,600;1,700;1,900&display=swap');
+	@import url('https://fonts.googleapis.com/css2?family=Ubuntu+Mono:wght@400;700&display=swap');
 
 	* {
-		font-family: 'Source Code Pro', monospace;
+		font-family: 'Ubuntu Mono', monospace;
 	}
     
     body {
@@ -215,6 +212,10 @@
     	color: var(--green);
     }
 
+    .custom-select[disabled="disabled"] {
+    	opacity: 0.5;
+    }
+
     .list-group-item {
     	background-color: seashell;
     	border-color: gainsboro;
@@ -233,7 +234,6 @@
     }
 
     .table tr td a span, .table tr td a:link, .table tr td a:focus, .table tr td a:active, .table tr td a:visited {
-    	//color: #007bff;
     	color: lightgreen;
     }
 
@@ -273,7 +273,6 @@
     	background-color: darkblue;
     	color: var(--light);
     	border-color: none;
-    	//opacity: 0.8
     }
 
     .page-link {
@@ -331,5 +330,11 @@
 	}
 
 	scrollbar-color: gray var(--light);
+
+	.tooltip-inner {
+  		max-width: max-content;
+  		min-width: max-content;
+  		color: var(--green);
+  	}
 
 }
