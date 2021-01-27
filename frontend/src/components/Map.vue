@@ -9,19 +9,14 @@
  -->
 
 <template>
-
 <b-container fluid>
-    <b-row class="topinfo">
-        <b-col/>
-    </b-row>
-
     <!-- display map -->
     <b-row>
         <b-col/>
 
         <b-col cols=10>
             <GeneralMap
-                height="80vh"
+                height="85vh"
                 width="100%"
                 :zoom="zoom"
                 :center="center"

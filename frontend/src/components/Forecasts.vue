@@ -10,7 +10,6 @@
 
 <template>
     <b-container fluid>
-        <br/>
         <b-row align-v="center">
             <b-col cols="1"/>
             

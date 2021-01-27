@@ -223,9 +223,4 @@ h1, h2 {
 a {
   color: #42b983;
 }
-
-.topinfo {
-    background-color: gray;
-    margin-top: 3%;
-}
 </style>

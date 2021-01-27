@@ -9,7 +9,7 @@
  -->
 
 <template>
-<div>
+<div class="top-header">
 	<b-navbar
 		toggleable="md"
 		type="dark"
@@ -197,6 +197,11 @@ export default {
 </script>
 
 <style scoped>
+.top-header {
+    background-color: gray;
+    margin-bottom: 1%;
+}
+
 .logo {
     height: 50px;
 }
