@@ -51,6 +51,7 @@
     .custom-select  {
     	background-color: var(--gray);
     	color: var(--white);
+        background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3E%3Cpath fill='rgb(255,255,255)' d='M2 0L0 2h4zm0 5L0 3h4z'/%3E%3C/svg%3E"); //select arrow
     }
 
     .custom-select[disabled="disabled"] {
@@ -210,6 +211,7 @@
     .custom-select  {
     	background-color: darkblue;
     	color: var(--green);
+        background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3E%3Cpath fill='rgb(40,167,69)' d='M2 0L0 2h4zm0 5L0 3h4z'/%3E%3C/svg%3E"); //select arrow (https://stackoverflow.com/questions/46836406/bootstrap-4-how-to-amend-custom-select-arrow-to-change-colour)
     }
 
     .custom-select[disabled="disabled"] {
@@ -336,5 +338,9 @@
   		min-width: max-content;
   		color: var(--green);
   	}
+
+    .top-header .dropdown-toggle:after {
+        color: var(--green);
+    }
 
 }
