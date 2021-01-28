@@ -156,6 +156,7 @@
             <b-container
                 v-if="selectedCity !== -1 && showDetailedForecast"
                 fluid
+                style="min-height: 45vh;"
             >
                 <b-row>
                     <b-col/>
@@ -197,7 +198,7 @@
                 v-if="selectedCity !== -1 && showPlot"
                 fluid
             >
-                <b-row>
+                <b-row class="pb-1">
                     <b-col/>
                     
                     <b-col
