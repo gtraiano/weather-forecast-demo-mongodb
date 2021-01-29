@@ -156,15 +156,15 @@
             <b-container
                 v-if="selectedCity !== -1 && showDetailedForecast"
                 fluid
-                style="min-height: 45vh;"
+                style="min-height: 47vh;"
             >
                 <b-row>
-                    <b-col/>
+                    <b-col cols="2"/>
 
-                    <b-col cols="9">
+                    <b-col cols="8">
                         <h4>{{cityData[selectedCity].name[this.$i18n.locale]}}</h4>
                     </b-col>
-                    <b-col cols="1">
+                    <b-col cols="1" class="pr-0">
                           <b-button-close @click="showPlot ? showDetailedForecast = false : selectedCity = -1; showDetailedForecast = false;" />
                     </b-col>
                     
@@ -198,7 +198,7 @@
                 v-if="selectedCity !== -1 && showPlot"
                 fluid
             >
-                <b-row class="pb-1">
+                <b-row class="pb-2">
                     <b-col/>
                     
                     <b-col
@@ -223,7 +223,7 @@
                         </h4>
                     </b-col>
                     
-                    <b-col>
+                    <b-col class="pr-0">
                         <!-- container close button -->
                         <b-button-close @click="showDetailedForecast ? showPlot = false : selectedCity = -1; showPlot = false;" />
                     </b-col>
