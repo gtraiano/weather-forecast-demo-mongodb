@@ -204,8 +204,35 @@
     	color: var(--green);
     }
 
+    .input-group-append, .input-group-append {
+        background-color: inherit;
+        color: inherit;
+        border-style: solid;
+        border-width: 1px;
+        border-top-right-radius: 3px;
+        border-bottom-right-radius: 3px;
+        border-color: var(--light);
+    }
+
+    .btn {
+        background-color: darkblue;
+        color: var(--light);
+        border-color: var(--light);
+    }
+
+    .top-header .btn {
+        background-color: inherit;
+        border: none;
+    }
+
+    .show > .btn {
+        background-color: var(--light);
+        color: var(--green);
+    }
+
     .dropdown-item:hover {
-    	background-color: var(--dark);
+    	//background-color: var(--dark);
+        background-color: var(--light);
     }
 
     .custom-select  {
