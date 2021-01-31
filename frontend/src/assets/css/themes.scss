@@ -214,12 +214,6 @@
         border-color: var(--light);
     }
 
-    .btn {
-        background-color: darkblue;
-        color: var(--light);
-        border-color: var(--light);
-    }
-
     .top-header .btn {
         background-color: inherit;
         border: none;
@@ -228,6 +222,16 @@
     .show > .btn {
         background-color: var(--light);
         color: var(--green);
+    }
+
+    .list-group-item .btn {
+        border-color: darkblue;
+    }
+
+    .btn {
+        background-color: darkblue;
+        color: var(--light);
+        border-color: var(--light);
     }
 
     .dropdown-item:hover {
