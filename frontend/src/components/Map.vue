@@ -118,11 +118,6 @@ export default {
     },
 
     async created() {
-        if(!this.cityData.length) {
-            console.log('Load our data first');
-            await this.$store.dispatch('allCityData/setAllCityDataAsync');
-        }
-
         this.options = this.populateOptions();
 
         if(window.localStorage.getItem('activeLayers')) { // load control panel options from local storage

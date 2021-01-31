@@ -143,14 +143,16 @@ export default {
 
       theme() {
           document.documentElement.setAttribute('theme', this.theme);
-          //htmlElement.setAttribute('theme', this.theme)
       }
   },
 
   async created() {
       try {
+          console.log('Checking backend status');
           await this.$store.dispatch('preferences/initializeAvailableProtocols');
           await this.checkBackendStatus();
+          console.log('Loading forecast data');
+          await this.$store.dispatch('allCityData/setAllCityDataAsync');
       }
       catch(error) {
           console.log('Backend status is', this.backendStatus ? 'online' : 'offline'); 
@@ -158,8 +160,7 @@ export default {
   },
 
   mounted() {
-    //this.theme = this.preferences.frontend.activeTheme;
-    document.documentElement.setAttribute('theme', this.theme);
+      document.documentElement.setAttribute('theme', this.theme);
   }
 }
 </script>

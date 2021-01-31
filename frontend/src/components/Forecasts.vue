@@ -438,11 +438,6 @@ export default {
   },
   
   async created() {
-      if(!this.cityData.length) {
-          console.log('Load our data first');
-          await this.$store.dispatch('allCityData/setAllCityDataAsync');
-      }
-
       this.overviewColumns = JSON.parse(window.localStorage.getItem('overviewColumns')) || this.overviewColumns;
       this.overviewPeriod = JSON.parse(window.localStorage.getItem('overviewPeriod')) || this.overviewPeriod;
   },
