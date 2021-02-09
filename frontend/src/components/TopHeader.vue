@@ -30,7 +30,8 @@
 					class="ml-auto"
 					style="z-index: 9999;"
 				><!-- draw dropdown menu on top of all other elements -->
-					<b-nav-item><!-- meteorological map -->
+					<!-- meteorological map -->
+					<b-nav-item>
 						<router-link
 							class="regular"
 							to="/"
@@ -39,7 +40,9 @@
 							{{$t('meteomap')}}
 						</router-link>
 					</b-nav-item>
-					<b-nav-item><!-- forecasts -->
+					
+					<!-- forecasts -->
+					<b-nav-item>
 						<router-link
 							class="regular"
 							to="/forecasts"
@@ -48,7 +51,9 @@
 							{{$t('forecasts')}}
 						</router-link>
 					</b-nav-item>
-					<b-nav-item><!-- about -->
+					
+					<!-- about -->
+					<b-nav-item>
 						<router-link
 							class="regular"
 							to="/about"
@@ -58,6 +63,7 @@
 						</router-link>
 					</b-nav-item>
 					
+					<!-- swich language -->
 					<LanguageSwitcher />
 					
 					<!-- search city -->
@@ -85,6 +91,7 @@
 					    	</template>
 					  	</b-input-group>
 					</div>
+					
 					<!-- refresh meteorological data -->
 					<div>
 						<b-button
@@ -102,6 +109,7 @@
 				          	/>
 				        </b-button>
 			    	</div>
+			        
 			        <!-- preferences -->
 			        <div>
 			        	<b-dropdown
@@ -129,6 +137,7 @@
 								     />
 								     <!--label>on port {{ preferences.backend.port }}</label-->
 						        </b-form-group>
+						        
 						        <!-- detailed forecast pagination/scrollbar select -->
 						        <b-form-group :label="$t('detailed forecast style')">
 						          <b-form-select
@@ -137,6 +146,7 @@
 							          @change="$event => $store.dispatch('preferences/setPreference', { preference: 'frontend.detailedForecastStyle', value: $event })"
 							      />
 						        </b-form-group>
+						        
 						        <!-- theme -->
 						        <b-form-group :label="$t('theme')">
 						          <b-form-select
@@ -200,6 +210,9 @@ export default {
 .top-header {
     background-color: gray;
     margin-bottom: 1%;
+    position: sticky;
+    top: 0;
+    z-index: 2147483647;
 }
 
 .logo {
