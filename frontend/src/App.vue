@@ -68,14 +68,42 @@
         </p>
         <!-- alternatives -->
         <div v-if="showAvailable">
-            <a
-                v-for="available in $store.getters['preferences/getPreferences'].backend.availableProtocols.filter(p => p.status === true)"
-                href=""
-                @click.prevent="$store.dispatch('preferences/setActiveProtocol', available.protocol)"
-            >
-              {{ available.url }}
-            </a>
-            <br>
+            <h6>Available URLs</h6>
+            <div>
+              <a
+                  v-for="available in $store.getters['preferences/getPreferences'].backend.availableProtocols.filter(p => p.status === true)"
+                  href=""
+                  @click.prevent="$store.dispatch('preferences/setActiveProtocol', available.protocol)"
+              >
+                  {{ available.url }}
+              </a>
+              <br>
+            </div>
+
+            <!-- set backend url manually (experimental, not working) -->
+            <!--div style="margin-left: 39%; margin-right: 39%; margin-top: 2vh;">
+                <h6>Set URL manually</h6>
+                <b-form
+                    @submit="setBackendUrl($event.srcElement[0]._value)"
+                    @reset="$event.srcElement[0]._value = null"
+                >
+                    <b-form-group
+                        id="input-group-1"
+                        label-for="input-1"
+                      >
+                          <b-form-input
+                            id="input-1"
+                            type="url"
+                            placeholder="Enter backend URL"
+                            required
+                            trim
+                          />
+                      </b-form-group>
+
+                      <b-button type="submit" variant="primary">Submit</b-button>
+                      <b-button type="reset" variant="danger">Reset</b-button>
+                </b-form>
+            </div-->
         </div>
     </div>
 </template>
@@ -84,7 +112,7 @@
 import TopHeader from './components/TopHeader.vue';
 import { BOverlay, BButton, BModal, BIconLightning } from 'bootstrap-vue'
 import SearchResults from './components/SearchResults.vue';
-import { ping } from './controllers/backend.js';
+import { pingActiveProtocol, setBackendUrl } from './controllers/backend.js';
 import { mapGetters } from 'vuex'
 
 export default {
@@ -110,12 +138,29 @@ export default {
   methods: {
       async checkBackendStatus() {
           try {
-              const res = await ping();
+              const res = await pingActiveProtocol();
               this.backendStatus = res ? res.status == 200 : false;
           }
           catch(error) {
               //this.backendStatus = 0;
           }
+      },
+
+      async initializateApp() {
+          try {
+              console.log('Checking backend status');
+              await this.$store.dispatch('preferences/initializeAvailableProtocols');
+              await this.checkBackendStatus();
+              console.log('Loading forecast data');
+              await this.$store.dispatch('allCityData/setAllCityDataAsync');
+          }
+          catch(error) {
+              console.log('Backend status is', this.backendStatus ? 'online' : 'offline'); 
+          }
+      },
+
+      setBackendUrl(url) {
+          setBackendUrl(url);
       }
   },
 
@@ -137,8 +182,9 @@ export default {
           catch(error) {
               console.log('Backend status is', this.backendStatus ? 'online' : 'offline'); 
           }
-          //console.log('Backend status is', this.backendStatus ? 'online' : 'offline');
-          this.backendStatus ? clearInterval(this.pingHandle) : this.pingHandle = setInterval(this.checkBackendStatus, 3000); // reset interval if necessary
+          this.backendStatus
+              ? (clearInterval(this.pingHandle), await this.initializateApp())
+              : this.pingHandle = setInterval(this.checkBackendStatus, 3000); // reset interval if necessary
       },
 
       theme() {
@@ -147,16 +193,7 @@ export default {
   },
 
   async created() {
-      try {
-          console.log('Checking backend status');
-          await this.$store.dispatch('preferences/initializeAvailableProtocols');
-          await this.checkBackendStatus();
-          console.log('Loading forecast data');
-          await this.$store.dispatch('allCityData/setAllCityDataAsync');
-      }
-      catch(error) {
-          console.log('Backend status is', this.backendStatus ? 'online' : 'offline'); 
-      }
+      await this.initializateApp();
   },
 
   mounted() {
