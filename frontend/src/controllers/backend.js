@@ -1,12 +1,14 @@
 import axios from 'axios';
 
-let protocol = process.env.EXPRESS_SERVER_PROTOCOLS.split(',').map(p => p.trim().toLowerCase()).includes('https') ? 'https' : 'http';
-let backendPort = protocol === 'https' ? process.env.EXPRESS_SERVER_HTTPS_PORT : process.env.EXPRESS_SERVER_HTTP_PORT;
-let baseUrl = `${protocol}://${process.env.BACKEND_DOMAIN}:${backendPort}${process.env.BACKEND_API_ENDPOINT}`;
+let backendProtocol = process.env.EXPRESS_SERVER_PROTOCOLS.split(',').map(p => p.trim().toLowerCase()).includes('https') ? 'https' : 'http';
+let backendDomain = process.env.BACKEND_DOMAIN;
+let backendPort = backendProtocol === 'https' ? process.env.EXPRESS_SERVER_HTTPS_PORT : process.env.EXPRESS_SERVER_HTTP_PORT;
+let backendEndpoint = process.env.BACKEND_API_ENDPOINT;
+let baseUrl = `${backendProtocol}://${backendDomain}:${backendPort}${backendEndpoint}`;
 
 const pingTimeout = 3000;
 // ping active protocol
-const ping = async () => {
+const pingActiveProtocol = async () => {
 	try {
 		return await axios.get(
 			`${baseUrl}ping`,
@@ -50,14 +52,26 @@ const pingProtocol = async protocol => {
 }
 // get and set backend parameters
 const setActiveProtocol = value => {
-	protocol = value;
-	backendPort = protocol === 'https' ? process.env.EXPRESS_SERVER_HTTPS_PORT : process.env.EXPRESS_SERVER_HTTP_PORT;
-	baseUrl = `${protocol}://${process.env.BACKEND_DOMAIN}:${backendPort}${process.env.BACKEND_API_ENDPOINT}`;
+	backendProtocol = value;
+	backendPort = backendProtocol === 'https' ? process.env.EXPRESS_SERVER_HTTPS_PORT : process.env.EXPRESS_SERVER_HTTP_PORT;
+	baseUrl = `${backendProtocol}://${process.env.BACKEND_DOMAIN}:${backendPort}${process.env.BACKEND_API_ENDPOINT}`;
 }
 
-const getActiveProtocol = () => protocol
+const getActiveProtocol = () => backendProtocol
 
 const getActivePort = () => backendPort
+
+const setBackendUrl = url => {
+/* parse url and set backend parameters */
+	const params = [...url.matchAll(/(.*):\/{2}(.+?):??(?=\d+)(\d*?)(\/.*)/gm)];
+	if(!params.length) return;
+	
+	backendProtocol = params[1];
+	backendDomain = params[2];
+	backendPort = params[3] || 80;
+	backendEndpoint = params[4];
+	baseUrl = url;
+}
 
 // Nominatim calls
 const nominatimSearchName = async (name, locale) => {
@@ -199,9 +213,10 @@ export {
 	postCityLatLon,
 	postCity,
 	getDetailedForecastLatLon,
-	ping,
+	pingActiveProtocol,
 	pingProtocol,
 	setActiveProtocol,
 	getActiveProtocol,
-	getActivePort
+	getActivePort,
+	setBackendUrl
 };
