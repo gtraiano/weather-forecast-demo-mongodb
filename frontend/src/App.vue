@@ -8,30 +8,104 @@
  -->
 
 <template>
+    <!-- OpenWeather API key not set -->
+    <div
+        v-if="!apiKeySet"
+        id="app"
+        tabindex="0"
+        class="container-fluid"
+    >
+        <h1>{{$t('api key not set')}}</h1>
+        <h6 style="margin-top: 20vh">{{$t('set api key')}}</h6>
+        <b-form
+            @submit="setOWApiKey($event.srcElement[0]._value)"
+            @reset="$event.srcElement[0]._value = null"
+        >
+            <b-form-group
+                id="input-group-1"
+                label-for="input-1"
+                style="width: 50%; margin-left: auto; margin-right: auto;"
+              >
+                  <b-form-input
+                    id="input-1"
+                    type="text"
+                    placeholder="Enter API key"
+                    required
+                    trim
+                  />
+              </b-form-group>
+
+              <b-button type="submit" variant="primary">Submit</b-button>
+              <b-button type="reset" variant="danger">Reset</b-button>
+        </b-form>
+        <h5 v-html="$t('set api key warn')" style="margin-top: 2vh"></h5>
+    </div>
+    
+    <!-- backend is available -->
     <div 
-        v-if="backendStatus"
+        v-else-if="apiKeySet && backendStatus"
         id="app"
         tabindex="0"
         @keydown.esc="$store.dispatch('search/clear')"
     >
         <!-- display overlay with search results -->
         <b-overlay
-            style="height: 99vh"
+            style="height: 99vh;"
             :show="$store.getters['search/getShowResults'] && !$store.getters['action/getShow']"
             :z-index="(Number.MAX_VALUE/8).toLocaleString('fullwide', { useGrouping: false })"
         >
             <template #overlay>
-                <h3> {{ $t('search for')}} <i>"{{ $store.getters['search/getSearchTerm'] }}"</i></h3>
-                <div v-if="$store.getters['search/getShowResults']">
-                    <SearchResults :results="$store.getters['search/getSearchResults']" />
+                <div
+                    style="
+                        min-width: 20vw;
+                        max-width: 30vw;
+                    "
+                >
+                    <h3> {{ $t('search for')}} <i>"{{ $store.getters['search/getSearchTerm'] }}"</i></h3>
+
+                    <div
+                        style="
+                            margin-bottom: 1vh;
+                            height: inherit;
+                        "
+                    >
+                        <b-input-group>
+                            <b-form-input
+                                id="search-input"
+                                class="search"
+                                :value="$store.getters['search/getSearchTerm']"
+                                :placeholder="$t('add city')"
+                                trim
+                                @keydown.enter="searchCity()"
+                                style="
+                                    background-color: #fff;
+                                    height: inherit;
+                                "
+                            />
+                            <template #append>
+                                <b-button
+                                  @click="searchCity()"
+                                >
+                                  <b-icon-search/>
+                                </b-button>
+                            </template>
+                          </b-input-group>
+                      </div>
+
+                    <div v-if="$store.getters['search/getShowResults']">
+                        <SearchResults :results="$store.getters['search/getSearchResults']" />
+                    </div>
+                    <br>
+                    <b-button @click="$store.dispatch('search/clear')">
+                        {{ $t('close') }}
+                    </b-button>
                 </div>
-                <br>
-                <b-button @click="$store.dispatch('search/clear')">
-                    {{ $t('close') }}
-                </b-button>
             </template>
+            
             <TopHeader/>
+            
             <router-view/>
+            
             <!-- intended to render modal inside the overlay but had trouble with its z-index being lower than the overlay's -->
             <b-modal
                 no-fade
@@ -52,8 +126,13 @@
             </b-modal>
         </b-overlay>
     </div>
-    <!-- when backend is unaivalable -->
-    <div id="app" tabindex="0" v-else>
+    
+    <!-- when backend is unavailable -->
+    <div
+        id="app"
+        tabindex="0"
+        v-else
+    >
         <!-- message -->
         <h2 style="margin-top: 50vh">{{$t('await backend')}}</h2>
         <p>
@@ -66,7 +145,7 @@
         <p v-if="$store.getters['preferences/getPreferences'].backend.availableProtocols.length">
             {{$t('or check other')}} <a href="" @click.prevent = "showAvailable = !showAvailable">{{$t('available options')}}</a>
         </p>
-        <!-- alternatives -->
+        <!-- backend url alternatives -->
         <div v-if="showAvailable">
             <h6>Available URLs</h6>
             <div>
@@ -110,9 +189,9 @@
 
 <script>
 import TopHeader from './components/TopHeader.vue';
-import { BOverlay, BButton, BModal, BIconLightning } from 'bootstrap-vue'
+import { BOverlay, BButton, BModal, BIconLightning, BIconSearch } from 'bootstrap-vue'
 import SearchResults from './components/SearchResults.vue';
-import { pingActiveProtocol, setBackendUrl } from './controllers/backend.js';
+import { pingActiveProtocol, setBackendUrl, getOWApiKey, setOWApiKey } from './controllers/backend.js';
 import { mapGetters } from 'vuex'
 
 export default {
@@ -124,71 +203,154 @@ export default {
     BButton,
     BModal,
     SearchResults,
-    BIconLightning
+    BIconLightning,
+    BIconSearch
 	},
 
   data() {
       return {
-          backendStatus: null,
-          pingHandle: null,
-          showAvailable: false
+          backendStatus: null,          // backend is available
+          pingHandle: null,             // backend ping setInterval handle
+          showAvailable: false,         // show available backend options when backend is unavailable
+          upToDate: null,               // forecast data is up to date (or needs to be refetched from openweather)
+          upToDateHandle: null,         // check forecast data up to date setInterval handle
+          upToDateLastChecked: null,     // forecast data up to date last checked
+          apiKeySet: true
       }
   },
 
   methods: {
       async checkBackendStatus() {
-          try {
-              const res = await pingActiveProtocol();
-              this.backendStatus = res ? res.status == 200 : false;
-          }
-          catch(error) {
-              //this.backendStatus = 0;
+          this.backendStatus = await pingActiveProtocol() !== 404;
+      },
+
+      checkUpToDate() {
+      /* checks forecast data is up to date */
+          let upToDate = JSON.parse(window.localStorage.getItem('upToDate')) || 0;
+          // if option to refresh outdated forecast data is disabled, return always true
+          this.upToDate = !this.autoRefetch
+              ? true
+              : !(upToDate < (Date.now() + this.$store.getters['preferences/getPreference']('frontend.autoRefetchOlderThan')*3600000));
+          this.upToDateLastChecked = Date.now();
+      },
+
+      setCheckUpToDateInterval(interval) {
+      /* sets interval for checkUpToDate(), use 0 to clear interval */
+          clearInterval(this.upToDateHandle);
+          this.upToDateHandle = 0;
+          if(interval !== 0) {
+              this.upToDateHandle = setInterval(this.checkUpToDate, interval);
           }
       },
 
       async initializateApp() {
+      /* app initialization */
           try {
+              // check backend status 
               console.log('Checking backend status');
               await this.$store.dispatch('preferences/initializeAvailableProtocols');
               await this.checkBackendStatus();
-              console.log('Loading forecast data');
-              await this.$store.dispatch('allCityData/setAllCityDataAsync');
+              if(this.backendStatus) {
+                  //console.log('OW_API_KEY', await this.getOWApiKey());
+                  this.apiKeySet = await getOWApiKey() != '';
+                  console.log(`OpenWeather API key is${this.apiKeySet ? '' : ' not'} set`)
+                  console.log('Loading forecast data');
+                  if(this.autoRefetch) {
+                      // check if forecast data is needs to be refreshed
+                      this.checkUpToDate();
+                      await this.$store.dispatch('allCityData/setAllCityDataAsync', !this.upToDate);
+                      // enable check up to date interval
+                      this.setCheckUpToDateInterval(this.upToDateCheckInterval);
+                  }
+                  else {
+                      await this.$store.dispatch('allCityData/setAllCityDataAsync', false);
+                  }
+              }
           }
           catch(error) {
               console.log('Backend status is', this.backendStatus ? 'online' : 'offline'); 
+              console.error(error.message);
           }
       },
 
       setBackendUrl(url) {
           setBackendUrl(url);
+      },
+
+      async searchCity() {
+          this.$store.dispatch('search/setSearchTerm', document.getElementById('search-input').value);
+          await this.$store.dispatch('search/setShowResults', true);
+          await this.$store.dispatch('search/searchCity');
+      },
+
+      async setOWApiKey(key) {
+          try {
+              this.apiKeySet = await setOWApiKey(key) != '';
+              console.log('API key set to', await getOWApiKey());
+            }
+            catch(error) {
+                console.error(error.message);
+            }
       }
   },
 
   computed: {
-      ...mapGetters({
-          preferences: 'preferences/getPreferences'
-      }),
-
       theme() {
-          return this.preferences.frontend.activeTheme;
+      // active app theme
+          return this.$store.getters['preferences/getPreference']('frontend.activeTheme');
+      },
+
+      autoRefetch() {
+      // automatic refetch
+          return this.$store.getters['preferences/getPreference']('frontend.autoRefetch');
+      },
+
+      upToDateCheckInterval() {
+          return this.$store.getters['preferences/getPreference']('frontend.checkUpToDatePeriod');
       }
   },
 
   watch: {
       async backendStatus() {
-          try {
-              await this.checkBackendStatus();
+          await this.checkBackendStatus();
+          console.log('Backend status is', this.backendStatus ? 'online' : 'offline');
+          if(this.backendStatus) {
+              clearInterval(this.pingHandle);
+              this.pingHandle = 0;
+              await this.initializateApp();
           }
-          catch(error) {
-              console.log('Backend status is', this.backendStatus ? 'online' : 'offline'); 
+          else {
+              this.pingHandle = setInterval(this.checkBackendStatus, 3000); // reset interval if necessary
           }
-          this.backendStatus
-              ? (clearInterval(this.pingHandle), await this.initializateApp())
-              : this.pingHandle = setInterval(this.checkBackendStatus, 3000); // reset interval if necessary
       },
 
       theme() {
           document.documentElement.setAttribute('theme', this.theme);
+      },
+
+      autoRefetch() {
+          if(!this.autoRefetch) {
+              this.setCheckUpToDateInterval(0);
+          }
+          else {
+              this.checkUpToDate();
+              this.setCheckUpToDateInterval(this.upToDateCheckInterval);
+          }
+          console.log(this.autoRefetch ? 'Enabled' : 'Disabled', 'automatic refetch');
+      },
+
+      async upToDateLastChecked(newValue, oldValue) {
+          console.log(`Forecast data is ${!this.upToDate ? 'not' : ''} up to date on ${new Date(this.upToDateLastChecked)}`);
+          if(!this.upToDate) {
+              // refresh forecast data
+              console.log('Forecast data is outdated, fetching fresh data');
+              await this.$store.dispatch('allCityData/setAllCityDataAsync', !this.upToDate);
+          }
+      },
+
+      upToDateCheckInterval() {
+          console.log('Set up to date check interval to', this.upToDateCheckInterval);
+          this.setCheckUpToDateInterval(this.upToDateCheckInterval);
       }
   },
 
@@ -251,7 +413,7 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin: 6px;
+  margin: 0px;
 }
 
 h1, h2 {
@@ -260,5 +422,13 @@ h1, h2 {
 
 a {
   color: #42b983;
+}
+
+.tooltip .arrow {
+  display: none !important;
+}
+
+#app .container-fluid {
+    margin-top: 2%;
 }
 </style>

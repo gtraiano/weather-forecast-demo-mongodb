@@ -7,49 +7,48 @@ let backendEndpoint = process.env.BACKEND_API_ENDPOINT;
 let baseUrl = `${backendProtocol}://${backendDomain}:${backendPort}${backendEndpoint}`;
 
 const pingTimeout = 3000;
-// ping active protocol
+// ping active protocol and return status code
 const pingActiveProtocol = async () => {
 	try {
-		return await axios.get(
+		const res = await axios.get(
 			`${baseUrl}ping`,
 			{
 				timeout: pingTimeout,
 				headers: { 'Access-Control-Allow-Origin': true }
 			}
 		)
+
+		return res.status;
 	}
 	catch(error) {
-		console.log(error.message);
+		return 404;
 	}
 }
 
-// ping specific protocol
+// ping specific protocol and return { protocol, url, status }
 const pingProtocol = async protocol => {
+	let res;
+	let prot = protocol.toLowerCase();
+	let url = `${prot}://${process.env.BACKEND_DOMAIN}:${prot === 'https' ? process.env.EXPRESS_SERVER_HTTPS_PORT : process.env.EXPRESS_SERVER_HTTP_PORT}${process.env.BACKEND_API_ENDPOINT}ping`;
+	let status;
 	try {
-		if(protocol.toLowerCase() === 'http') {
-			return await axios.get(
-				`http://${process.env.BACKEND_DOMAIN}:${process.env.EXPRESS_SERVER_HTTP_PORT}${process.env.BACKEND_API_ENDPOINT}ping`,
-				{
-					timeout: pingTimeout,
-					headers: { 'Access-Control-Allow-Origin': true } 
-				}
-			);
-		}
-		else if(protocol.toLowerCase() === 'https') {
-			return await axios.get(
-				`https://${process.env.BACKEND_DOMAIN}:${process.env.EXPRESS_SERVER_HTTPS_PORT}${process.env.BACKEND_API_ENDPOINT}ping`,
-				{
-					timeout: pingTimeout,
-					headers: { 'Access-Control-Allow-Origin': true } 
-				}
-			);
-		}
+		res = await axios.get(
+			url,
+			{
+				timeout: pingTimeout,
+				headers: { 'Access-Control-Allow-Origin': true } 
+			}
+		);
+		status = res.status;
 	}
 	catch(error) {
-		console.error(error.message);
-		return null;
+		status = 404;
+	}
+	finally {
+		return { protocol: prot, url: url.match(/(.*:\d+)/g)[0], status };
 	}
 }
+
 // get and set backend parameters
 const setActiveProtocol = value => {
 	backendProtocol = value;
@@ -73,6 +72,26 @@ const setBackendUrl = url => {
 	baseUrl = url;
 }
 
+const getOWApiKey = async () => {
+	try {
+		const response = await axios.get(`${baseUrl}apikey`);
+		return response.data;
+	}
+	catch(error) {
+		throw new Error('API key could not be retrieved.', error.message);
+	}
+}
+
+const setOWApiKey = async key => {
+	try {
+		const response = await axios.post(`${baseUrl}apikey?key=${key}`);
+		return response.data;
+	}
+	catch(error) {
+		throw new Error('API key could not be set.', error.message);
+	}
+}
+
 // Nominatim calls
 const nominatimSearchName = async (name, locale) => {
 	try {
@@ -80,7 +99,7 @@ const nominatimSearchName = async (name, locale) => {
 		return results.data;
 	}
 	catch(error) {
-		console.error(error.message);
+		throw new Error(`${baseUrl}nominatim/${name} ${error.message}`);
 	}
 }
 
@@ -90,7 +109,7 @@ const nominatimSearchLatLon = async (lat, lon, locale) => {
 		return results.data;
 	}
 	catch(error) {
-		console.error(error.message);
+		throw new Error(`${baseUrl}nominatim/${lat}/${lon} ${error.message}`);
 	}
 }
 
@@ -101,10 +120,11 @@ const openWeatherSarch = async (lat, lon) => {
 		return result.data;
 	}
 	catch(error) {
-		console.error(error.message);
+		throw new Error(`${baseUrl}openweather/${lat}/${lon} ${error.message}`);
 	}
 }
 
+// database calls
 // database get city
 const getAllCities = async () => {
 	try {
@@ -112,7 +132,7 @@ const getAllCities = async () => {
 		return results.data;
 	}
 	catch(error) {
-		console.error(error.message);
+		throw new Error(`${baseUrl}coords ${error.message}`);
 	}
 }
 
@@ -122,7 +142,7 @@ const updateAllCities = async () => {
 		return results.data;
 	}
 	catch(error) {
-		console.error(error.message);
+		throw new Error(`${baseUrl}coords/refetch ${error.message}`)
 	}	
 }
 
@@ -132,7 +152,7 @@ const getCityLatLon = async (lat, lon) => {
 		return result.data;
 	}
 	catch(error) {
-		console.error(error.message);
+		throw new Error(`${baseUrl}coords/${lat}/${lon} ${error.message}`);
 	}
 }
 
@@ -142,7 +162,7 @@ const updateCityLatLon = async (lat, lon) => {
 		return result.data;
 	}
 	catch(error) {
-		console.error(error.message);
+		throw new Error(`${baseUrl}coords/${lat}/${lon}/refetch ${error.message}`);
 	}
 }
 
@@ -154,7 +174,7 @@ const putCityLatLon = async (lat, lon, data) => {
 		return result.data;
 	}
 	catch(error) {
-		console.error(error.message);
+		throw new Error(`${baseUrl}coords ${error.message}`);
 	}
 }
 
@@ -165,7 +185,7 @@ const deleteCityLatLon = async (lat, lon, locale) => {
 		return result;
 	}
 	catch(error) {
-		console.error(error.message);
+		throw new Error(`${baseUrl}coords/${lat}/${lon} ${error.message}`);
 	}
 }
 
@@ -176,7 +196,7 @@ const postCityLatLon = async (lat, lon, locales) => {
 		return result.data;
 	}
 	catch(error) {
-		console.error(error.message);
+		throw new Error(`${baseUrl}coords/${lat}/${lon} ${error.message}`);
 	}
 }
 
@@ -186,17 +206,7 @@ const postCity = async data => {
 		return result.data;
 	}
 	catch(error) {
-		console.error(error.message);
-	}
-}
-
-const getDetailedForecastLatLon = async (lat, lon) => {
-	try {
-		const result = await axios.post(`${baseUrl}detailed/${lat}/${lon}`);
-		return result.data;
-	}
-	catch(error) {
-		console.error(error);
+		throw new Error(`${baseUrl}coords ${error.message}`);
 	}
 }
 
@@ -212,11 +222,12 @@ export {
 	deleteCityLatLon,
 	postCityLatLon,
 	postCity,
-	getDetailedForecastLatLon,
 	pingActiveProtocol,
 	pingProtocol,
 	setActiveProtocol,
 	getActiveProtocol,
 	getActivePort,
-	setBackendUrl
+	setBackendUrl,
+	getOWApiKey,
+	setOWApiKey
 };

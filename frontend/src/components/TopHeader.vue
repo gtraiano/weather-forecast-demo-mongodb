@@ -14,16 +14,25 @@
 		toggleable="md"
 		type="dark"
 		variant="dark"
+		style="
+			height: 100%;
+			margin: 0;
+			padding-top: auto;
+			padding-bottom: auto;
+			position: relative;
+		"
 	>
 		<!--b-navbar-brand>
 			<img src="../assets/logo_rect.png" class="logo">
 		</b-navbar-brand-->
 		<b-navbar-toggle
 			target="nav-collapse"
+			style="height: 100%;"
 		/>
 			<b-collapse
 				id="nav-collapse"
 				is-nav
+				style="height: 100%;"
 			>
 				<!-- Right aligned nav items -->
 				<b-navbar-nav
@@ -117,21 +126,21 @@
 			        		right
 			        		lazy
 			        		@show="$store.dispatch('preferences/initializeAvailableProtocols')"
-			        		v-b-tooltip.hover.bottom.ds500
-							:title="$t('preferences')"
+			        		v-b-tooltip.hover.bottom.ds500.title="`${$t('preferences')}`"
 			        	>
 			        		<template #button-content>
         						<b-icon-gear/>
       						</template>
       						<!-- backend protocol select -->
-      						<b-dropdown-form style="min-width: max-content; max-width: max-content;">
+      						<b-dropdown-form style="width: 20vw;">
       							<b-form-group
       								:label="$t('backend protocol')"
       								class="mb-2"
+      								title=""
       							>
 							         <b-form-select
-							         	:disabled="preferences.backend.availableProtocols.filter(p => p.status === true).length === 1"
-								        :options="preferences.backend.availableProtocols.filter(p => p.status === true).map(p => ({ text: p.protocol.toUpperCase(), value: p.protocol }) )"
+							         	:disabled="preferences.backend.availableProtocols.filter(p => p.status !== 404).length <= 1"
+								        :options="preferences.backend.availableProtocols.filter(p => p.status !== 404).map(p => ({ text: p.protocol.toUpperCase(), value: p.protocol }) )"
 								        :value="preferences.backend.activeProtocol"
 								        @change="$event => $store.dispatch('preferences/setActiveProtocol', $event)"
 								     />
@@ -139,22 +148,86 @@
 						        </b-form-group>
 						        
 						        <!-- detailed forecast pagination/scrollbar select -->
-						        <b-form-group :label="$t('detailed forecast style')">
-						          <b-form-select
-							          :options="['paginated', 'scrollbar'].map(o => ({ text: $t(o), value: o}))"
-							          :value="preferences.frontend.detailedForecastStyle"
-							          @change="$event => $store.dispatch('preferences/setPreference', { preference: 'frontend.detailedForecastStyle', value: $event })"
-							      />
+						        <b-form-group
+						        	:label="$t('detailed forecast style')"
+						        	title=""
+						        >
+						          	<b-form-select
+							          	:options="['paginated', 'scrollbar'].map(o => ({ text: $t(o), value: o}))"
+							          	:value="preferences.frontend.detailedForecastStyle"
+							          	@change="$event => $store.dispatch('preferences/setPreference', { preference: 'frontend.detailedForecastStyle', value: $event })"
+							      	/>
 						        </b-form-group>
 						        
 						        <!-- theme -->
-						        <b-form-group :label="$t('theme')">
-						          <b-form-select
-							          :options="preferences.frontend.availableThemes"
-							          :value="preferences.frontend.activeTheme"
-							          @change="$event => $store.dispatch('preferences/setPreference', { preference: 'frontend.activeTheme', value: $event })"
-							      />
+						        <b-form-group
+						        	:label="$t('theme')"
+						        	title=""
+						        >
+						          	<b-form-select
+							          	:options="preferences.frontend.availableThemes"
+							          	:value="preferences.frontend.activeTheme"
+							          	@change="$event => $store.dispatch('preferences/setPreference', { preference: 'frontend.activeTheme', value: $event })"
+							      	/>
 						        </b-form-group>
+
+						        <!-- auto refetch -->
+						        <b-form-group>
+							        <b-form-checkbox
+							        	:checked="preferences.frontend.autoRefetch"
+							        	@change="$event => $store.dispatch('preferences/setPreference', { preference: 'frontend.autoRefetch', value: $event })"
+							        >
+							    		{{$t('auto refresh')}}
+							    	</b-form-checkbox>
+						    	</b-form-group>
+
+						    	<!-- auto refetch period -->
+						    	<b-form-group
+						    		:style="{ opacity: preferences.frontend.autoRefetch ? 1 : 0.5 }"
+						    		title=""
+						    	>
+						    		{{$t('auto refresh period')}}
+							    	<b-form-input
+							    		style="
+							    			min-width: 15%;
+							    			max-width: 20%;
+							    			display: inline;
+							    			padding: 0% 1% 0% 1%;
+							    			text-align: center;
+							    		"
+							    		type="number"
+							    		:value="preferences.frontend.autoRefetchOlderThan"
+							    		min="1"
+							    		max="72"
+							    		@change="$event => $store.dispatch('preferences/setPreference', { preference: 'frontend.autoRefetchOlderThan', value: $event })"
+							    		:disabled="!preferences.frontend.autoRefetch"
+							    	/>
+							    	{{$t('hours')}}
+						    	</b-form-group>
+
+						    	<!-- check fresh data period -->
+						    	<b-form-group
+						    		:style="{ opacity: preferences.frontend.autoRefetch ? 1 : 0.5 }"
+						    		title=""
+						    	>
+						    		{{$t('check period')}}
+							    	<b-form-input
+							    		style="
+							    			min-width: 15%;
+							    			max-width: 20%;
+							    			display: inline;
+							    			padding: 0% 1% 0% 1%;
+							    			text-align: center;
+							    		"
+							    		type="number"
+							    		:value="preferences.frontend.checkUpToDatePeriod/60000"
+							    		min="1"
+							    		@change="$event => $store.dispatch('preferences/setPreference', { preference: 'frontend.checkUpToDatePeriod', value: $event*60000 })"
+							    		:disabled="!preferences.frontend.autoRefetch"
+							    	/>
+							    	{{$t('mins')}}
+						    	</b-form-group>
+
       						</b-dropdown-form>
 			        	</b-dropdown>
 			        </div>
@@ -179,17 +252,9 @@ export default {
 		BIconGear
 	},
 
-	data() {
-		return {
-			refreshing: false
-		}
-	},
-
 	methods: {
 		async refreshForecastData() {
-			this.refreshing = true;
 			await this.$store.dispatch('allCityData/setAllCityDataAsync', true);
-			this.refreshing = false;
 		},
 
 		async searchCity() {
@@ -200,7 +265,8 @@ export default {
 
 	computed: {
 		...mapGetters({
-			preferences: 'preferences/getPreferences'
+			preferences: 'preferences/getPreferences',
+			refreshing: 'allCityData/getFetching'
 		})
 	}
 }
@@ -208,11 +274,13 @@ export default {
 
 <style scoped>
 .top-header {
-    background-color: gray;
-    margin-bottom: 1%;
+    background-color: var(--dark);
+    /*margin-bottom: 1%;*/
     position: sticky;
     top: 0;
     z-index: 2147483647;
+    min-height: 4vh;
+    max-height: 4vh;
 }
 
 .logo {
@@ -233,6 +301,10 @@ export default {
 	text-decoration: none;
     font-weight: bold;
 	color: white;
+}
+
+>>> .dropdown-menu {
+	top: 4.75vh;
 }
 
 *:focus {
