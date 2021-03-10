@@ -1,4 +1,5 @@
 /*
+
 PATH						METHOD			PARAMETERS 						HEADERS 										ACTION
 
 /coords 					GET 																							get all cities in database
@@ -18,6 +19,11 @@ PATH						METHOD			PARAMETERS 						HEADERS 										ACTION
 
 /nominatim/:name 			GET 											Locale = search results locale					Nominatim search
 /nominatim/:lat:/lon 		GET 			lat=latitude lon=longitude 		Locale = search result locale					Nominatim reverse search
+
+/ping						GET																								returns 'pong' (check if backend is running)
+/apikey						GET																								returns OpenWeather API key
+/apikey						POST			query: ?key='key'																sets OpenWeather API key to 'key'
+
 */
 
 const { searchCity } = require('./services/NominatimSearch');
@@ -88,22 +94,22 @@ const unixToJsDatetime = (req, res, next) => {
 
 const refetchForecastData = async (lat, lon) => {
 /* refetches fresh data from OpenWeather fot city document */
-	const forecastData = await owService.fetchCity(lat, lon);
-	
-	if(!forecastData) { // something wrong with the api call
-		throw new Error('OpenWeather API call wrong parameter');
-		return;
+	try {
+		const forecastData = await owService.fetchCity(lat, lon);
+		// get rid of coords from OpenWeather data
+		delete forecastData.lat;
+		delete forecastData.lon;
+
+		return {
+			lat: Number.parseFloat(lat),
+			lon: Number.parseFloat(lon),
+			...forecastData
+		};
 	}
-
-	// get rid of coords from OpenWeather data
-	delete forecastData.lat;
-	delete forecastData.lon;
-
-	return {
-		lat: Number.parseFloat(lat),
-		lon: Number.parseFloat(lon),
-		...forecastData
-	};
+	catch (error) {
+		//console.log(`OpenWeather API call failed for lat: ${lat} lon: ${lon}`);
+		throw error;
+	}
 }
 
 const express = require('express');
@@ -122,33 +128,38 @@ router.get('/coords', async (req, res, next) => {
 });
 
 router.get('/coords/refetch', async (req, res, next) => {
-/* get all cities from database */
+/* get all cities from database and refreshes their forecast data */
 	let results = await forecastDb.allCities();
 	
 	results = await Promise.all(
-		results.map( async city => ({ ...city, ...await refetchForecastData(city.lat, city.lon) }) )
+		results.map( async city => {
+			try {
+				const updated = await refetchForecastData(city.lat, city.lon);
+				// add updated property to declare if forecast data updated or not
+				return { updated: true, ...city, ...updated }
+			}
+			catch(error) {
+				return { updated: false, ...city };
+			}
+		})
 	);
-	await forecastDb.insertCities(results);
+	await forecastDb.updateCities(results.filter(city => city.updated == true ));
 
-	res.json(results);
+	res.json(results.map(city => {
+		delete city.updated;
+		return city;
+	}));
 });
 
 router.get('/coords/:lat/:lon', async (req, res, next) => {
 /* get city by lat & lon */
 	try {
-		let forecastData = null;
 		let cityData = await forecastDb.findCity(req.params.lat, req.params.lon);
-
-		if(!cityData) {
-			res.status(404).end();
-			return;
-		}
-
-		forecastData = await forecastDb.findCity(req.params.lat, req.params.lon);
-		forecastData ? res.json(forecastData) : res.status(404).end();
+		res.json(cityData);
 	}
 	catch(error) {
-		res.status(404).end();
+		//res.status(404).end();
+		res.status(404).json({ error: error.message });
 		next(error);
 	}
 });
@@ -159,33 +170,12 @@ router.get('/coords/:lat/:lon/refetch', async (req, res, next) => {
 		let forecastData = null;
 		let cityData = await forecastDb.findCity(req.params.lat, req.params.lon);
 
-		if(!cityData) {
-			res.status(404).end();
-			return;
-		}
-
 		const updated = await refetchForecastData(req.params.lat, req.params.lon);
-		await forecastDb.insertCity({ ...cityData, ...updated });
-		forecastData = await forecastDb.findCity(req.params.lat, req.params.lon);
-		forecastData ? res.json(forecastData) : res.status(404).end();
+		forecastData = await forecastDb.updateCity(req.params.lat, req.params.lon, { ...cityData, ...updated });
+		res.json(forecastData);
 	}
 	catch(error) {
-		res.status(404).end();
-		next(error);
-	}
-});
-
-router.get('detailed/:lat/:lon', async (req, res, next) => {
-	try {
-		let forecast = await forecastDb.findCity(req.params.lat, req.params.lon);
-		if(!forecast) {
-			res.status(404).end();
-			return;
-		}
-		res.json(detailed.hourly);
-	}
-	catch(error) {
-		res.status(404).end();
+		res.status(404).json({ error: error.message });
 		next(error);
 	}
 });
@@ -199,9 +189,9 @@ router.put('/coords/:lat/:lon', async (req, res, next) => {
 
 		}
 		const result = await forecastDb.updateCity(req.params.lat, req.params.lon, body);
-		if(result.matchedCount && result.modifiedCount) res.json(200).end();
-		else if(result.matchedCount && !result.modifiedCount) res.status(304).end();
-		else res.status(404).end();
+		/*if(result) res.json(200).end();
+		else res.status(404).end();*/
+		res.status(200).json(result);
 	}
 	catch(error){
 		res.status(404).end()
@@ -241,11 +231,6 @@ router.post('/coords/:lat/:lon', async (req, res, next) => {
 		);
 
 		forecastData = await owService.fetchCity(req.params.lat, req.params.lon);
-		
-		if(!forecastData || !locationData) { // something wrong with the api calls parameters
-			res.status(400).end();
-			return;
-		}
 
 		// we want keep coords from location data only
 		delete forecastData.lat;
@@ -268,8 +253,13 @@ router.post('/coords/:lat/:lon', async (req, res, next) => {
 });
 
 router.delete('/coords/:lat/:lon', async (req, res, next) => {
-	const result = await forecastDb.removeCity(req.params.lat, req.params.lon);
-	res.status(result.deletedCount === 1 ? 200 : 404).end();
+	try {
+		await forecastDb.removeCity(req.params.lat, req.params.lon);
+		res.status(200).end();
+	}
+	catch(error) {
+		res.status(404).end();
+	}
 });
 
 router.get('/openweather/:lat/:lon', async (req, res, next) => {
@@ -279,6 +269,7 @@ router.get('/openweather/:lat/:lon', async (req, res, next) => {
 		res.json(data);
 	}
 	catch(error) {
+		res.status(404).json({ error: error.message });
 		next(error);
 	}
 });
@@ -290,6 +281,7 @@ router.get('/nominatim/:name', async (req, res, next) => {
 		res.json(data);
 	}
 	catch(error) {
+		res.status(404).json({ error: error.message });
 		next(error);
 	}
 })
@@ -301,6 +293,7 @@ router.get('/nominatim/:lat/:lon', async (req, res, next) => {
 		res.json(data);
 	}
 	catch(error) {
+		res.status(404).json({ error: error.message });
 		next(error);
 	}
 })
@@ -308,5 +301,19 @@ router.get('/nominatim/:lat/:lon', async (req, res, next) => {
 router.get('/ping', (req, res) => {
 	res.send('pong');
 });
+
+router.get('/apikey', (req, res) => {
+	res.send(owService.getOWApiKey());
+});
+
+router.post('/apikey', (req, res) => {
+	if(req.query.key) {
+		owService.setOWApiKey(req.query.key);
+		res.status(200).send(owService.getOWApiKey()); // respond with newly set key
+	}
+	else {
+		res.status(400).end();
+	}
+})
 
 module.exports = router;

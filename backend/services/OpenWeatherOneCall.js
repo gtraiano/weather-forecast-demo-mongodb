@@ -3,7 +3,7 @@ const axios = require('axios');
 
 const cities = require('./supportedcities.json');
 const baseUrl = 'https://api.openweathermap.org/data/2.5/onecall';
-const apiKey = process.env.OW_API_KEY;
+let apiKey = process.env.OW_API_KEY;
 
 
 // params = (lat, lon)
@@ -12,19 +12,19 @@ const prepareQuery = (lat, lon) => {
 }
 
 // fetch single query
-const fetchQuery = async (query, retries = 5) => {
+const fetchQuery = async (query, retries = 2) => {
 	try {
 		console.log(`Fetching ${query}`)
-		return await axios.get(query); // needs to be resolved
+		return await axios.get(query, { timeout: 1073741824 }); // needs to be resolved
 	}
 	catch (error) {
 		console.log(`Retrying ${query}`)
 		if (retries === 1) {
 			console.log(`Failed ${query}`);
-			throw error
+			throw new Error(`Failed ${query}`);
 		}
 		
-		setTimeout(() => {}, 100)
+		setTimeout(() => {}, 200);
 		return fetchQuery(query, retries - 1);
 	}
 }
@@ -33,33 +33,36 @@ const fetchQuery = async (query, retries = 5) => {
 const fetchBatch = async batch => {
 	let data = [];
 
-	try {
-		data = batch.map(async entry => { // entry = { id, name, lat, lon }
-			let query = prepareQuery(entry.lat, entry.lon)
-			let response = await fetchQuery(query)
-
+	data = batch.map(async (entry, index) => { // entry = { id, name, lat, lon }
+		let query = prepareQuery(entry.lat, entry.lon)
+		let response;
+		try {
+			response = await Promise.resolve(fetchQuery(query));
 			return ({
 				cityId: entry.id,
 				name: entry.name,
 				...response.data
 			});
-		});
-	}
-	catch (error) {
-		throw error;
-	}
+		}
+		catch(error) {
+			return ({
+				cityId: entry.id,
+				name: entry.name,
+			});
+		}
+	});
 
 	return Promise.all(data);
 }
 
 const fetchCity = async (lat, lon) => {
 	try {
-		const response = await fetchQuery(prepareQuery(lat, lon));
+		const response = await Promise.resolve(fetchQuery(prepareQuery(lat, lon)));
 		return response.data;
 	}
 
 	catch (error) {
-		console.log(error.message);
+		throw error;
 	}
 }
 
@@ -70,8 +73,16 @@ const fetchAllCities = async (cityList = cities) => {
 		return response;
 	}
 	catch (error) {
-		console.log(error.message);
+		//console.log(error.message);
 	}
 }
 
-module.exports = { fetchAllCities, fetchCity }
+const setOWApiKey = key => {
+	apiKey = key;
+}
+
+const getOWApiKey = () => {
+	return apiKey;
+}
+
+module.exports = { fetchAllCities, fetchCity, getOWApiKey, setOWApiKey }
