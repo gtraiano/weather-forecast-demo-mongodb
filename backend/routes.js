@@ -94,22 +94,16 @@ const unixToJsDatetime = (req, res, next) => {
 
 const refetchForecastData = async (lat, lon) => {
 /* refetches fresh data from OpenWeather fot city document */
-	try {
-		const forecastData = await owService.fetchCity(lat, lon);
-		// get rid of coords from OpenWeather data
-		delete forecastData.lat;
-		delete forecastData.lon;
+	const forecastData = await owService.fetchCity(lat, lon);
+	// get rid of coords from OpenWeather data
+	delete forecastData.lat;
+	delete forecastData.lon;
 
-		return {
-			lat: Number.parseFloat(lat),
-			lon: Number.parseFloat(lon),
-			...forecastData
-		};
-	}
-	catch (error) {
-		//console.log(`OpenWeather API call failed for lat: ${lat} lon: ${lon}`);
-		throw error;
-	}
+	return {
+		lat: Number.parseFloat(lat),
+		lon: Number.parseFloat(lon),
+		...forecastData
+	};
 }
 
 const express = require('express');
@@ -160,7 +154,7 @@ router.get('/coords/:lat/:lon', async (req, res, next) => {
 	catch(error) {
 		//res.status(404).end();
 		res.status(404).json({ error: error.message });
-		next(error);
+		next(error.message);
 	}
 });
 
@@ -176,7 +170,7 @@ router.get('/coords/:lat/:lon/refetch', async (req, res, next) => {
 	}
 	catch(error) {
 		res.status(404).json({ error: error.message });
-		next(error);
+		next(error.message);
 	}
 });
 
@@ -195,7 +189,7 @@ router.put('/coords/:lat/:lon', async (req, res, next) => {
 	}
 	catch(error){
 		res.status(404).end()
-		next(error);
+		next(error.message);
 	}
 });
 
@@ -212,7 +206,7 @@ router.post('/coords', async (req, res, next) => {
 	}
 	catch(error) {
 		res.status(404).end();
-		next(error);
+		next(error.message);
 	}
 });
 
@@ -248,7 +242,7 @@ router.post('/coords/:lat/:lon', async (req, res, next) => {
 	}
 	catch(error) {
 		res.status(404).end();
-		next(error);
+		next(error.message);
 	}
 });
 
@@ -259,6 +253,7 @@ router.delete('/coords/:lat/:lon', async (req, res, next) => {
 	}
 	catch(error) {
 		res.status(404).end();
+		next(error.message);
 	}
 });
 
@@ -270,7 +265,7 @@ router.get('/openweather/:lat/:lon', async (req, res, next) => {
 	}
 	catch(error) {
 		res.status(404).json({ error: error.message });
-		next(error);
+		next(error.message);
 	}
 });
 
@@ -282,7 +277,7 @@ router.get('/nominatim/:name', async (req, res, next) => {
 	}
 	catch(error) {
 		res.status(404).json({ error: error.message });
-		next(error);
+		next(error.message);
 	}
 })
 
@@ -294,7 +289,7 @@ router.get('/nominatim/:lat/:lon', async (req, res, next) => {
 	}
 	catch(error) {
 		res.status(404).json({ error: error.message });
-		next(error);
+		next(error.message);
 	}
 })
 
