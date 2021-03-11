@@ -13,10 +13,6 @@ let collection = null;
 const insertCity = async city => {
 // (C)reates city
 	const result = await collection.updateOne({ lat: Number.parseFloat(city.lat), lon: Number.parseFloat(city.lon) }, { $set: { ...city } }, { upsert: true });
-	/*if(result.insertedCount !== 1) {
-		throw new Error(`Inserting lat:${city.lat} lon:${city.lon} failed`);
-	}*/
-	console.log(result)
 	if(!result.upsertedCount) {
 		throw new Error(`Inserting lat:${city.lat} lon:${city.lon} failed`);
 	}
@@ -34,15 +30,14 @@ const findCity = async (lat, lon) => {
 
 const updateCity = async (lat, lon, data) => {
 // (U)pdates city
-	const result = await collection.updateOne({ lat: Number.parseFloat(lat), lon: Number.parseFloat(lon) }, { $set: { ...data } });
-	if(result.matchedCount === 0) {
+	const result = await collection.findOneAndUpdate({ lat: Number.parseFloat(lat), lon: Number.parseFloat(lon) }, { $set: { ...data } });
+	if(!result.lastErrorObject.n) {
 		throw new Error(`lat: ${lat} lon: ${lon} does not exist`);
 	}
-	/*if(result.modifiedCount || result.matchedCount) {
+	else if(!result.lastErrorObject.updatedExisting) {
 		throw new Error(`Updating lat: ${lat} lon: ${lon} failed`);
-	}*/
-	//return result;
-	return await collection.findOne({ lat: Number.parseFloat(lat), lon: Number.parseFloat(lon) }); // return updated document
+	}
+	return result.value;
 }
 
 const removeCity = async (lat, lon) => {
