@@ -429,6 +429,6 @@ a {
 }
 
 #app .container-fluid {
-    margin-top: 2%;
+    margin-top: 1%;
 }
 </style>
