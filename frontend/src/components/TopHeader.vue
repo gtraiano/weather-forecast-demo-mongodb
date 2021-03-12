@@ -279,8 +279,7 @@ export default {
     position: sticky;
     top: 0;
     z-index: 2147483647;
-    min-height: 4vh;
-    max-height: 4vh;
+    height: max-content;
 }
 
 .logo {
@@ -304,7 +303,8 @@ export default {
 }
 
 >>> .dropdown-menu {
-	top: 4.75vh;
+	position: absolute;
+	top: 130%;
 }
 
 *:focus {
