@@ -50,7 +50,6 @@
     >
         <!-- display overlay with search results -->
         <b-overlay
-            style="height: 99vh;"
             :show="$store.getters['search/getShowResults'] && !$store.getters['action/getShow']"
             :z-index="(Number.MAX_VALUE/8).toLocaleString('fullwide', { useGrouping: false })"
         >
