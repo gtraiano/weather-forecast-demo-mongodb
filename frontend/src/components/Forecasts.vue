@@ -368,7 +368,8 @@ export default {
               //currentDate.setTime(currentDate.getTime() + counter*this.overviewPeriod*60*60*1000)
               currentDate = new Date(now + counter*this.overviewPeriod*60*60*1000);
               let new_label = {
-                  key: String(counter),
+                  //key: String(counter),
+                  key: `forecast_${counter}`,
                   sortable: true,
                   label: currentDate.toLocaleDateString(this.$i18n.locale, options)
               }
