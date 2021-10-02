@@ -18,6 +18,7 @@ const cors = require('cors');
 const compression = require('compression');
 
 const server = express();
+server.use(express.static('dist'));
 
 // middleware
 server.use(function timeLog (req, res, next) { // logging timestamp
