@@ -16,6 +16,21 @@
 			@wheel.prevent="onWheel"
 		>
 			<b-card
+				v-if="paginated"
+				class="chevron"
+				body-class="chevron"
+			>
+				<b-icon-chevron-left
+					style="
+						height: auto;
+						vertical-align: middle;
+						cursor: pointer;
+					"
+					scale="2"
+					@click="currentPage -= currentPage > 1 ? 1 : 0"
+				/>
+			</b-card>
+			<b-card
 				v-for="(item, index) in cardSet"
 				:key="item.dt"
 				class="text-center"
@@ -90,6 +105,21 @@
 					</b-container>
 				</b-card-text>
 			</b-card>
+			<b-card
+				v-if="paginated"
+				class="chevron"
+				body-class="chevron"
+			>
+				<b-icon-chevron-right
+					style="
+						height: 100%;
+						vertical-align: middle;
+						cursor: pointer;
+					"
+					scale="2"
+					@click="currentPage += currentPage < Math.trunc(forecastData.hourly.length/cardsPerPage) ? 1 : 0"
+				/>
+			</b-card>
 		</b-card-group>
 		<div
 			v-if="paginated"
@@ -123,7 +153,7 @@
 
 <script>
 import { getCityLatLon } from '../controllers/backend'
-import { BIconThreeDots } from 'bootstrap-vue'
+import { BIconThreeDots, BIconChevronLeft, BIconChevronRight } from 'bootstrap-vue'
 
 export default {
 	name: 'DetailedForecast',
@@ -149,7 +179,7 @@ export default {
 		},
 	},
 
-	components: { BIconThreeDots },
+	components: { BIconThreeDots, BIconChevronLeft, BIconChevronRight },
 
 	data() {
 		return {
@@ -308,3 +338,16 @@ export default {
 	}
 }
 </script>
+
+<style scoped>
+.chevron {
+	max-width: min-content;
+	padding-left: 0 !important;
+	padding-right: 0 !important;
+	margin-left: 0 !important;
+	margin-right: 0 !important;
+	background-color: rgba(0,0,0,0) !important;
+	border-color: rgba(0,0,0,0) !important;
+	align-self: center;
+}
+</style>
