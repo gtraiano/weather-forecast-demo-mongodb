@@ -24,6 +24,7 @@
     .input-group-append, .input-group-append * {
         background-color: var(--dark) !important;
         color: var(--light) !important;
+        border-color: var(--gray);
     }
 
     .list-group-item {
@@ -273,14 +274,15 @@
         color: var(--green);
     }
 
-    .input-group-append, .input-group-append {
+    .input-group-append {
         background-color: inherit;
         color: inherit;
-        border-style: solid;
-        border-width: 1px;
+        /*border-style: solid;
+        border-width: 0px;
         border-top-right-radius: 3px;
         border-bottom-right-radius: 3px;
-        border-color: var(--light);
+        border-color: var(--light);*/
+        border: none;
     }
 
     .top-header .btn {
