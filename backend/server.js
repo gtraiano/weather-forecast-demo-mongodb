@@ -92,7 +92,7 @@ async function connectDb(retries = 5) {
 	try {
 		console.log('Connecting to MongoDB server')
 		await forecastDb.connect();
-		console.log('Connected to MongoDB server on port', process.env.MONGODB_PORT);	
+		console.log('Connected to MongoDB at', process.env.MONGODB_URI.match(/@.*\//)[0]);
 	}
 	catch(error) {
 		if(retries === 1) {
@@ -100,7 +100,7 @@ async function connectDb(retries = 5) {
 			process.exitCode = 1;
 			process.exit();
 		}
-		console.error(`Failed to connect to MongoDB server on port ${process.env.MONGODB_PORT} [Error: ${error.message}]`);
+		console.error(`Failed to connect to MongoDB at ${process.env.MONGODB_URI.match(/@.*\//)} [Error: ${error.message}]`);	
 		console.log(`Retrying to connect to MongoDB server, remaining attempts: ${retries - 1}`);
 		return connectDb(retries - 1);
 	}

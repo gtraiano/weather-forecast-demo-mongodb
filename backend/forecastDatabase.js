@@ -2,7 +2,7 @@ const { MongoClient } = require('mongodb');
  
 const dbName = 'weather-forecast';
 const collectionName = 'forecasts';
-const uri = `mongodb://localhost:${process.env.MONGODB_PORT}`;
+const uri = process.env.MONGODB_URI
 let client = null;
 let database = null;
 let collection = null;
