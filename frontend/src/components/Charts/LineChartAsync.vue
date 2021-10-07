@@ -19,6 +19,7 @@ import LineChart from './LineChart.vue'
 
 export default {
     name: 'LineChartAsync',
+
     props: {
         chartData: {
             type: Promise
@@ -37,39 +38,39 @@ export default {
         },
     },
   
-  components: { LineChart },
-  
-  data: () => ({
-      loaded: false,
-      data: null
-  }),
+    components: { LineChart },
+    
+    data: () => ({
+        loaded: false,
+        data: null
+    }),
 
-  watch: {
-      async chartData(newValue, oldValue) {
-          this.loaded = false
-          try {
-              this.data = await newValue
-              this.loaded = true
-          }
-          catch(e) {
-              console.error(e)
-          }
-      },
+    watch: {
+        async chartData(newValue, oldValue) {
+            this.loaded = false
+            try {
+                this.data = await newValue
+                this.loaded = true
+            }
+            catch(e) {
+                console.error(e)
+            }
+        },
 
-      scale(newValue, oldValue) {
-          console.log(newValue);
-      }
-  },
-  
-  async mounted () {
-      this.loaded = false
-      try {
-          this.data = await this.chartData
-          this.loaded = true
-      }
-      catch (e) {
-          console.error(e)
-      }
-  }
+        scale(newValue, oldValue) {
+            console.log(newValue);
+        }
+    },
+    
+    async mounted () {
+        this.loaded = false
+        try {
+            this.data = await this.chartData
+            this.loaded = true
+        }
+        catch (e) {
+            console.error(e)
+        }
+    }
 }
 </script>

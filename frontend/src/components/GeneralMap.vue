@@ -96,7 +96,7 @@ import { LMap, LTileLayer, LMarker, LPopup, LControlAttribution, LTooltip, LCont
 import { Icon }  from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { mapGetters } from 'vuex'
-import PopupChart from './PopupChart.vue'
+import { PopupChart } from './Charts'
 
 // this part resolve an issue where the markers would not appear
 delete Icon.Default.prototype._getIconUrl;

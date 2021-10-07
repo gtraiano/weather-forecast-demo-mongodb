@@ -2,7 +2,7 @@
 	<!-- render results if they exist -->
 	<b-list-group
 		v-if="results.length"
-		:style="{ maxHeight: '500px', overflow: 'auto', scrollbarWidth: 'thin'}"
+		:style="{ maxHeight: '500px', overflow: 'auto', scrollbarWidth: 'thin', ...containerStyle }"
 	>
 		<b-list-group-item
 			v-for="(result, index) in results"
@@ -48,7 +48,7 @@ import { BIconCheck, BIconThreeDots } from 'bootstrap-vue'
 import { mapGetters } from 'vuex'
 
 export default {
-	name: 'SearchResults',
+	name: 'SearchResultsList',
 	
 	components: {
 		BIconCheck,
@@ -84,6 +84,11 @@ export default {
 			default: function() {
 				return [];
 			}	
+		},
+
+		containerStyle: {
+			type: Object,
+			required: false
 		}
 	},
 

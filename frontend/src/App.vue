@@ -9,38 +9,19 @@
 
 <template>
     <!-- OpenWeather API key not set -->
-    <div
-        v-if="!apiKeySet"
-        id="app"
-        tabindex="0"
-        class="container-fluid"
-    >
-        <h1>{{$t('api key not set')}}</h1>
-        <h6 style="margin-top: 20vh">{{$t('set api key')}}</h6>
-        <b-form
-            @submit="setOWApiKey($event.srcElement[0]._value)"
-            @reset="$event.srcElement[0]._value = null"
-        >
-            <b-form-group
-                id="input-group-1"
-                label-for="input-1"
-                style="width: 50%; margin-left: auto; margin-right: auto;"
-              >
-                  <b-form-input
-                    id="input-1"
-                    type="text"
-                    placeholder="Enter API key"
-                    required
-                    trim
-                  />
-              </b-form-group>
+    <OWApiKey
+      v-if="!apiKeySet"
+      :isOWApiKeySet="apiKeySet"
+      :setOWApiKey="setOWApiKey"
+    />
 
-              <b-button type="submit" variant="primary">Submit</b-button>
-              <b-button type="reset" variant="danger">Reset</b-button>
-        </b-form>
-        <h5 v-html="$t('set api key warn')" style="margin-top: 2vh"></h5>
-    </div>
-    
+    <!-- backend is unavailable -->
+    <BackendStatus
+      v-else-if="!backendStatus"
+      :isBackendOnline="backendStatus"
+      :showAvailableUrls="showAvailable"
+    />
+
     <!-- backend is available -->
     <div 
         v-else-if="apiKeySet && backendStatus"
@@ -54,58 +35,32 @@
             :z-index="(Number.MAX_VALUE/8).toLocaleString('fullwide', { useGrouping: false })"
         >
             <template #overlay>
-                <div
-                    style="
-                        min-width: 20vw;
-                        max-width: 30vw;
-                    "
-                >
-                    <h3> {{ $t('search for')}} <i>"{{ $store.getters['search/getSearchTerm'] }}"</i></h3>
-
-                    <div
-                        style="
-                            margin-bottom: 1vh;
-                            height: inherit;
-                        "
-                    >
-                        <b-input-group>
-                            <b-form-input
-                                id="search-input"
-                                class="search"
-                                :value="$store.getters['search/getSearchTerm']"
-                                :placeholder="$t('add city')"
-                                trim
-                                @keydown.enter="searchCity()"
-                                style="
-                                    background-color: #fff;
-                                    height: inherit;
-                                "
-                            />
-                            <template #append>
-                                <b-button
-                                  @click="searchCity()"
-                                >
-                                  <b-icon-search/>
-                                </b-button>
-                            </template>
-                          </b-input-group>
-                      </div>
-
-                    <div v-if="$store.getters['search/getShowResults']">
-                        <SearchResults :results="$store.getters['search/getSearchResults']" />
-                    </div>
-                    <br>
-                    <b-button @click="$store.dispatch('search/clear')">
-                        {{ $t('close') }}
-                    </b-button>
+                <div style="width: 100vw; position: relative; height: 6vh;">
+                  <Alert/>
                 </div>
+                <SearchResults :searchCity="searchCity" />
             </template>
-            
+
+            <!-- app contents when overlay is off -->
+            <!-- navigation header -->
             <TopHeader/>
-            
+            <!-- alert -->
+            <div
+              :style="{
+                height: '6vh',
+                maxHeight: 'max-content',
+                width: '100%',
+                position: 'absolute',
+                top: '3.5em',
+                zIndex: $store.getters['alert/getShow'] ? 10000 : 0
+              }"
+            >
+              <Alert v-if="!$store.getters['search/getShowResults']" />
+            </div>
+            <!-- render active route view -->
             <router-view/>
-            
-            <!-- intended to render modal inside the overlay but had trouble with its z-index being lower than the overlay's -->
+
+            <!-- confirmation dialog box -->
             <b-modal
                 no-fade
                 hide-backdrop
@@ -125,73 +80,15 @@
             </b-modal>
         </b-overlay>
     </div>
-    
-    <!-- when backend is unavailable -->
-    <div
-        id="app"
-        tabindex="0"
-        v-else
-    >
-        <!-- message -->
-        <h2 style="margin-top: 50vh">{{$t('await backend')}}</h2>
-        <p>
-            <b-icon-lightning
-                class="h1"
-                animation="fade"
-            />
-        </p>
-        <!-- present alternatives on link click -->
-        <p v-if="$store.getters['preferences/getPreferences'].backend.availableProtocols.length">
-            {{$t('or check other')}} <a href="" @click.prevent = "showAvailable = !showAvailable">{{$t('available options')}}</a>
-        </p>
-        <!-- backend url alternatives -->
-        <div v-if="showAvailable">
-            <h6>Available URLs</h6>
-            <div>
-              <a
-                  v-for="available in $store.getters['preferences/getPreferences'].backend.availableProtocols.filter(p => p.status === true)"
-                  href=""
-                  @click.prevent="$store.dispatch('preferences/setActiveProtocol', available.protocol)"
-              >
-                  {{ available.url }}
-              </a>
-              <br>
-            </div>
-
-            <!-- set backend url manually (experimental, not working) -->
-            <!--div style="margin-left: 39%; margin-right: 39%; margin-top: 2vh;">
-                <h6>Set URL manually</h6>
-                <b-form
-                    @submit="setBackendUrl($event.srcElement[0]._value)"
-                    @reset="$event.srcElement[0]._value = null"
-                >
-                    <b-form-group
-                        id="input-group-1"
-                        label-for="input-1"
-                      >
-                          <b-form-input
-                            id="input-1"
-                            type="url"
-                            placeholder="Enter backend URL"
-                            required
-                            trim
-                          />
-                      </b-form-group>
-
-                      <b-button type="submit" variant="primary">Submit</b-button>
-                      <b-button type="reset" variant="danger">Reset</b-button>
-                </b-form>
-            </div-->
-        </div>
-    </div>
 </template>
 
 <script>
 import TopHeader from './components/TopHeader.vue';
-import { BOverlay, BButton, BModal, BIconLightning, BIconSearch } from 'bootstrap-vue'
-import SearchResults from './components/SearchResults.vue';
+import { BOverlay, BModal } from 'bootstrap-vue';
+import SearchResults from './components/SearchResults';
 import { pingActiveProtocol, setBackendUrl, getOWApiKey, setOWApiKey } from './controllers/backend.js';
-import { mapGetters } from 'vuex'
+import Alert from './components/Alert.vue';
+import { OWApiKey, BackendStatus } from './components/BackendIssues';
 
 export default {
 	name: 'app',
@@ -199,22 +96,22 @@ export default {
 	components: {
 		TopHeader,
     BOverlay,
-    BButton,
     BModal,
     SearchResults,
-    BIconLightning,
-    BIconSearch
+    Alert,
+    OWApiKey,
+    BackendStatus
 	},
 
   data() {
       return {
-          backendStatus: null,          // backend is available
+          backendStatus: true,          // backend is available
           pingHandle: null,             // backend ping setInterval handle
           showAvailable: false,         // show available backend options when backend is unavailable
           upToDate: null,               // forecast data is up to date (or needs to be refetched from openweather)
           upToDateHandle: null,         // check forecast data up to date setInterval handle
-          upToDateLastChecked: null,     // forecast data up to date last checked
-          apiKeySet: true
+          upToDateLastChecked: null,    // forecast data up to date last checked
+          apiKeySet: true               // OpenWeather API key is set
       }
   },
 

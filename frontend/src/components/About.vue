@@ -83,7 +83,7 @@
 						{{$t('search-add.step2')}}
 					</ul>
 					<ul>
-						<SearchResults
+						<SearchResultsList
 							:results="[
 								{ lat: 0, lon: 0, name: $t('city name'), region: $t('region'), postCode: $t('postal code'), country: $t('country') },
 								{ lat: 1, lon: 1, name: 'Another City', region: 'Nowhere', postCode: '123456', country: 'Noland' }
@@ -98,7 +98,7 @@
 						{{$t('search-add.step4')}}
 					</ul>
 					<ul>
-						<SearchResults
+						<SearchResultsList
 							:results="[
 								{ lat: 0, lon: 0, name: $t('city name'), region: $t('region'), postCode: $t('postal code'), country: $t('country') },
 								{ lat: 1, lon: 1, name: 'Another City', region: 'Nowhere', postCode: '123456', country: 'Noland' }
@@ -325,7 +325,7 @@
 
 <script>
 import { BIconSearch, BIconTrash, BIconArrowClockwise, BIconGraphUp, BIconChevronUp, BIconChevronDown, BIconX, BIconGear } from 'bootstrap-vue'
-import SearchResults from './SearchResults.vue'
+import { SearchResultsList } from './SearchResults'
 import Controls from './Controls.vue'
 import Vue from 'vue'
 
@@ -334,7 +334,7 @@ export default {
 	
 	components: {
 		BIconSearch,
-		SearchResults,
+		SearchResultsList,
 		BIconTrash,
 		BIconArrowClockwise,
     	BIconGraphUp,

@@ -250,10 +250,9 @@
 
 <script>
 import Controls from './Controls.vue'
-import LineChart from './LineChart.vue'
+import { LineChart, LineChartAsync } from './Charts'
 import { mapGetters } from 'vuex'
 import DetailedForecast from './DetailedForecast.vue'
-import LineChartAsync from './LineChartAsync.vue'
 import ForecastsTableCustom from './ForecastsTableCustom.vue'
 import { BIconX } from 'bootstrap-vue'
 
