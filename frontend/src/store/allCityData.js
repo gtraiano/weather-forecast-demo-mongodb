@@ -112,6 +112,7 @@ const actions = {
 				catch(error) {
 					// nothing to do
 					console.error(error.message);
+					store.dispatch('alert/display', { message: `Could update forecast for ${city.name[store.i18n.locale]}. [${error.message}]`, type: 'danger' });
 				}
 			});
 		}
@@ -138,9 +139,11 @@ const actions = {
 			context.commit('appendCity', transformDatabaseData(newCity));
 			context.commit('setLastChangedOn', Date.now());
 			store.dispatch('search/setAddedCities', { lat: newCity.lat, lon: newCity.lon });
+			store.dispatch('alert/display', { message: `Added ${city.name}.`, type: 'success' });
 		}
 		catch(error){
 			console.error(error.message);
+			store.dispatch('alert/display', { message: `Could not add ${city.name}. [${error.message}]`, type: 'danger' });
 		}
 	},
 
@@ -150,11 +153,16 @@ const actions = {
 		try {
 			const data = await updateCityLatLon(city.coords.lat, city.coords.lon);
 			context.commit('updateCityForecastData', { lat: city.coords.lat, lon: city.coords.lon, data: transformDatabaseData(data) });
-			context.commit('setFetching', false);
+			//context.commit('setFetching', false);
 			context.commit('setLastChangedOn', Date.now());
 		}
 		catch(error) {
 			console.error(error.message);
+			store.dispatch('alert/display', { message: `Could not update forecast for ${city.name}. [${error.message}]`, type: 'danger' });
+			//context.commit('setFetching', false);
+		}
+		finally {
+			context.commit('setFetching', false);
 		}
 	},
 
@@ -188,7 +196,6 @@ const mutations = {
 
 	updateCityForecastData: (state, { lat, lon, data }) => {
 		state.allCityData = [...state.allCityData.map(item => item.coords.lat !== lat && item.coords.lon !== lon ? item : data)];
-		//state.allCityData = [...state.allCityData.filter(city => city.coords.lat !== lat && city.coords.lon !== lon ), data];
 	},
 
 	removeCity: (state, coords) => {
