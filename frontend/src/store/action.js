@@ -83,11 +83,11 @@ const actions = {
 		context.commit('setCommand', {
 			command: 'add',
 			args: {
-				name: city.name[store.i18n.locale],
+				name: city.name,
 				lat: city.lat,
 				lon: city.lon
 			}
-		}); // add { name: translatedName, lat: latitude, lon: longitude }
+		});
 		context.commit('setShow', true);
 	}
 }

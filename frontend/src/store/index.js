@@ -6,6 +6,7 @@ import locale from './locale'
 import search from './search'
 import i18n from '../lang/i18n.js'
 import action from './action'
+import alert from './alert'
 import preferences from './preferences'
 
 Vue.use(Vuex);
@@ -19,6 +20,7 @@ const store = new Vuex.Store({
 		locale,
 		search,
 		action,
+		alert,
 		preferences
 	},
 	strict: debug
