@@ -88,7 +88,7 @@ const mutations = {
 
 	setLocale: (state, locale) => {
 		state.locale = locale;
-    }
+  }
 }
 
 const actions = {

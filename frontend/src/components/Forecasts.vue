@@ -124,7 +124,7 @@
                                     :selectedRow="selectedCity"
                                     :tableStyle="tableStyle"
                                     :tableFilter="tableFilter"
-                                    @selectedRowUpdate="(index, value) => { $emit('selectedRowUpdate', index, value); }"
+                                    @selectedRowUpdate="({ index, coords }) => { $emit('selectedRowUpdate', { index, coords }); }"
                                     @sortingChanged="value => { $emit('sortingChanged', value) }"
                                     @showPlot="$emit('showPlot');"
                                     @showDetailedForecast="$emit('showDetailedForecast')"
@@ -362,8 +362,7 @@ export default {
               }
           ];
 
-          for (let counter = 0; counter < this.overviewColumns; counter++)
-          {
+          for (let counter = 0; counter < this.overviewColumns; counter++) {
               //currentDate.setTime(currentDate.getTime() + counter*this.overviewPeriod*60*60*1000)
               currentDate = new Date(now + counter*this.overviewPeriod*60*60*1000);
               let new_label = {
@@ -445,7 +444,7 @@ export default {
 
   mounted() {
       this.$on('selectedRowUpdate', ({index, coords}) => {
-          this.selectedCity = this.findCityIndex(coords);
+          this.selectedCity = this.findCityIndex(coords || { lon: null, lat: null });
           this.selectedCityIndexSorted = index;
       });
 

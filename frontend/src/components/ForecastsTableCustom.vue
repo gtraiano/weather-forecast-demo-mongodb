@@ -52,7 +52,7 @@
         <!-- clickable city name to load plot -->
         <a
             href="" 
-        	  v-on:click.prevent="selectedRowUpdate(data.index, data.value.coords); $emit('showDetailedForecast');"
+        	v-on:click.prevent="selectedRowUpdate(data.index, data.value.coords); $emit('showDetailedForecast');"
             v-b-tooltip.hover.bottom.ds500
             :title="`lat: ${data.value.coords.lat} lon: ${data.value.coords.lon}`"
         >
@@ -87,9 +87,9 @@
         <!-- refresh forecast data icon -->
       	<a
             class="ml-1 mr-1"
-      		  href=""
-      		  @click.prevent="singleAction = data.index; updateCityForecast(data.item['city']);"
-      		  style="color: unset"
+      		href=""
+      		@click.prevent="singleAction = data.index; updateCityForecast(data.item['city']);"
+      		style="color: unset"
             v-b-tooltip.hover.bottom.ds500
             :title="$t('refresh forecast data')"
       	>
@@ -98,9 +98,9 @@
         <!-- remove city icon -->
       	<a
             class="ml-1 mr-1"
-      		  href=""
-      		  @click.prevent="removeCity(data.item['city'])"
-      		  style="color: unset"
+      		href=""
+      		@click.prevent="removeCity(data.item['city'])"
+      		style="color: unset"
             v-b-tooltip.hover.bottom.ds500
             :title="$t('delete')"
       	>
@@ -123,42 +123,42 @@ export default {
   	name: 'ForecastsTableCustom',
   	
   	components: {
-  		  BIconTrash,
-  		  BIconArrowClockwise,
+  		BIconTrash,
+  		BIconArrowClockwise,
         BIconGraphUp,
         BIconChevronDown,
         BIconChevronUp
   	},
 
   	props: {
-    		forecastData: {
-    			 type: Array,
-    			 required: true
-    		},
+		forecastData: {
+			 type: Array,
+			 required: true
+		},
 
-    		tableItems: { // table rows
-    			 type: Array,
-    			 required: true
-    		},
+		tableItems: { // table rows
+			 type: Array,
+			 required: true
+		},
 
-    		tableFields: { // table fields
-    			 type: Array,
-    			 required: true
-    		},
+		tableFields: { // table fields
+			 type: Array,
+			 required: true
+		},
 
-    		selectedRow: {
-    			 type: Number,
-    			 required: false,
-    			 default: -1
-    		},
+		selectedRow: {
+			 type: Number,
+			 required: false,
+			 default: -1
+		},
 
-    		tableStyle: { // css styling for table
-    			 type: Object,
-    			 required: false,
-    			 default: function() {
-    				  return { height: '70vh' };
-    			 }
-    		},
+		tableStyle: { // css styling for table
+			 type: Object,
+			 required: false,
+			 default: function() {
+				  return { height: '70vh' };
+			 }
+		},
 
         tableFilter: {
             type: String,
@@ -185,9 +185,9 @@ export default {
     },
 
   	methods: {
-    		selectedRowUpdate(index, coords) {
-    		    this.$emit('selectedRowUpdate', { index: index, coords: coords });
-    		},
+		selectedRowUpdate(index, coords) {
+		    this.$emit('selectedRowUpdate', { index: index, coords: coords });
+		},
 
         sortingChanged() {
             const sortSum = Object.values(this.sortFields).reduce((acc, curr) => curr !== null ? curr ? acc + 2 : acc + 1 : acc, 0); // sum sort order fields (null -> 0, true -> 2, false -> 1)
@@ -195,7 +195,7 @@ export default {
             this.$emit('sortingChanged', sortSum);
         },
 
-    		scrollToRow(index) {
+		scrollToRow(index) {
             this.$nextTick(() => { // ensure DOM has been updated
                 let table = this.$el.querySelector("#table");
                 table = table.parentElement.children[0]; // get the actual table from DOM
@@ -212,7 +212,7 @@ export default {
       	},
 
       	addActionsField() {
-      		  return [
+      		return [
                 { key: 'actions', label: this.$t('actions'), sortable: false },
                 { key: 'index', label: '#', sortable: false },
                 ...this.tableFields.map( field => ( field.sortable ? { ...field, thStyle: {'background-image': 'none'} } : field ) ) // remove standard sort icon from sortable fields
@@ -220,12 +220,20 @@ export default {
       	},
 
       	async removeCity(city) {
-      		  await this.$store.dispatch('action/delete', city);
-      		  this.$emit('selectedRowUpdate', -1, {});
+      		await this.$store.dispatch('action/delete', city);
+            if(this.selectedRow !== -1) { // row selected
+                if( // delete selected row
+                    this.tableItems[this.selectedRow].city.coords.lat === city.coords.lat &&
+                    this.tableItems[this.selectedRow].city.coords.lon === city.coords.lon
+                ) {
+                    this.$emit('selectedRowUpdate', -1, { lat: null, lon: null }) // un-select row
+                }
+            }
+      		//this.$emit('selectedRowUpdate', -1, {});
       	},
 
       	async updateCityForecast(city) {
-      		  await this.$store.dispatch('allCityData/updateCityForecastDataAsync', city);
+      		await this.$store.dispatch('allCityData/updateCityForecastDataAsync', city);
       	},
 
         plotCity(index, city) {
