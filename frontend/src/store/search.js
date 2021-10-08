@@ -1,5 +1,4 @@
 import { nominatimSearchName } from '../controllers/backend';
-import store from './'
 
 const transform = results => {
     return results
@@ -90,7 +89,7 @@ const actions = {
 
     searchCity: async (context) => {
         context.commit('setSearching', true);
-        let results = await nominatimSearchName(context.getters.getSearchTerm, store.getters['locale/getLocale']);
+        let results = await nominatimSearchName(context.getters.getSearchTerm, context.rootGetters['locale/getLocale']);
         context.commit('setSearchResults', transform(results));
         context.commit('setSearching', false);
     },
