@@ -2,7 +2,7 @@
   "name": "demo-weather-forecast",
   "description": "Demo forecast website",
   "version": "1.0.0",
-  "author": "Spyridon Dimopoulos (sdimopoulos@irisweb.gr)",
+  "author": "Spyridon Dimopoulos (sdimopoulos@irisweb.gr), Georgios Traianos (gtraiano@gmail.com)",
   "private": true,
   "scripts": {
     "dev": "cross-env webpack-dev-server --config config/webpack.dev.config.js",
