@@ -121,6 +121,10 @@
         color: var(--light);
     }
 
+    .close:hover {
+        color: invert;
+    }
+
     .chartjs-render-monitor {
         background-color: revert;
     }
@@ -180,6 +184,10 @@
         input {
             color: black;
         }
+    }
+
+    .card-deck {
+        scrollbar-color: var(--light) var(--dark);
     }
 
     .form-control:disabled {
@@ -274,6 +282,24 @@
         color: var(--green);
     }
 
+    div.dropdown button:hover, div.dropdown button:focus {
+        background-color: inherit;
+        border-color: inherit;
+    }
+
+    div.dropdown.show button {
+        background-color: var(--light);
+        color: var(--green);
+    }
+
+    .b-form-spinbutton.focus {
+        background-color: inherit;
+    }
+
+    .b-dropdown-form div.b-form-spinbutton > button, .b-dropdown-form div.b-form-spinbutton > button.focus {
+        background-color: inherit;
+    }
+
     .input-group-append {
         background-color: inherit;
         color: inherit;
@@ -283,6 +309,11 @@
         border-bottom-right-radius: 3px;
         border-color: var(--light);*/
         border: none;
+    }
+
+    input:focus-within + .input-group-append * {
+        border-color: rgb(129,189,255);
+        color: var(--green);
     }
 
     .top-header .btn {
@@ -434,6 +465,10 @@
         color: var(--green);
     }
 
+    .leaflet-control div button:hover, .leaflet-control div button:focus {
+        background-color: darkblue;
+    }
+
     #toolbar-save-image .dropdown-menu {
         background-color: darkblue;
     }
@@ -450,7 +485,9 @@
         color: black;
     }
 
-    scrollbar-color: gray var(--light);
+    .card-deck {
+        scrollbar-color: var(--light) var(--dark);
+    }
 
     .tooltip-inner {
         max-width: max-content;
