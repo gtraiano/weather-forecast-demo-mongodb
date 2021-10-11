@@ -74,10 +74,9 @@
         >
             <b-col/>
             
-            <!-- forecasts table renders only if cityData is populated -->
+            <!-- forecasts table & filter -->
             <transition name="fade-overview-table">
                 <b-col
-                    v-if="cityData && cityData.length"
                     cols="10"
                     key="overviewTable"
                 >
@@ -124,6 +123,7 @@
                                     :selectedRow="selectedCity"
                                     :tableStyle="tableStyle"
                                     :tableFilter="tableFilter"
+                                    :busy="fetching"
                                     @selectedRowUpdate="({ index, coords }) => { $emit('selectedRowUpdate', { index, coords }); }"
                                     @sortingChanged="value => { $emit('sortingChanged', value) }"
                                     @showPlot="$emit('showPlot');"
@@ -135,14 +135,14 @@
                         </b-row>
                     </transition>
                 </b-col>
-                <!-- otherwise display no forecasts message -->
-                <b-col
+                <!-- otherwise display no forecasts message, handled by ForecastsTableCustom -->
+                <!--b-col
                     v-else
                     key="noForecast"
                     cols="10"
                 >
                     <h3>{{ $t('no forecasts') }}</h3>
-                </b-col>
+                </b-col-->
             </transition>
             
             <b-col/>
@@ -388,7 +388,8 @@ export default {
       ...mapGetters({
           cityData: 'allCityData/getAllCityData',
           chartData: 'chartData/getChartData',
-          preferences: 'preferences/getPreferences'
+          preferences: 'preferences/getPreferences',
+          fetching: 'allCityData/getFetching'
       })
   },
 

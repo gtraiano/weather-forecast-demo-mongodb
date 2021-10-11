@@ -9,15 +9,17 @@
 
 <template>
 <b-table
+    id="table"
+    class="text-nowrap"
     striped hover borderless sticky-header
     small head-variant="light"
     no-local-sorting
+    show-empty
     :style="tableStyle"
     :items="rows"
     :fields="addActionsField()"
+    :busy="busy"
     @click.native.right.prevent
-    id="table"
-    class="text-nowrap"
 >	
   <!-- table header -->
   <template v-slot:head()="data"><!-- header custom rendering-->
@@ -113,6 +115,20 @@
         <span v-if="data.field.key.includes('forecast') && data.value == ''">&mdash;</span><!-- em dash on empty cells -->
         <span v-else>{{data.value}}</span>
     </template>
+
+    <!-- while fetching data -->
+    <template #table-busy>
+        <div class="text-center my-2">
+          <b-spinner class="align-middle" />
+          <br/>
+          <strong style="font-size: x-large;">{{$t('fetching')}}</strong>
+        </div>
+    </template>
+
+    <template #empty="scope">
+        <h4 v-if="tableFilter">{{ $t('emptyFiltered') }}</h4>
+        <h4 v-else>{{ $t('no forecasts') }}</h4>
+    </template>
 </b-table>
 </template>
 
@@ -164,6 +180,11 @@ export default {
             type: String,
             required: false,
             default: null
+        },
+
+        busy: {
+            type: Boolean,
+            required: true
         }
   	},
 
