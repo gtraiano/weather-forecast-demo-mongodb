@@ -112,7 +112,8 @@ const actions = {
 				catch(error) {
 					// nothing to do
 					console.error(error.message);
-					store.dispatch('alert/display', { message: `Could update forecast for ${city.name[store.i18n.locale]}. [${error.message}]`, type: 'danger' });
+					//store.dispatch('alert/display', { message: `Could update forecast for ${city.name[store.i18n.locale]}. [${error.message}]`, type: 'danger' });
+					context.dispatch('alert/display', { message: `Could update forecast for ${city.name[store.i18n.locale]}. [${error.message}]`, type: 'danger' }, { root: true });
 				}
 			});
 		}
@@ -138,12 +139,15 @@ const actions = {
 			let newCity = await postCityLatLon(city.lat, city.lon, store.i18n.availableLocales);
 			context.commit('appendCity', transformDatabaseData(newCity));
 			context.commit('setLastChangedOn', Date.now());
-			store.dispatch('search/setAddedCities', { lat: newCity.lat, lon: newCity.lon });
-			store.dispatch('alert/display', { message: `Added ${city.name}.`, type: 'success' });
+			//store.dispatch('search/setAddedCities', { lat: newCity.lat, lon: newCity.lon });
+			//store.dispatch('alert/display', { message: `Added ${city.name}.`, type: 'success' });
+			context.dispatch('search/setAddedCities', { lat: newCity.lat, lon: newCity.lon }, { root: true });
+			context.dispatch('alert/display', { message: `Added ${city.name}.`, type: 'success' }, { root: true });
 		}
 		catch(error){
 			console.error(error.message);
-			store.dispatch('alert/display', { message: `Could not add ${city.name}. [${error.message}]`, type: 'danger' });
+			//store.dispatch('alert/display', { message: `Could not add ${city.name}. [${error.message}]`, type: 'danger' });
+			context.dispatch('alert/display', { message: `Could not add ${city.name}. [${error.message}]`, type: 'danger' }, { root: true });
 		}
 	},
 
@@ -158,7 +162,8 @@ const actions = {
 		}
 		catch(error) {
 			console.error(error.message);
-			store.dispatch('alert/display', { message: `Could not update forecast for ${city.name}. [${error.message}]`, type: 'danger' });
+			//store.dispatch('alert/display', { message: `Could not update forecast for ${city.name}. [${error.message}]`, type: 'danger' });
+			context.dispatch('alert/display', { message: `Could not update forecast for ${city.name}. [${error.message}]`, type: 'danger' }, { root: true });
 			//context.commit('setFetching', false);
 		}
 		finally {
