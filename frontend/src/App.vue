@@ -33,12 +33,15 @@
         <b-overlay
             :show="$store.getters['search/getShowResults'] && !$store.getters['action/getShow']"
             :z-index="(Number.MAX_VALUE/8).toLocaleString('fullwide', { useGrouping: false })"
+            style="height: 100vh;"
         >
             <template #overlay>
-                <div style="width: 100vw; position: relative; height: 6vh;">
+                <div style="width: 100vw; position: relative; height: 6vh; top: 3vh;">
                   <Alert/>
                 </div>
-                <SearchResults :searchCity="searchCity" />
+                <div style="height: 90vh;">
+                  <SearchResults :searchCity="searchCity" />
+                </div>
             </template>
 
             <!-- app contents when overlay is off -->
