@@ -236,7 +236,7 @@ export default {
 				...!this.paginated && {
 					'margin-bottom': '1vh', // space before scrollbar
 					'margin-left': index == 0 ? '0px' : '', // 1st card
-					'margin-right': index == this.forecastData.hourly.length - 1 ? '0px' : '' // last card
+					'margin-right': index == this.forecastData.hourly.length - 1 ? '0px' : '6px' // last card
 				}
 			};
  		},
