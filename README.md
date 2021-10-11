@@ -56,9 +56,7 @@ A single .env file must reside at the project's root folder. A sample .env file 
 `EXPRESS_SERVER_CA` SSL certification authority (optional)
 
 ### Backend config
-`MONGODB_PORT` MongoDB port
-
-`BACKEND_DOMAIN` Backend domain
+`MONGODB_URI` MongoDB URI string
 
 `BACKEND_API_ENDPOINT` Backend endpoint
 
