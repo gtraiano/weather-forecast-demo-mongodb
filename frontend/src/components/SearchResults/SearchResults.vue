@@ -1,11 +1,12 @@
 <template>
 <div
-    style="
-        min-width: 20vw;
-        max-width: 30vw;
-        margin-left: auto;
-        margin-right: auto;
-    "
+    :style="{
+        minWidth: '20vw',
+        maxWidth: '30vw',
+        marginLeft: 'auto',
+        marginRight: 'auto',
+        ...containerStyle
+    }"
 >
     <h3> {{ $t('search for')}} <i>"{{ $store.getters['search/getSearchTerm'] }}"</i></h3>
 
@@ -63,7 +64,11 @@ export default {
 		searchCity: {
 			type: Function,
 			required: true
-		}
+		},
+        containerStyle: {
+            type: Object,
+            required: false
+        }
 	}
 }
 </script>
