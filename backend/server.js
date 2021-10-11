@@ -22,7 +22,7 @@ server.use(express.static('dist'));
 
 // middleware
 server.use(function timeLog (req, res, next) { // logging timestamp
-	console.log(`${new Date().toLocaleString()} ${req.protocol} ${req.method} ${req.path} ${res.statusCode}`);
+	console.log(`${new Date().toLocaleString()} ${req.ip} ${req.protocol} ${req.method} ${req.path} ${res.statusCode}`);
 	next();
 });
 server.use(compression());
@@ -92,7 +92,7 @@ async function connectDb(retries = 5) {
 	try {
 		console.log('Connecting to MongoDB server')
 		await forecastDb.connect();
-		console.log('Connected to MongoDB at', process.env.MONGODB_URI.match(/@.*\//)[0]);
+		console.log('Connected to MongoDB', process.env.MONGODB_URI.match(/@.*\//)[0]);
 	}
 	catch(error) {
 		if(retries === 1) {
