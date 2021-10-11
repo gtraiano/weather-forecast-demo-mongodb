@@ -1,6 +1,6 @@
 <template>
 <div
-	v-if="isBackendOnline"
+	v-if="!isBackendOnline"
     id="app"
     tabindex="0"
 >
@@ -70,7 +70,7 @@ export default {
 	},
 	props: {
 		isBackendOnline: {
-			type: [Boolean],
+			type: Boolean,
 			required: true
 		}
 	},
