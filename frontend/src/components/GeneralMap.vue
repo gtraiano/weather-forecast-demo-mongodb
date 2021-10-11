@@ -9,86 +9,99 @@
  -->
 
 <template>
-<l-map
-    :options="{
-        worldCopyJump: true,
-        attributionControl: false,
-        preferCanvas: true,
-        wheelPxPerZoomLevel: activeCityPopup !== -1 ? Number.MAX_VALUE : 60 // prevent wheel zooming when popup is displayed
-    }"
-    :style="{
-        height: this.height,
-        width: this.width,
-        marginLeft: 'auto',
-        marginRight: 'auto'
-    }"
-    :zoom="zoom"
-    :center="center"
-    @update:zoom="zoomUpdated"
-    @update:center="centerUpdated"
-    @update:bounds="boundsUpdated"
-    @contextmenu=""
+<b-overlay
+    id="general-map"
+    :show="loading"
+    :z-index="800"
 >
+    <!-- while fetching data -->
+    <template #overlay>
+        <b-spinner label="loading"/>
+        <br/><span>{{$t('fetching')}}</span>
+    </template>
 
-    <l-tile-layer :url="mapUrl" />
-    <l-tile-layer v-if="openWeather" v-for="(url, index) in openWeatherTileUrls"
-        :key="url"
-        :url="url"
-    />
-
-    <l-control-attribution
-        position="bottomright"
-        :prefix="attribution"
-    />
-
-    <l-control v-if="openWeather" position="topright">
-        <b-dropdown right :text="$t('active layers')" class="m-0 p-0" size="sm">
-            <b-dropdown-form class="m-0 p-0">
-                <b-form-group>
-                    <b-form-checkbox-group
-                        class="text-left"
-                        size="xs"
-                        v-model="activeLayers"
-                        :options="openWeatherOptions"
-                        switches
-                        stacked
-                    >
-                    </b-form-checkbox-group>
-                </b-form-group>
-            </b-dropdown-form>
-        </b-dropdown>
-    </l-control>
-    
-    <l-marker v-for="(city, index) in markerData" :key="`${city.coords.lat},${city.coords.lon}`"
-        :lat-lng="[city.coords.lat,city.coords.lon]"
-        :icon="l_icon(markerCurrentWeatherIcon(city))"
-        @popupclose="activeCityPopupUpdated(-1); resetZoom(index);"
-        @popupopen="activeCityPopupUpdated(city.id)"
-        v-on:contextmenu="activeCityPopup !== city.id ? markerContextMenu(city) : null"
+    <!-- map -->
+    <l-map
+        :options="{
+            worldCopyJump: true,
+            attributionControl: false,
+            preferCanvas: true,
+            wheelPxPerZoomLevel: activeCityPopup !== -1 ? Number.MAX_VALUE : 60 // prevent wheel zooming when popup is displayed
+        }"
+        :style="{
+            height: this.height,
+            width: this.width,
+            marginLeft: 'auto',
+            marginRight: 'auto'
+        }"
+        :zoom="zoom"
+        :center="center"
+        @update:zoom="zoomUpdated"
+        @update:center="centerUpdated"
+        @update:bounds="boundsUpdated"
+        @contextmenu=""
     >
-        <l-tooltip
-            :options="{
-                direction: 'bottom',
-                offset: markerCurrentWeatherIcon(city) ? [iconOptions.iconAnchor[0], iconOptions.iconAnchor[1]/2] : [Math.round((25/4)*iconScale), Math.round((41/2)*iconScale)],
-                opacity: activeCityPopup !== city.id ? 0.9 : 0 // hide active city popup tooltip
-            }"
+
+        <l-tile-layer :url="mapUrl" />
+        <l-tile-layer v-if="openWeather" v-for="(url, index) in openWeatherTileUrls"
+            :key="url"
+            :url="url"
+        />
+
+        <l-control-attribution
+            position="bottomright"
+            :prefix="attribution"
+        />
+
+        <l-control v-if="openWeather" position="topright">
+            <b-dropdown right :text="$t('active layers')" class="m-0 p-0" size="sm">
+                <b-dropdown-form class="m-0 p-0">
+                    <b-form-group>
+                        <b-form-checkbox-group
+                            class="text-left"
+                            size="xs"
+                            v-model="activeLayers"
+                            :options="openWeatherOptions"
+                            switches
+                            stacked
+                        >
+                        </b-form-checkbox-group>
+                    </b-form-group>
+                </b-dropdown-form>
+            </b-dropdown>
+        </l-control>
+        
+        <l-marker v-for="(city, index) in markerData" :key="`${city.coords.lat},${city.coords.lon}`"
+            :lat-lng="[city.coords.lat,city.coords.lon]"
+            :icon="l_icon(markerCurrentWeatherIcon(city))"
+            @popupclose="activeCityPopupUpdated(-1); resetZoom(index);"
+            @popupopen="activeCityPopupUpdated(city.id)"
+            v-on:contextmenu="activeCityPopup !== city.id ? markerContextMenu(city) : null"
         >
-            {{ city.name[$i18n.locale] }}
-        </l-tooltip>
-        <l-popup
-            :options="{
-                'maxWidth': 'auto',
-                offset: [iconOptions.iconAnchor[0], 0]
-            }"
-        >
-            <PopupChart
-                :chartData="chartData[index]"
-                :active="activeCityPopup === city.id"
-                :ref="index"
-            />
-        </l-popup>
-    </l-marker>
-</l-map>
+            <l-tooltip
+                :options="{
+                    direction: 'bottom',
+                    offset: markerCurrentWeatherIcon(city) ? [iconOptions.iconAnchor[0], iconOptions.iconAnchor[1]/2] : [Math.round((25/4)*iconScale), Math.round((41/2)*iconScale)],
+                    opacity: activeCityPopup !== city.id ? 0.9 : 0 // hide active city popup tooltip
+                }"
+            >
+                {{ city.name[$i18n.locale] }}
+            </l-tooltip>
+            <l-popup
+                :options="{
+                    'maxWidth': 'auto',
+                    offset: [iconOptions.iconAnchor[0], 0]
+                }"
+            >
+                <PopupChart
+                    :chartData="chartData[index]"
+                    :active="activeCityPopup === city.id"
+                    :ref="index"
+                />
+            </l-popup>
+        </l-marker>
+    </l-map>
+</b-overlay>
 </template>
 
 <script>
@@ -97,6 +110,7 @@ import { Icon }  from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { mapGetters } from 'vuex'
 import { PopupChart } from './Charts'
+import { BOverlay } from 'bootstrap-vue';
 
 // this part resolve an issue where the markers would not appear
 delete Icon.Default.prototype._getIconUrl;
@@ -118,7 +132,8 @@ export default {
         LControlAttribution,
         LTooltip,
         LControl,
-        PopupChart
+        PopupChart,
+        BOverlay
     },
 
     props: {
@@ -222,6 +237,13 @@ export default {
         markerCurrentWeatherIcon: {
             type: Function,
             required: true
+        },
+
+        // show overlay when fetching forecast data
+        loading: {
+            type: Boolean,
+            required: false,
+            default: false
         }
     },
 

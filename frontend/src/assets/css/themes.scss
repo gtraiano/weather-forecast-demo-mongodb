@@ -199,6 +199,10 @@
         max-width: max-content;
         min-width: max-content;
     }
+
+    #general-map .b-overlay span {
+        color: var(--dark);
+    }
 }
 
 [theme="terminal"] {

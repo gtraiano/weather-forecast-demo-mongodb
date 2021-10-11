@@ -30,6 +30,7 @@
                 :activeOpenWeatherLayers="activeLayers"
                 :markerContextMenu="removeMarker"
                 :markerCurrentWeatherIcon="currentWeatherIcon"
+                :loading="fetching"
                 @zoomUpdated="value => $emit('zoomUpdated', value)"
                 @centerUpdated="value => $emit('centerUpdated', value)"
                 @boundsUpdated="value => $emit('boundsUpdated', value)"
@@ -205,7 +206,8 @@ export default {
         // map store state to computed properties
         ...mapGetters({ 
             cityData: 'allCityData/getAllCityData',
-            chartData: 'chartData/getChartData'
+            chartData: 'chartData/getChartData',
+            fetching: 'allCityData/getFetching'
         })
     }
 }
