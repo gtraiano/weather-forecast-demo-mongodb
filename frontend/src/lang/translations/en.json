@@ -98,6 +98,7 @@
   "table columns": "Table columns",
   "period": "Time period",
   "filter": "Filter",
+  "emptyFiltered": "There are no records matching your request",
 
   "cloudiness": "Cloudiness",
   "dew point": "Dew point",
@@ -117,6 +118,7 @@
   "postal code": "Postal code",
   "country": "Country",
 
+  "fetching": "Fetching forecast data",
   "refresh forecast": "Refresh forecast data",
   "refetch data": "to fetch fresh forecast data for all cities",
   "preferences": "preferences",
