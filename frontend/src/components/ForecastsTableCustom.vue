@@ -95,7 +95,7 @@
             v-b-tooltip.hover.bottom.ds500
             :title="$t('refresh forecast data')"
       	>
-      		  <b-icon-arrow-clockwise :animation="$store.getters['allCityData/getFetching'] && singleAction == data.index ? 'spin' : ''" />
+      		  <b-icon-arrow-clockwise :animation="$store.getters['allCityData/getUpdating'] && singleAction == data.index ? 'spin' : ''" />
       	</a>
         <!-- remove city icon -->
       	<a
@@ -110,9 +110,10 @@
       	</a>
     </template>
     
-    <!-- forecast values column -->
+    <!-- country, continent & forecast values columns -->
     <template v-slot:cell()="data">
-        <span v-if="data.field.key.includes('forecast') && data.value == ''">&mdash;</span><!-- em dash on empty cells -->
+        <span v-if="/forecast/gi.test(data.field.key)">{{data.item[data.field.key.match(/\d+/)[0]]}}</span><!-- forecast value cell -->
+        <span v-if="/forecast/gi.test(data.field.key) && data.item[data.field.key.match(/\d+/)[0]] === ''">&mdash;</span><!-- em dash on empty forecast cell -->
         <span v-else>{{data.value}}</span>
     </template>
 

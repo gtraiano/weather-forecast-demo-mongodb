@@ -123,7 +123,7 @@
                                     :selectedRow="selectedCity"
                                     :tableStyle="tableStyle"
                                     :tableFilter="tableFilter"
-                                    :busy="fetching"
+                                    :busy="fetching && !updating"
                                     @selectedRowUpdate="({ index, coords }) => { $emit('selectedRowUpdate', { index, coords }); }"
                                     @sortingChanged="value => { $emit('sortingChanged', value) }"
                                     @showPlot="$emit('showPlot');"
@@ -332,7 +332,7 @@ export default {
               }
               for (let counter = 0; counter < this.overviewColumns && nowIndex !== -1 && nowIndex + counter*this.overviewPeriod < city.forecast[this.selectedVar].length; counter++) // if nowIndex === =1, there is no up to date forecast data to pass to the table
               {
-                  curr_data[String(counter)] = city.forecast[this.selectedVar][nowIndex + counter*this.overviewPeriod]; // hour forecast columns
+                  curr_data[`forecast_${String(counter)}`] = city.forecast[this.selectedVar][nowIndex + counter*this.overviewPeriod]; // hour forecast columns
               }
               data_for_table.push(curr_data);
           });
@@ -389,7 +389,8 @@ export default {
           cityData: 'allCityData/getAllCityData',
           chartData: 'chartData/getChartData',
           preferences: 'preferences/getPreferences',
-          fetching: 'allCityData/getFetching'
+          fetching: 'allCityData/getFetching',
+          updating: 'allCityData/getUpdating'
       })
   },
 
