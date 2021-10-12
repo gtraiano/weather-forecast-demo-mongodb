@@ -17,16 +17,19 @@ const express = require('express');
 const cors = require('cors');
 const compression = require('compression');
 
+// middleware
+const { timeLog, checkRefetchDisabled } = require('./middleware');
+
 const server = express();
 server.use(express.static('dist'));
 
 // middleware
-server.use(function timeLog (req, res, next) { // logging timestamp
-	console.log(`${new Date().toLocaleString()} ${req.ip} ${req.protocol} ${req.method} ${req.path} ${res.statusCode}`);
-	next();
-});
+server.use(timeLog);
 server.use(compression());
 server.use(cors());
+server.use(checkRefetchDisabled);
+
+// routing
 server.use(process.env.BACKEND_API_ENDPOINT, router);
 
 // http & https servers
