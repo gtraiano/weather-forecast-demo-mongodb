@@ -94,120 +94,67 @@ const setOWApiKey = async key => {
 
 // Nominatim calls
 const nominatimSearchName = async (name, locale) => {
-	try {
-		const results = await axios.get(`${baseUrl}nominatim/${name}`, { headers: { Locale: locale }});
-		return results.data;
-	}
-	catch(error) {
-		throw new Error(`${baseUrl}nominatim/${name} ${error.message}`);
-	}
+	const results = await axios.get(`${baseUrl}nominatim/${name}`, { headers: { Locale: locale }});
+	return results.data;
 }
 
 const nominatimSearchLatLon = async (lat, lon, locale) => {
-	try {
-		const results = await axios.get(`${baseUrl}nominatim/${lat}/${lon}`, { headers: { Locale: locale } });
-		return results.data;
-	}
-	catch(error) {
-		throw new Error(`${baseUrl}nominatim/${lat}/${lon} ${error.message}`);
-	}
+	const results = await axios.get(`${baseUrl}nominatim/${lat}/${lon}`, { headers: { Locale: locale } });
+	return results.data;
 }
+
+const generateErrorMessage = error => axios.isAxiosError(error) && error?.response?.data?.message ? error.response.data.message : error.message;
 
 // OpenWeather call
 const openWeatherSarch = async (lat, lon) => {
-	try {
-		const result = await axios.get(`${baseUrl}openweather/${lat}/${lon}`);
-		return result.data;
-	}
-	catch(error) {
-		throw new Error(`${baseUrl}openweather/${lat}/${lon} ${error.message}`);
-	}
+	const result = await axios.get(`${baseUrl}openweather/${lat}/${lon}`);
+	return result.data;
 }
 
 // database calls
 // database get city
 const getAllCities = async () => {
-	try {
-		const results = await axios.get(`${baseUrl}coords`);
-		return results.data;
-	}
-	catch(error) {
-		throw new Error(`${baseUrl}coords ${error.message}`);
-	}
+	const results = await axios.get(`${baseUrl}coords`);
+	return results.data;
 }
 
 const updateAllCities = async () => {
-	try {
-		const results = await axios.get(`${baseUrl}coords/refetch`);
-		return results.data;
-	}
-	catch(error) {
-		throw new Error(`${baseUrl}coords/refetch ${error.message}`)
-	}	
+	const results = await axios.get(`${baseUrl}coords/refetch`);
+	return results.data;
 }
 
 const getCityLatLon = async (lat, lon) => {
-	try {
-		const result = await axios.get(`${baseUrl}coords/${lat}/${lon}`);
-		return result.data;
-	}
-	catch(error) {
-		throw new Error(`${baseUrl}coords/${lat}/${lon} ${error.message}`);
-	}
+	const result = await axios.get(`${baseUrl}coords/${lat}/${lon}`);
+	return result.data;
 }
 
 const updateCityLatLon = async (lat, lon) => {
-	try {
-		const result = await axios.get(`${baseUrl}coords/${lat}/${lon}/refetch`);
-		return result.data;
-	}
-	catch(error) {
-		throw new Error(`${baseUrl}coords/${lat}/${lon}/refetch ${error.message}`);
-	}
+	const result = await axios.get(`${baseUrl}coords/${lat}/${lon}/refetch`);
+	return result.data;
 }
 
 
 // database put city
 const putCityLatLon = async (lat, lon, data) => {
-	try {
-		const result = axios.put(`${baseUrl}coords`, data);
-		return result.data;
-	}
-	catch(error) {
-		throw new Error(`${baseUrl}coords ${error.message}`);
-	}
+	const result = axios.put(`${baseUrl}coords`, data);
+	return result.data;
 }
 
 // database delete city
 const deleteCityLatLon = async (lat, lon, locale) => {
-	try {
-		const result = await axios.delete(`${baseUrl}coords/${lat}/${lon}`);
-		return result;
-	}
-	catch(error) {
-		throw new Error(`${baseUrl}coords/${lat}/${lon} ${error.message}`);
-	}
+	const result = await axios.delete(`${baseUrl}coords/${lat}/${lon}`);
+	return result;
 }
 
 // database post city
 const postCityLatLon = async (lat, lon, locales) => {
-	try {
-		const result = await axios.post(`${baseUrl}coords/${lat}/${lon}`, {}, { headers: { Locales: locales.toString() } });
-		return result.data;
-	}
-	catch(error) {
-		throw new Error(`${baseUrl}coords/${lat}/${lon} ${error.message}`);
-	}
+	const result = await axios.post(`${baseUrl}coords/${lat}/${lon}`, {}, { headers: { Locales: locales.toString() } });
+	return result.data;
 }
 
 const postCity = async data => {
-	try {
-		const result = await axios.post(`${baseUrl}coords`, data);
-		return result.data;
-	}
-	catch(error) {
-		throw new Error(`${baseUrl}coords ${error.message}`);
-	}
+	const result = await axios.post(`${baseUrl}coords`, data);
+	return result.data;
 }
 
 export { 
@@ -229,5 +176,6 @@ export {
 	getActivePort,
 	setBackendUrl,
 	getOWApiKey,
-	setOWApiKey
+	setOWApiKey,
+	generateErrorMessage
 };
