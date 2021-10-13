@@ -4,85 +4,86 @@
   Main App File
 
   @author Spiros Dimopoulos <sdimopoulos@irisweb.gr>
+  @author Georgios Traianos <gtraiano@gmail.com>
   @version 1.0
  -->
 
 <template>
-    <!-- OpenWeather API key not set -->
-    <OWApiKey
-      v-if="!apiKeySet"
-      :isOWApiKeySet="apiKeySet"
-      :setOWApiKey="setOWApiKey"
-    />
+<!-- backend is unavailable -->
+<BackendStatus
+  v-if="!backendStatus"
+  :isBackendOnline="backendStatus"
+  :showAvailableUrls="showAvailable"
+/>
 
-    <!-- backend is unavailable -->
-    <BackendStatus
-      v-else-if="!backendStatus"
-      :isBackendOnline="backendStatus"
-      :showAvailableUrls="showAvailable"
-    />
+<!-- OpenWeather API key not set -->
+<OWApiKey
+  v-else-if="backendStatus && !apiKeySet"
+  :isOWApiKeySet="apiKeySet"
+  :setOWApiKey="setOWApiKey"
+/>
 
-    <!-- backend is available -->
-    <div 
-        v-else-if="apiKeySet && backendStatus"
-        id="app"
-        tabindex="0"
-        @keydown.esc="$store.dispatch('search/clear')"
+<!-- backend is available -->
+<div 
+    v-else-if="apiKeySet && backendStatus"
+    id="app"
+    tabindex="0"
+    @keydown.esc="$store.dispatch('search/clear')"
+>
+    <!-- display overlay with search results -->
+    <b-overlay
+        :show="$store.getters['search/getShowResults'] && !$store.getters['action/getShow']"
+        :z-index="(Number.MAX_VALUE/8).toLocaleString('fullwide', { useGrouping: false })"
+        style="height: 100vh;"
     >
-        <!-- display overlay with search results -->
-        <b-overlay
-            :show="$store.getters['search/getShowResults'] && !$store.getters['action/getShow']"
-            :z-index="(Number.MAX_VALUE/8).toLocaleString('fullwide', { useGrouping: false })"
-            style="height: 100vh;"
-        >
-            <template #overlay>
-                <div style="width: 100vw; position: relative; height: 6vh; top: 3vh;">
-                  <Alert/>
-                </div>
-                <div style="height: 90vh;">
-                  <SearchResults :searchCity="searchCity" />
-                </div>
-            </template>
-
-            <!-- app contents when overlay is off -->
-            <!-- navigation header -->
-            <TopHeader/>
-            <!-- alert -->
-            <div
-              :style="{
-                height: '6vh',
-                maxHeight: 'max-content',
-                width: '100%',
-                position: 'absolute',
-                top: '3.5em',
-                zIndex: $store.getters['alert/getShow'] ? 10000 : 0
-              }"
-            >
-              <Alert v-if="!$store.getters['search/getShowResults']" />
+        <template #overlay>
+            <div style="width: 100vw; position: relative; height: 6vh; top: 3vh;">
+              <Alert/>
             </div>
-            <!-- render active route view -->
-            <router-view/>
+            <div style="height: 90vh;">
+              <SearchResults :searchCity="searchCity" />
+            </div>
+        </template>
 
-            <!-- confirmation dialog box -->
-            <b-modal
-                no-fade
-                hide-backdrop
-                centered
-                :title="$store.getters['action/getTitle']"
-                :visible="$store.getters['action/getShow']"
-                :okTitle="$t('yes')"
-                :cancelTitle="$t('no')"
-                @ok="$store.dispatch('action/setAnswer', true)"
-                @cancel="$store.dispatch('action/setAnswer', false)"
-                @close="$store.dispatch('action/setAnswer', false)"
-                @hidden="$store.dispatch('action/setAnswer', false)"
-            >
-                <p>
-                    {{ $store.getters['action/getMessage'] }}
-                </p>
-            </b-modal>
-        </b-overlay>
-    </div>
+        <!-- app contents when overlay is off -->
+        <!-- navigation header -->
+        <TopHeader/>
+        <!-- alert -->
+        <div
+          :style="{
+            height: '6vh',
+            maxHeight: 'max-content',
+            width: '100%',
+            position: 'absolute',
+            top: '3.5em',
+            zIndex: $store.getters['alert/getShow'] ? 10000 : 0
+          }"
+        >
+          <Alert v-if="!$store.getters['search/getShowResults']" />
+        </div>
+        <!-- render active route view -->
+        <router-view/>
+
+        <!-- confirmation dialog box -->
+        <b-modal
+            no-fade
+            hide-backdrop
+            centered
+            :title="$store.getters['action/getTitle']"
+            :visible="$store.getters['action/getShow']"
+            :okTitle="$t('yes')"
+            :cancelTitle="$t('no')"
+            @ok="$store.dispatch('action/setAnswer', true)"
+            @cancel="$store.dispatch('action/setAnswer', false)"
+            @close="$store.dispatch('action/setAnswer', false)"
+            @hidden="$store.dispatch('action/setAnswer', false)"
+        >
+            <p>
+                {{ $store.getters['action/getMessage'] }}
+            </p>
+        </b-modal>
+    </b-overlay>
+</div>
 </template>
 
 <script>
@@ -151,7 +152,7 @@ export default {
               await this.checkBackendStatus();
               if(this.backendStatus) {
                   //console.log('OW_API_KEY', await this.getOWApiKey());
-                  this.apiKeySet = await getOWApiKey() != '';
+                  this.apiKeySet = Boolean(await getOWApiKey());
                   console.log(`OpenWeather API key is${this.apiKeySet ? '' : ' not'} set`)
                   console.log('Loading forecast data');
                   if(this.autoRefetch) {
@@ -184,12 +185,17 @@ export default {
 
       async setOWApiKey(key) {
           try {
-              this.apiKeySet = await setOWApiKey(key) != '';
-              console.log('API key set to', await getOWApiKey());
+              const res = await setOWApiKey(key);
+              this.apiKeySet = res != '';
+              console.log('API key set', await getOWApiKey() ? 'succeded' : 'failed');
             }
             catch(error) {
                 console.error(error.message);
             }
+      },
+
+      async clearTempApiKey() {
+        await setOWApiKey(null);
       }
   },
 
@@ -255,10 +261,16 @@ export default {
 
   async created() {
       await this.initializateApp();
+      window.addEventListener('beforeunload', this.clearTempApiKey);
   },
 
   mounted() {
       document.documentElement.setAttribute('theme', this.theme);
+  }
+  ,
+
+  destroyed() {
+    window.removeEventListener('beforeunload', this.clearTempApiKey);
   }
 }
 </script>

@@ -4,7 +4,7 @@
   Map display component, shows a geographical/meteorological map
 
   @author Spiros Dimopoulos <sdimopoulos@irisweb.gr>
-  @author Geirgios Traianos <gtraiano@gmail.com>
+  @author Georgios Traianos <gtraiano@gmail.com>
   @version 1.0
  -->
 
