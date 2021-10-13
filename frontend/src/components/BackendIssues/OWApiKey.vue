@@ -1,6 +1,5 @@
 <template>
 <div
-	v-if="!isOWApiKeySet"
     id="app"
     tabindex="0"
     class="container-fluid"
@@ -8,7 +7,7 @@
     <h1>{{$t('api key not set')}}</h1>
     <h6 style="margin-top: 20vh">{{$t('set api key')}}</h6>
     <b-form
-        @submit="setOWApiKey($event.srcElement[0]._value)"
+        @submit="$event.preventDefault(); setOWApiKey($event.srcElement[0]._value)"
         @reset="$event.srcElement[0]._value = null"
     >
         <b-form-group
