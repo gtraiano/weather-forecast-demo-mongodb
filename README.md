@@ -10,6 +10,10 @@ The application utilizes
  - Vue Leaflet to render the map
  - vue-chartjs to render plots
 
+You can try a [live demo](https://weather-forecast-backend.herokuapp.com/), provided that you have an OpenWeather API key ([details](https://openweathermap.org/price)).
+
+Note: The API key you provided will be removed from the backend when you close the browser tab/window. The application does not support user sessions, all API requests use the same key.
+
 ## Build Setup
 
 ### Backend
@@ -62,6 +66,8 @@ A single .env file must reside at the project's root folder. A sample .env file 
 
 `OW_API_KEY` OpenWeather API key
 
+`DISABLE_REFETCH` Disables fetching of forecast data from OpenWeather API
+
 ### Webpack Dev Server config
 `WEBPACK_DEV_SERVER_HTTPS` Set to 1 to run server with HTTPS protocol
 
@@ -77,6 +83,9 @@ If not provided, Webpack Dev Server will generate its own.
 
 ## License - Proprietary
 Copyright - Spiros Dimopoulos <sdimopoulos@irisweb.gr>
+
 Modification and additions - Georgios Traianos <gtraiano@gmail.com>
+
 It is provided as is without any guarantee for demonstration purposes solely.
+
 Not to be redistributed in any form, copied or sold.
