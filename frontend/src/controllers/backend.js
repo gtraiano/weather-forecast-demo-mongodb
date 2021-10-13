@@ -84,7 +84,7 @@ const getOWApiKey = async () => {
 
 const setOWApiKey = async key => {
 	try {
-		const response = await axios.post(`${baseUrl}apikey?key=${key}`);
+		const response = await axios.post(`${baseUrl}apikey`, { key: key });
 		return response.data;
 	}
 	catch(error) {
