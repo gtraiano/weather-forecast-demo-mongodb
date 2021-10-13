@@ -21,8 +21,8 @@ PATH						METHOD			PARAMETERS 						HEADERS 										ACTION
 /nominatim/:lat:/lon 		GET 			lat=latitude lon=longitude 		Locale = search result locale					Nominatim reverse search
 
 /ping						GET																								returns 'pong' (check if backend is running)
-/apikey						GET																								returns OpenWeather API key
-/apikey						POST			query: ?key='key'																sets OpenWeather API key to 'key'
+/apikey						GET																								returns true/false depending on wether OpenWeather API key is set
+/apikey						POST			key='key'																		sets OpenWeather API key to 'key'
 
 */
 
@@ -298,12 +298,12 @@ router.get('/ping', (req, res) => {
 });
 
 router.get('/apikey', (req, res) => {
-	res.send(owService.getOWApiKey());
+	res.send(owService.getOWApiKey()?.length > 0);
 });
 
 router.post('/apikey', (req, res) => {
-	if(req.query.key) {
-		owService.setOWApiKey(req.query.key);
+	if(req.body.key !== undefined) {
+		owService.setOWApiKey(req.body.key);
 		res.status(200).send(owService.getOWApiKey()); // respond with newly set key
 	}
 	else {

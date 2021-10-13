@@ -1,9 +1,9 @@
 /* Module for OneCall OpenWeather API. Returns historical data for a city for 48 hours. */
 const axios = require('axios');
 
-const cities = require('./supportedcities.json');
 const baseUrl = 'https://api.openweathermap.org/data/2.5/onecall';
 let apiKey = process.env.OW_API_KEY;
+let usesTempApiKey = process.env.OW_API_KEY.trim().length === 0;
 
 
 // params = (lat, lon)
@@ -56,29 +56,25 @@ const fetchBatch = async batch => {
 }
 
 const fetchCity = async (lat, lon) => {
-	try {
-		const response = await Promise.resolve(fetchQuery(prepareQuery(lat, lon)));
-		return response.data;
-	}
-
-	catch (error) {
-		throw error;
-	}
+	const response = await Promise.resolve(fetchQuery(prepareQuery(lat, lon)));
+	return response.data;
 }
 
 // query api for all cities
-const fetchAllCities = async (cityList = cities) => {
-	try {
-		const response = await fetchBatch(cityList);
-		return response;
-	}
-	catch (error) {
-		//console.log(error.message);
-	}
+const fetchAllCities = async (cityList) => {
+	const response = await fetchBatch(cityList);
+	return response;
 }
 
 const setOWApiKey = key => {
-	apiKey = key;
+	if(usesTempApiKey && key === null) { // clear temp api key
+		apiKey = null;
+		console.log('cleared temp OpenWeather API key');
+	}
+	else if(key) {
+		apiKey = key;
+		console.log('setOWApiKey', key);
+	}
 }
 
 const getOWApiKey = () => {
