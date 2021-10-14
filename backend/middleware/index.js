@@ -4,7 +4,7 @@ const timeLog = (req, res, next) => { // logging timestamp
 };
 
 const checkRefetchDisabled = (req, res, next) => {
-	if(Boolean(process.env.DISABLE_REFETCH) && /refetch$/gi.test(req.path)) {
+	if(Boolean(Number.parseInt(process.env.DISABLE_REFETCH)) && /refetch$/gi.test(req.path)) {
 		res.status(401).json({ message: 'Refetch from OpenWeather is disabled'});
 		next('Refetch from OpenWeather is disabled');
 	}

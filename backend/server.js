@@ -32,6 +32,8 @@ server.use(checkRefetchDisabled);
 // routing
 server.use(process.env.BACKEND_API_ENDPOINT, router);
 
+server.listen(process.env.PORT || 8080);
+
 // http & https servers
 if(protocols.includes('http')) {
 	const http = require('http');
