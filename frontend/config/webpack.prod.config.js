@@ -6,9 +6,6 @@ const VueLoaderPlugin = require('vue-loader/lib/plugin');
 const Dotenv = require('dotenv-webpack');
 const TerserPlugin = require("terser-webpack-plugin");
 
-const HOST = process.env.HOST || '127.0.0.1';
-const PORT = process.env.PORT || '8080';
-
 const config = {
   mode: 'production',
   entry: './src/main.js',
@@ -18,20 +15,18 @@ const config = {
     publicPath: './'
   },
   resolve: {
-	alias: {
-      'vue$': 'vue/dist/vue.esm.js'
-    },
-    extensions: ['.js']
+  	alias: {
+        'vue$': 'vue/dist/vue.esm.js'
+      },
+      extensions: ['.js']
   },
-  devtool: 'eval-cheap-module-source-map',
   module: {
     rules: [{
         test: /\.vue$/,
         use: [{
           loader: 'vue-loader',
           options: {
-		    loaders: {
-			}
+		        loaders: {}
           }
         }]
       },
@@ -47,8 +42,7 @@ const config = {
 		use: [
 		  {
 		    loader: MiniCssExtractPlugin.loader,
-          options: {
-		      },
+        options: {},
 		  },
 		  'css-loader',
 	    ]
@@ -91,7 +85,7 @@ const config = {
       title: 'demo weather forecast',
       inject: 'body'
     }),
-	  new MiniCssExtractPlugin({filename:"main.css"}),
+	  new MiniCssExtractPlugin({ filename: "main.css" }),
 	  new VueLoaderPlugin(),
 	  new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify('production')
@@ -105,7 +99,6 @@ const config = {
     minimize: true,
     minimizer: [new TerserPlugin()]
   },
-  devtool: 'source-map'
 };
 
 module.exports = config;
