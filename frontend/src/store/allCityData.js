@@ -4,7 +4,8 @@ import {
 	postCityLatLon,
 	deleteCityLatLon,
 	updateCityLatLon,
-	generateErrorMessage
+	generateErrorMessage,
+	getCityLatLon
 } from '../controllers/backend'
 
 /*
@@ -32,7 +33,7 @@ city weather forecast object
 */
 
 const extractName = entry => {
-/* extracts city name for all avalable locales */
+/* extracts city name from DB object for all avalable locales */
 	return Object.assign(
 		{},
 		...store.i18n.availableLocales.map(
@@ -48,6 +49,7 @@ const extractName = entry => {
 }
 
 const extractCountry = entry => {
+/* extracts country namefrom DB object for available locales */
 	return Object.assign(
 		{},
 		...store.i18n.availableLocales.map( locale => ({ [locale]: entry.location[locale].address.country || entry.location[locale].address.country_code  }) )
@@ -114,24 +116,25 @@ const actions = {
 		}
 
 		data = data.map(city => transformDatabaseData(city));
+		console.log('fetched', data[0]);
 
 		if(refetch) {
-			data.forEach(async (city, index) => {
-				// query backend to refresh city forecast and fetch data
+			data.map(city => city.coords).reduce(async (errors, city, index) => {
 				try {
-					const updated = await updateCityLatLon(city.coords.lat, city.coords.lon);
-					context.commit('updateCityForecastData', { lat: city.coords.lat, lon: city.coords.lon, data: transformDatabaseData(updated) });
+					await updateCityLatLon(city.lat, city.lon);
+					return errors && true;
 				}
 				catch(error) {
-					// nothing to do
 					console.error(error.message);
-					//store.dispatch('alert/display', { message: `Could update forecast for ${city.name[store.i18n.locale]}. [${error.message}]`, type: 'danger' });
 					index < 1 && context.dispatch('alert/display', { message: `Refreshing forecast data failed. [${generateErrorMessage(error)}]`, type: 'danger' }, { root: true });
-					//context.dispatch('alert/display', { message: `Could update forecast for ${city.name[store.i18n.locale]}. [${generateErrorMessage(error)}]`, type: 'danger' }, { root: true });
+					return errors && false;
 				}
-			});
+			}, false);
+			data = await getAllCities();
+			data = data.map(city => transformDatabaseData(city));
+			console.log('refetched', data[0]);
 		}
-		
+
 		context.commit('setFetching', false);
 		console.log('Fetched forecast data from', refetch ? 'OpenWeather' : 'backend');
 		context.commit('setAllCityData', data); // save api data to state
