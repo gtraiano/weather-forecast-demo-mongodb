@@ -195,6 +195,7 @@ export default {
       },
 
       async clearTempApiKey() {
+        if(process.env.OW_API_KEY) return;
         await setOWApiKey(null);
       }
   },
@@ -212,6 +213,10 @@ export default {
 
       upToDateCheckInterval() {
           return this.$store.getters['preferences/getPreference']('frontend.checkUpToDatePeriod');
+      },
+
+      showOverlay() {
+          return this.$store.getters['search/getShowResults'] && !this.$store.getters['action/getShow'];
       }
   },
 
@@ -242,6 +247,10 @@ export default {
               this.setCheckUpToDateInterval(this.upToDateCheckInterval);
           }
           console.log(this.autoRefetch ? 'Enabled' : 'Disabled', 'automatic refetch');
+      },
+
+      showOverlay() {
+          document.body.style.overflow = this.showOverlay ? 'hidden' : 'auto';
       },
 
       async upToDateLastChecked(newValue, oldValue) {
