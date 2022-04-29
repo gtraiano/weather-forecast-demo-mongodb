@@ -6,7 +6,7 @@
   "private": true,
   "scripts": {
     "dev": "cross-env NODE_OPTIONS=--openssl-legacy-provider webpack-dev-server --config config/webpack.dev.config.js",
-    "build": "cross-env webpack --config config/webpack.prod.config.js --progress"
+    "build": "cross-env NODE_OPTIONS=--openssl-legacy-provider webpack --config config/webpack.prod.config.js --progress"
   },
   "dependencies": {
     "@types/leaflet": "^1.5.19",
