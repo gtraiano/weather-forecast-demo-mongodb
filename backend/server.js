@@ -3,7 +3,7 @@ require('dotenv').config({ path: '../.env' });
 const path = require('path');
 const fs = require('fs');
 
-const protocols = process.env.EXPRESS_SERVER_PROTOCOLS.split(',').map( p => p.trim().toLowerCase() );
+const protocols = process.env.BACKEND_SERVER_PROTOCOLS.split(',').map( p => p.trim().toLowerCase() );
 
 // routes and services
 const router = require('./routes');
@@ -41,13 +41,13 @@ if(protocols.includes('http')) {
 if(protocols.includes('https')) {
 	const https = require('https');
 	// prepare credentials
-	const privateKey  = fs.readFileSync(path.resolve(process.env.EXPRESS_SERVER_PRIVATE_KEY), 'utf8');
-	const certificate = fs.readFileSync(path.resolve(process.env.EXPRESS_SERVER_CERTIFICATE), 'utf8');
-	if(process.env.EXPRESS_SERVER_CA) var certificateAuthority = fs.readFileSync(path.resolve(process.env.EXPRESS_SERVER_CA), 'utf8');
+	const privateKey  = fs.readFileSync(path.resolve(process.env.BACKEND_SERVER_PRIVATE_KEY), 'utf8');
+	const certificate = fs.readFileSync(path.resolve(process.env.BACKEND_SERVER_CERTIFICATE), 'utf8');
+	if(process.env.BACKEND_SERVER_CA) var certificateAuthority = fs.readFileSync(path.resolve(process.env.BACKEND_SERVER_CA), 'utf8');
 	const credentials = {
 		key: privateKey,
 		cert: certificate,
-		...process.env.EXPRESS_SERVER_CA && { ca: certificateAuthority }
+		...process.env.BACKEND_SERVER_CA && { ca: certificateAuthority }
 	};
 	var httpsServer = https.createServer(credentials, server);
 }
@@ -56,13 +56,13 @@ if(protocols.includes('https')) {
 connectDb()
 	.then(() => {
 		if(protocols.includes('http'))
-			httpServer.listen(process.env.EXPRESS_SERVER_HTTP_PORT, () => {
-				console.log("HTTP server is running on port", process.env.EXPRESS_SERVER_HTTP_PORT);
+			httpServer.listen(process.env.BACKEND_SERVER_HTTP_PORT, () => {
+				console.log("HTTP server is running on port", process.env.BACKEND_SERVER_HTTP_PORT);
 			});
 
 		if(protocols.includes('https'))
-			httpsServer.listen(process.env.EXPRESS_SERVER_HTTPS_PORT, () => {
-				console.log("HTTPS server is running on port", process.env.EXPRESS_SERVER_HTTPS_PORT);
+			httpsServer.listen(process.env.BACKEND_SERVER_HTTPS_PORT, () => {
+				console.log("HTTPS server is running on port", process.env.BACKEND_SERVER_HTTPS_PORT);
 			});
 	});
 

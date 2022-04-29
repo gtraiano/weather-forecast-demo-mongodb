@@ -1,10 +1,10 @@
 import axios from 'axios';
 
-let backendProtocol = process.env.EXPRESS_SERVER_PROTOCOLS.split(',').map(p => p.trim().toLowerCase()).includes('https') ? 'https' : 'http';
-let backendDomain = process.env.BACKEND_DOMAIN;
-let backendPort = backendProtocol === 'https' ? process.env.EXPRESS_SERVER_HTTPS_PORT : process.env.EXPRESS_SERVER_HTTP_PORT;
+let backendProtocol = process.env.BACKEND_SERVER_PROTOCOLS.split(',').map(p => p.trim().toLowerCase()).includes('https') ? 'https' : 'http';
+let backendDomain = process.env.BACKEND_DOMAIN.replaceAll('/', '');
+let backendPort = backendProtocol === 'https' ? process.env.BACKEND_SERVER_HTTPS_PORT : process.env.BACKEND_SERVER_HTTP_PORT;
 let backendEndpoint = process.env.BACKEND_API_ENDPOINT;
-let baseUrl = `${backendProtocol}://${backendDomain}:${backendPort}${backendEndpoint}`;
+let baseUrl = `${backendProtocol}://${backendDomain}${backendPort ? `:${backendPort}` : ''}${backendEndpoint}`;
 
 const pingTimeout = 3000;
 // ping active protocol and return status code
@@ -16,7 +16,7 @@ const pingActiveProtocol = async () => {
 				timeout: pingTimeout,
 				headers: { 'Access-Control-Allow-Origin': true }
 			}
-		)
+		);
 
 		return res.status;
 	}
@@ -28,8 +28,9 @@ const pingActiveProtocol = async () => {
 // ping specific protocol and return { protocol, url, status }
 const pingProtocol = async protocol => {
 	let res;
-	let prot = protocol.toLowerCase();
-	let url = `${prot}://${process.env.BACKEND_DOMAIN}:${prot === 'https' ? process.env.EXPRESS_SERVER_HTTPS_PORT : process.env.EXPRESS_SERVER_HTTP_PORT}${process.env.BACKEND_API_ENDPOINT}ping`;
+	const prot = protocol.toLowerCase();
+	const port = prot === 'https' ? process.env.BACKEND_SERVER_HTTPS_PORT : process.env.BACKEND_SERVER_HTTP_PORT;
+	const url = `${baseUrl.replace(/https?/i, prot).replace(/:\d+/, `:${port}`)}ping`
 	let status;
 	try {
 		res = await axios.get(
@@ -45,29 +46,29 @@ const pingProtocol = async protocol => {
 		status = 404;
 	}
 	finally {
-		return { protocol: prot, url: url.match(/(.*:\d+)/g)[0], status };
+		return { protocol: prot, url: url.match(/(.*:?\d*)\//g)[0], status };
 	}
 }
 
 // get and set backend parameters
 const setActiveProtocol = value => {
 	backendProtocol = value;
-	backendPort = backendProtocol === 'https' ? process.env.EXPRESS_SERVER_HTTPS_PORT : process.env.EXPRESS_SERVER_HTTP_PORT;
-	baseUrl = `${backendProtocol}://${process.env.BACKEND_DOMAIN}:${backendPort}${process.env.BACKEND_API_ENDPOINT}`;
+	backendPort = backendProtocol === 'https' ? process.env.BACKEND_SERVER_HTTPS_PORT : process.env.BACKEND_SERVER_HTTP_PORT;
+	baseUrl = `${backendProtocol}://${process.env.BACKEND_DOMAIN}${backendPort ? `:${backendPort}` : ''}${process.env.BACKEND_API_ENDPOINT}`;
 }
 
-const getActiveProtocol = () => backendProtocol
+const getActiveProtocol = () => backendProtocol;
 
-const getActivePort = () => backendPort
+const getActivePort = () => backendPort;
 
 const setBackendUrl = url => {
 /* parse url and set backend parameters */
-	const params = [...url.matchAll(/(.*):\/{2}(.+?):??(?=\d+)(\d*?)(\/.*)/gm)];
+	const params = [...url.matchAll(/(.*):\/{2}([^:]+):?(\d*?)\/(.*)/gm)];
 	if(!params.length) return;
 	
 	backendProtocol = params[1];
 	backendDomain = params[2];
-	backendPort = params[3] || 80;
+	backendPort = params[3];
 	backendEndpoint = params[4];
 	baseUrl = url;
 }
