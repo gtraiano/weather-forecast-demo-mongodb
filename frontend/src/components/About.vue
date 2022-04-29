@@ -246,7 +246,7 @@
 							</a>
 							
 						</template>
-						<template v-slot:cell(actions)="data">
+						<template v-slot:cell(actions)>
 					        <a
 					            class="ml-1 mr-1"
 					            href=""
@@ -355,17 +355,17 @@ export default {
 </script>
 
 <style scoped>
-ul, >>> ul {
+ul, * >>> ul {
   list-style-type: none;
   padding: 0;
 }
 
-li, >>> li {
+li, * >>> li {
   display: inline-block;
   margin: 0 10px;
 }
 
->>> .tooltip-inner {
+* >>> .tooltip-inner {
   max-width: max-content;
   min-width: max-content;
 }

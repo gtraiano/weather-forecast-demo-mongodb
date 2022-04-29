@@ -35,7 +35,7 @@ const actions = {
 	setPreference: (context, { preference, value }) => {
 	// preference follows the form 'a.b'
 		context.commit('setPreference', { preference, value });
-		window.localStorage.setItem(preference, JSON.stringify(/-?\d+\.?\d+/.test(value.toString()) ? Number.parseFloat(value) : value));
+		window.localStorage.setItem(preference, JSON.stringify(/-?\d+\.?\d+/.test(value ? value.toString() : '') ? Number.parseFloat(value) : value));
 	},
 
 	initializeAvailableProtocols: async context => {
@@ -54,6 +54,7 @@ const actions = {
 			return;
 		}
 		setActiveProtocol(value.toLowerCase());
+		console.log('store.preferences.setActiveProtocol', value, getActivePort());
 		context.commit('setPreference', { preference: 'backend.activeProtocol', value: value.toLowerCase() });
 		context.commit('setPreference', { preference: 'backend.port', value: getActivePort() });
 	}
@@ -66,11 +67,13 @@ const mutations = {
 		if(value instanceof Array) { // assume type of array elements is ok
 			state[path[0]][path[1]] = [...value];
 		}
-		else if(/-?\d+\.?\d+/.test(value.toString())) { // numeric
-			state[path[0]][path[1]] = Number.parseFloat(value);
-		}
-		else if(/^[a-zA-Z]+$/.test(value.toString())) {
-			state[path[0]][path[1]] = value;
+		else if(typeof value === 'string') {
+			if(/-?\d+\.?\d+/.test(value?.toString() ?? '')) { // numeric
+				state[path[0]][path[1]] = Number.parseFloat(value);
+			}
+			else if(/^[a-zA-Z]+$/.test(value?.toString() ?? '')) {
+				state[path[0]][path[1]] = value;
+			}
 		}
 		else {
 			state[path[0]][path[1]] = value;

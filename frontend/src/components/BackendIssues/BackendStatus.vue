@@ -22,6 +22,7 @@
         <div>
           <a
               v-for="available in $store.getters['preferences/getPreferences'].backend.availableProtocols.filter(p => p.status === true)"
+              :key="available.protocol"
               href=""
               @click.prevent="$store.dispatch('preferences/setActiveProtocol', available.protocol)"
           >
