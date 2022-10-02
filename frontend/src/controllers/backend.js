@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-let backendProtocol = process.env.BACKEND_SERVER_PROTOCOLS.split(',').map(p => p.trim().toLowerCase()).includes('https') ? 'https' : 'http';
+let backendProtocol = process.env.BACKEND_SERVER_PROTOCOLS?.split(',').map(p => p.trim().toLowerCase()).includes('https') ? 'https' : 'http';
 let backendDomain = process.env.BACKEND_DOMAIN.replaceAll('/', '');
 let backendPort = backendProtocol === 'https' ? process.env.BACKEND_SERVER_HTTPS_PORT : process.env.BACKEND_SERVER_HTTP_PORT;
 let backendEndpoint = process.env.BACKEND_API_ENDPOINT;
