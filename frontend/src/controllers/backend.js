@@ -14,7 +14,7 @@ const pingActiveProtocol = async () => {
 			`${baseUrl}ping`,
 			{
 				timeout: pingTimeout,
-				headers: { 'Access-Control-Allow-Origin': true }
+				//headers: { 'Access-Control-Allow-Origin': '*' }
 			}
 		);
 
@@ -37,7 +37,7 @@ const pingProtocol = async protocol => {
 			url,
 			{
 				timeout: pingTimeout,
-				headers: { 'Access-Control-Allow-Origin': true } 
+				//headers: { 'Access-Control-Allow-Origin': '*' } 
 			}
 		);
 		status = res.status;
