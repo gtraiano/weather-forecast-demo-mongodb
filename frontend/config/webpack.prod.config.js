@@ -6,6 +6,8 @@ const VueLoaderPlugin = require('vue-loader/lib/plugin');
 const Dotenv = require('dotenv-webpack');
 const TerserPlugin = require("terser-webpack-plugin");
 
+console.info('.env path is set to', process.env.ENV_FILE)
+
 const config = {
   mode: 'production',
   entry: './src/main.js',
@@ -90,7 +92,7 @@ const config = {
 	  new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify('production')
     }),
-    new Dotenv({ path: path.resolve(__dirname, '../../.env') }),
+    new Dotenv({ path: path.resolve(__dirname, process.env.ENV_FILE ?? '../../.env') }),
     new webpack.LoaderOptionsPlugin({
       minimize: true
     })

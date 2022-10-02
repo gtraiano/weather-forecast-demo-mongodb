@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "cross-env webpack-dev-server --config config/webpack.dev.config.js",
     "build": "cross-env webpack --config config/webpack.prod.config.js --progress",
+    "build-render": "cross-env ENV_FILE='/etc/secrets/.env' webpack --config config/webpack.prod.config.js --progress",
     "dev-legacy": "cross-env NODE_OPTIONS=--openssl-legacy-provider webpack-dev-server --config config/webpack.dev.config.js",
     "build-legacy": "cross-env NODE_OPTIONS=--openssl-legacy-provider webpack --config config/webpack.prod.config.js --progress"
   },
