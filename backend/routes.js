@@ -92,9 +92,9 @@ const unixToJsDatetime = (req, res, next) => {
 }
 */
 
-const refetchForecastData = async (lat, lon) => {
+const refetchForecastData = async (lat, lon, tempKey) => {
 /* refetches fresh data from OpenWeather fot city document */
-	const forecastData = await owService.fetchCity(lat, lon);
+	const forecastData = await owService.fetchCity(lat, lon, tempKey);
 	// get rid of coords from OpenWeather data
 	delete forecastData.lat;
 	delete forecastData.lon;
@@ -108,6 +108,7 @@ const refetchForecastData = async (lat, lon) => {
 
 const express = require('express');
 const router = express.Router();
+const { setTempAPIKey, hasTempAPIKey, useTempAPIKey, getTempAPIKey, TEMP_API_KEY } = require('./middleware/useTemporaryAPIKey');
 
 // middleware
 router.use(express.json());
@@ -164,7 +165,7 @@ router.get('/coords/:lat/:lon/refetch', async (req, res, next) => {
 		let forecastData = null;
 		let cityData = await forecastDb.findCity(req.params.lat, req.params.lon);
 
-		const updated = await refetchForecastData(req.params.lat, req.params.lon);
+		const updated = await refetchForecastData(req.params.lat, req.params.lon, req[TEMP_API_KEY]);
 		forecastData = await forecastDb.updateCity(req.params.lat, req.params.lon, { ...cityData, ...updated });
 		res.json(forecastData);
 	}
@@ -224,7 +225,7 @@ router.post('/coords/:lat/:lon', async (req, res, next) => {
 			...await Promise.all( locales.map(async locale => ({ [locale]: await searchLatLon(req.params.lat, req.params.lon, locale) }) ) )
 		);
 
-		forecastData = await owService.fetchCity(req.params.lat, req.params.lon);
+		forecastData = await owService.fetchCity(req.params.lat, req.params.lon, req[TEMP_API_KEY]);
 
 		// we want keep coords from location data only
 		delete forecastData.lat;
@@ -260,7 +261,8 @@ router.delete('/coords/:lat/:lon', async (req, res, next) => {
 router.get('/openweather/:lat/:lon', async (req, res, next) => {
 /* OpenWeather call by lat, lon */
 	try {
-		const data = await owService.fetchCity(req.params.lat, req.params.lon);
+		console.log('temp api key', req[TEMP_API_KEY])
+		const data = await owService.fetchCity(req.params.lat, req.params.lon, req[TEMP_API_KEY]);
 		res.json(data);
 	}
 	catch(error) {
@@ -298,13 +300,27 @@ router.get('/ping', (req, res) => {
 });
 
 router.get('/apikey', (req, res) => {
-	res.send(owService.getOWApiKey()?.length > 0);
+// return whether Open Weather API key has been set
+	res.status(200).send(
+		owService.usesTempApiKey					// if using temporary API key
+			? hasTempAPIKey(req.ip)					// look up per request IP
+			: owService.getOWApiKey()?.length > 0	// otherwise check the key set in .env
+	);
 });
 
 router.post('/apikey', (req, res) => {
 	if(req.body.key !== undefined) {
-		owService.setOWApiKey(req.body.key);
-		res.status(200).send(owService.getOWApiKey()); // respond with newly set key
+		setTempAPIKey(req.ip, String(req.body.key));
+		//owService.setOWApiKey(req.body.key);
+		//res.status(200).send(owService.getOWApiKey()); // respond with newly set key
+		res.cookie(
+			'apiKey',
+			getTempAPIKey(req.ip),
+			{
+				secure: true
+			}
+		)
+		res.status(200).send(getTempAPIKey(req.ip)) // respond with newly set key
 	}
 	else {
 		res.status(400).end();

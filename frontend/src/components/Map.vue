@@ -89,6 +89,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import { OW_API_KEY } from '../utils/OpenWeatherOneCall.js'
 import GeneralMap from './GeneralMap.vue'
 
 const hoursPassed = (end, start) => {
@@ -200,7 +201,7 @@ export default {
 
         generateOpenWeatherTileLayers() {
             /* creates urls for active OpenWeather map layers */
-            return this.activeLayers.map(layer => `https://tile.openweathermap.org/map/${layer}/{z}/{x}/{y}.png?appid=${process.env.OW_API_KEY}`)
+            return this.activeLayers.map(layer => `https://tile.openweathermap.org/map/${layer}/{z}/{x}/{y}.png?appid=${process.env.OW_API_KEY ?? OW_API_KEY}`)
         },
 
         // map store state to computed properties

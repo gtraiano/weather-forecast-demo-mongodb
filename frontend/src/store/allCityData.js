@@ -115,7 +115,7 @@ const actions = {
 		}
 
 		data = data.map(city => transformDatabaseData(city));
-		console.log('fetched', data[0]);
+		//console.log('fetched', data[0]);
 
 		if(refetch) {
 			data.map(city => city.coords).reduce(async (errors, city, index) => {
@@ -131,7 +131,7 @@ const actions = {
 			}, false);
 			data = await getAllCities();
 			data = data.map(city => transformDatabaseData(city));
-			console.log('refetched', data[0]);
+			//console.log('refetched', data[0]);
 		}
 
 		context.commit('setFetching', false);

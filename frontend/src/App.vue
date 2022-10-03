@@ -93,6 +93,7 @@ import SearchResults from './components/SearchResults';
 import { pingActiveProtocol, setBackendUrl, getOWApiKey, setOWApiKey } from './controllers/backend.js';
 import Alert from './components/Alert.vue';
 import { OWApiKey, BackendStatus } from './components/BackendIssues';
+import { OW_API_KEY, setAPIKey } from './utils/OpenWeatherOneCall';
 
 export default {
 	name: 'app',
@@ -109,13 +110,13 @@ export default {
 
   data() {
       return {
-          backendStatus: true,          // backend is available
+          backendStatus: false,          // backend is available
           pingHandle: null,             // backend ping setInterval handle
           showAvailable: false,         // show available backend options when backend is unavailable
           upToDate: null,               // forecast data is up to date (or needs to be refetched from openweather)
           upToDateHandle: null,         // check forecast data up to date setInterval handle
           upToDateLastChecked: null,    // forecast data up to date last checked
-          apiKeySet: true               // OpenWeather API key is set
+          apiKeySet: false               // OpenWeather API key is set
       }
   },
 
@@ -187,7 +188,13 @@ export default {
           try {
               const res = await setOWApiKey(key);
               this.apiKeySet = res != '';
-              console.log('API key set', await getOWApiKey() ? 'succeded' : 'failed');
+              const apiKey = res;
+              console.log('set temp API key', apiKey)
+              if(apiKey) {
+                setAPIKey(apiKey);
+                console.info('API key set to', OW_API_KEY)
+              }
+              console.log('API key set', apiKey ? 'succeded' : 'failed');
             }
             catch(error) {
                 console.error(error.message);

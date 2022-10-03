@@ -3,12 +3,15 @@ import axios from 'axios';
 
 import cities from './supportedcities.json';
 const baseUrl = 'https://api.openweathermap.org/data/2.5/onecall';
-const apiKey = process.env.OW_USER_TOKEN;
+let OW_API_KEY = process.env.OW_USER_TOKEN;
 
+const setAPIKey = key => {
+	OW_API_KEY = key
+}
 
 // params = (lat, lon)
 const prepareQuery = (lat, lon) => {
-	return `${baseUrl}?lat=${lat}&lon=${lon}&exclude=minutely&units=metric&appid=${apiKey}`;
+	return `${baseUrl}?lat=${lat}&lon=${lon}&exclude=minutely&units=metric&appid=${OW_API_KEY}`;
 }
 
 // fetch single query
@@ -74,4 +77,4 @@ const fetchAllCities = async (cityList = cities) => {
 	}
 }
 
-export { fetchAllCities, fetchCity }
+export { fetchAllCities, fetchCity, setAPIKey, OW_API_KEY }

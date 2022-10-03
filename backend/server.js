@@ -19,6 +19,7 @@ const compression = require('compression');
 
 // middleware
 const { timeLog, checkRefetchDisabled } = require('./middleware');
+const { useTempAPIKey } = require('./middleware/useTemporaryAPIKey')
 
 const server = express();
 server.use(express.static('dist'));
@@ -28,6 +29,7 @@ server.use(timeLog);
 server.use(compression());
 server.use(cors());
 server.use(checkRefetchDisabled);
+server.use(useTempAPIKey);
 
 // routing
 server.use(process.env.BACKEND_API_ENDPOINT, router);

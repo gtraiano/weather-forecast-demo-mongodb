@@ -3,12 +3,12 @@ const axios = require('axios');
 
 const baseUrl = 'https://api.openweathermap.org/data/2.5/onecall';
 let apiKey = process.env.OW_API_KEY;
-let usesTempApiKey = process.env.OW_API_KEY.trim().length === 0;
+let usesTempApiKey = process.env.OW_API_KEY?.trim().length === 0;
 
 
 // params = (lat, lon)
-const prepareQuery = (lat, lon) => {
-	return `${baseUrl}?lat=${lat}&lon=${lon}&exclude=minutely&units=metric&appid=${apiKey}`;
+const prepareQuery = (lat, lon, tempKey = undefined) => {
+	return `${baseUrl}?lat=${lat}&lon=${lon}&exclude=minutely&units=metric&appid=${tempKey ?? apiKey}`;
 }
 
 // fetch single query
@@ -30,11 +30,11 @@ const fetchQuery = async (query, retries = 2) => {
 }
 
 // mass api query for multiple cities
-const fetchBatch = async batch => {
+const fetchBatch = async (batch, tempKey) => {
 	let data = [];
 
 	data = batch.map(async (entry, index) => { // entry = { id, name, lat, lon }
-		let query = prepareQuery(entry.lat, entry.lon)
+		let query = prepareQuery(entry.lat, entry.lon, tempKey)
 		let response;
 		try {
 			response = await Promise.resolve(fetchQuery(query));
@@ -55,14 +55,15 @@ const fetchBatch = async batch => {
 	return Promise.all(data);
 }
 
-const fetchCity = async (lat, lon) => {
-	const response = await Promise.resolve(fetchQuery(prepareQuery(lat, lon)));
+const fetchCity = async (lat, lon, tempKey) => {
+	console.log('fetchCity', lat, lon, tempKey);
+	const response = await Promise.resolve(fetchQuery(prepareQuery(lat, lon, tempKey)));
 	return response.data;
 }
 
 // query api for all cities
-const fetchAllCities = async (cityList) => {
-	const response = await fetchBatch(cityList);
+const fetchAllCities = async (cityList, tempKey) => {
+	const response = await fetchBatch(cityList, tempKey);
 	return response;
 }
 
@@ -81,4 +82,4 @@ const getOWApiKey = () => {
 	return apiKey;
 }
 
-module.exports = { fetchAllCities, fetchCity, getOWApiKey, setOWApiKey }
+module.exports = { fetchAllCities, fetchCity, getOWApiKey, setOWApiKey, usesTempApiKey }
