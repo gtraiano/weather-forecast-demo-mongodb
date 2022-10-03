@@ -313,6 +313,8 @@ router.post('/apikey', (req, res) => {
 		setTempAPIKey(req.ip, String(req.body.key));
 		//owService.setOWApiKey(req.body.key);
 		//res.status(200).send(owService.getOWApiKey()); // respond with newly set key
+		/*
+		TODO: send api key as secure cookie (preferably encrypted, decrypt it in frontend).
 		res.cookie(
 			'apiKey',
 			getTempAPIKey(req.ip),
@@ -320,6 +322,7 @@ router.post('/apikey', (req, res) => {
 				secure: true
 			}
 		)
+		*/
 		res.status(200).send(getTempAPIKey(req.ip)) // respond with newly set key
 	}
 	else {
