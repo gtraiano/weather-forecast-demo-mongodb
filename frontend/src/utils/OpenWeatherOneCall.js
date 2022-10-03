@@ -1,7 +1,7 @@
 /* Module for OneCall OpenWeather API. Returns historical data for a city for 48 hours. */
 import axios from 'axios';
 
-import cities from './supportedcities.json';
+import cities from './supportedCities.json';
 const baseUrl = 'https://api.openweathermap.org/data/2.5/onecall';
 let OW_API_KEY = process.env.OW_USER_TOKEN;
 
