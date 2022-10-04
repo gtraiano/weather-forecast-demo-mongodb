@@ -152,8 +152,11 @@ export default {
               await this.$store.dispatch('preferences/initializeAvailableProtocols');
               await this.checkBackendStatus();
               if(this.backendStatus) {
-                  //console.log('OW_API_KEY', await this.getOWApiKey());
-                  this.apiKeySet = Boolean(await getOWApiKey());
+                  // check if api key is set on both backend and frontend
+                  const remoteKey = await getOWApiKey();
+                  const localKey = OW_API_KEY ?? remoteKey;
+                  setAPIKey(localKey);
+                  this.apiKeySet = Boolean(remoteKey && localKey);
                   console.log(`OpenWeather API key is${this.apiKeySet ? '' : ' not'} set`)
                   console.log('Loading forecast data');
                   if(this.autoRefetch) {

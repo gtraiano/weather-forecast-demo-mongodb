@@ -2,8 +2,8 @@
 const axios = require('axios');
 
 const baseUrl = 'https://api.openweathermap.org/data/2.5/onecall';
-let apiKey = process.env.OW_API_KEY;
-let usesTempApiKey = process.env.OW_API_KEY?.trim().length === 0;
+let apiKey = process.env.OW_API_KEY?.trim();
+let usesTempApiKey = apiKey === undefined;
 
 
 // params = (lat, lon)
@@ -24,7 +24,7 @@ const fetchQuery = async (query, retries = 2) => {
 			throw new Error(`Failed ${query}`);
 		}
 		
-		setTimeout(() => {}, 200);
+		// introduce a delay?
 		return fetchQuery(query, retries - 1);
 	}
 }
@@ -56,7 +56,6 @@ const fetchBatch = async (batch, tempKey) => {
 }
 
 const fetchCity = async (lat, lon, tempKey) => {
-	console.log('fetchCity', lat, lon, tempKey);
 	const response = await Promise.resolve(fetchQuery(prepareQuery(lat, lon, tempKey)));
 	return response.data;
 }

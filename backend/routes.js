@@ -108,7 +108,7 @@ const refetchForecastData = async (lat, lon, tempKey) => {
 
 const express = require('express');
 const router = express.Router();
-const { setTempAPIKey, hasTempAPIKey, useTempAPIKey, getTempAPIKey, TEMP_API_KEY } = require('./middleware/useTemporaryAPIKey');
+const { setTempAPIKey, getTempAPIKey, TEMP_API_KEY } = require('./middleware/useTemporaryAPIKey');
 
 // middleware
 router.use(express.json());
@@ -303,7 +303,7 @@ router.get('/apikey', (req, res) => {
 // return whether Open Weather API key has been set
 	res.status(200).send(
 		owService.usesTempApiKey					// if using temporary API key
-			? hasTempAPIKey(req.ip)					// look up per request IP
+			? getTempAPIKey(req.ip)					// look up per request IP
 			: owService.getOWApiKey()?.length > 0	// otherwise check the key set in .env
 	);
 });
