@@ -11,7 +11,7 @@ The application utilizes
  - vue-chartjs to render plots
  - MongoDB for persistent storage
 
-You can try a [live demo](https://weather-forecast-backend.herokuapp.com/), provided that you have an OpenWeather API key ([details](https://openweathermap.org/price)).
+You can try a [live demo](https://weather-forecast.onrender.com/), provided that you have an OpenWeather API key ([details](https://openweathermap.org/price)).
 
 Note: The API key you provided will be removed from the backend when you close the browser tab/window. The application does not support user sessions, all API requests use the same key.
 
