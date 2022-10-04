@@ -22,7 +22,10 @@ const { timeLog, checkRefetchDisabled } = require('./middleware');
 const { useTempAPIKey } = require('./middleware/useTemporaryAPIKey')
 
 const server = express();
-server.use(express.static('dist'));
+server.enable('trust proxy');
+
+// serve frontend build
+process.env.SERVE_STATIC && server.use(express.static(process.env.SERVE_STATIC));
 
 // middleware
 server.use(timeLog);
