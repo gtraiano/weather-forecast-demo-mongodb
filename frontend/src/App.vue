@@ -90,7 +90,7 @@
 import TopHeader from './components/TopHeader.vue';
 import { BOverlay, BModal } from 'bootstrap-vue';
 import SearchResults from './components/SearchResults';
-import { pingActiveProtocol, setBackendUrl, getOWApiKey, setOWApiKey } from './controllers/backend.js';
+import { pingActiveProtocol, setBackendUrl, getOWApiKey, setOWApiKey, clearTempOWApiKey } from './controllers/backend.js';
 import Alert from './components/Alert.vue';
 import { OWApiKey, BackendStatus } from './components/BackendIssues';
 import { OW_API_KEY, setAPIKey } from './utils/OpenWeatherOneCall';
@@ -154,7 +154,7 @@ export default {
               if(this.backendStatus) {
                   // check if api key is set on both backend and frontend
                   const remoteKey = await getOWApiKey();
-                  const localKey = OW_API_KEY ?? remoteKey;
+                  const localKey = OW_API_KEY ?? remoteKey.data;
                   setAPIKey(localKey);
                   this.apiKeySet = Boolean(remoteKey && localKey);
                   console.log(`OpenWeather API key is${this.apiKeySet ? '' : ' not'} set`)
@@ -190,8 +190,8 @@ export default {
       async setOWApiKey(key) {
           try {
               const res = await setOWApiKey(key);
-              this.apiKeySet = res != '';
-              const apiKey = res;
+              this.apiKeySet = res.status === 201;
+              const apiKey = res.data;
               console.log('set temp API key', apiKey)
               if(apiKey) {
                 setAPIKey(apiKey);
@@ -206,7 +206,8 @@ export default {
 
       async clearTempApiKey() {
         if(process.env.OW_API_KEY) return;
-        await setOWApiKey(null);
+        await clearTempOWApiKey()
+        //await setOWApiKey(null);
       }
   },
 
@@ -280,7 +281,8 @@ export default {
 
   async created() {
       await this.initializateApp();
-      window.addEventListener('beforeunload', this.clearTempApiKey);
+      //window.addEventListener('beforeunload', this.clearTempApiKey);
+      window.addEventListener('unload', clearTempOWApiKey);
   },
 
   mounted() {
@@ -288,8 +290,10 @@ export default {
   }
   ,
 
-  destroyed() {
-    window.removeEventListener('beforeunload', this.clearTempApiKey);
+  async destroyed() {
+    //await clearTempOWApiKey();
+    //window.removeEventListener('beforeunload', this.clearTempApiKey);
+    window.removeEventListener('unload', clearTempOWApiKey);
   }
 }
 </script>

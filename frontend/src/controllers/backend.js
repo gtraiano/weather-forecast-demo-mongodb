@@ -6,7 +6,7 @@ let backendPort = backendProtocol === 'https' ? process.env.BACKEND_SERVER_HTTPS
 let backendEndpoint = process.env.BACKEND_API_ENDPOINT;
 let baseUrl = `${backendProtocol}://${backendDomain}${backendPort ? `:${backendPort}` : ''}${backendEndpoint}`;
 
-const pingTimeout = 3000;
+const pingTimeout = 5000;
 // ping active protocol and return status code
 const pingActiveProtocol = async () => {
 	try {
@@ -75,8 +75,9 @@ const setBackendUrl = url => {
 
 const getOWApiKey = async () => {
 	try {
-		const response = await axios.get(`${baseUrl}apikey`);
-		return response.data;
+		/*const response = await axios.get(`${baseUrl}apikey`);
+		return response.data;*/
+		return await axios.get(`${baseUrl}apikey`);
 	}
 	catch(error) {
 		throw new Error('API key could not be retrieved.', error.message);
@@ -85,12 +86,17 @@ const getOWApiKey = async () => {
 
 const setOWApiKey = async key => {
 	try {
-		const response = await axios.post(`${baseUrl}apikey`, { key: key });
-		return response.data;
+		/*const response = await axios.post(`${baseUrl}apikey`, { key: key });
+		return response.data;*/
+		return await axios.post(`${baseUrl}apikey`, { key: key });
 	}
 	catch(error) {
 		throw new Error('API key could not be set.', error.message);
 	}
+}
+
+const clearTempOWApiKey = () => {
+	navigator.sendBeacon(`${baseUrl}apikey`, JSON.stringify({ key: null }));
 }
 
 // Nominatim calls
@@ -178,5 +184,6 @@ export {
 	setBackendUrl,
 	getOWApiKey,
 	setOWApiKey,
+	clearTempOWApiKey,
 	generateErrorMessage
 };

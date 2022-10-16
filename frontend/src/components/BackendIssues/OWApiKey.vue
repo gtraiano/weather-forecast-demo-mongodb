@@ -8,7 +8,6 @@
     <h6 style="margin-top: 20vh">{{$t('set api key')}}</h6>
     <b-form
         @submit="$event.preventDefault(); setOWApiKey($event.srcElement[0]._value)"
-        @reset="$event.srcElement[0]._value = null"
     >
         <b-form-group
             id="input-group-1"
