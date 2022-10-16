@@ -14,7 +14,7 @@ const regEx = {
 
 const config = {
     server: {
-        BACKEND_DOMAIN: process.env.BACKEND_DOMAIN.trim(),
+        BACKEND_DOMAIN: process.env.BACKEND_DOMAIN?.trim(),
         BACKEND_SERVER_PROTOCOLS: process.env.BACKEND_SERVER_PROTOCOLS.split(',').map( p => p.trim().toLowerCase() ),
         ...process.env.BACKEND_SERVER_HTTP_PORT && {
             BACKEND_SERVER_HTTP_PORT: Number.parseInt(process.env.BACKEND_SERVER_HTTP_PORT) ?? 3000
