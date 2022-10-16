@@ -13,7 +13,7 @@ const checkRefetchDisabled = (req, res, next) => {
 	}
 };
 
-module.exports = {
+export {
 	timeLog,
 	checkRefetchDisabled
-};
+}

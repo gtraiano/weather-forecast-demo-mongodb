@@ -1,17 +1,26 @@
 // holds temporary api keys (<ip, key> pairs)
-const tempKeys = new Map()
+const tempKeys = new Map();
 
 // temporary key property name in request object
-const TEMP_API_KEY = 'TEMP_API_KEY'
+const TEMP_API_KEY = 'TEMP_API_KEY';
 
 const setTempAPIKey = (ip, key) => {
-    tempKeys.set(ip, key)
-    console.info('temporary OW API key for', ip, 'set to', key)
+// set key for ip
+// if null is passed, remove pair <ip, key>
+// return true/false depending on operation success
+    if(key === undefined) return false;
+    if(key === null) return removeTempAPIKey(ip);
+    const done = tempKeys.set(ip, key) instanceof Map;
+    done && console.info('Set temporary OpenWeather API key for', ip, 'to', key);
+    return done;
 }
 
 const removeTempAPIKey = (ip) => {
-    tempKeys.delete(ip)
-    !tempKeys.has(ip) && console.info('Deleted temporary OW API key for ip', ip)
+// remove key for given ip
+// return true/false depending on operation success
+    const done = tempKeys.delete(ip);
+    done && console.info('Deleted temporary OpenWeather API key for ip', ip);
+    return done;
 }
 
 const getTempAPIKey = (ip) => tempKeys.get(ip);
@@ -22,13 +31,12 @@ const hasTempAPIKey = (ip) => tempKeys.has(ip);
 const useTempAPIKey = (req, _res, next) => {
     if(tempKeys.has(req.ip)) {
         // pass it for further use
-        //Object.assign(req, { [TEMP_API_KEY]: tempKeys.get(req.ip) })
         req[TEMP_API_KEY] = tempKeys.get(req.ip);
     }
-    next()
+    next();
 }
 
-module.exports = {
+export {
     TEMP_API_KEY,
     setTempAPIKey,
     removeTempAPIKey,

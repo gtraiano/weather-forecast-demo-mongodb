@@ -1,8 +1,9 @@
-const { MongoClient } = require('mongodb');
+import { MongoClient } from 'mongodb';
+import config from '../../config/index.js';
  
-const dbName = 'weather-forecast';
-const collectionName = 'forecasts';
-const uri = process.env.MONGODB_URI
+const dbName = config.mongoDB.DATABASE_NAME;
+const collectionName = config.mongoDB.COLLECTION_NAME;
+const uri = config.mongoDB.MONGODB_URI;
 let client = null;
 let database = null;
 let collection = null;
@@ -22,7 +23,7 @@ const insertCity = async city => {
 const findCity = async (lat, lon) => {
 // (R)eads city
 	const result = await collection.findOne({ lat: Number.parseFloat(lat), lon: Number.parseFloat(lon) });
-	if(result == null) {
+	if(result === null) {
 		throw new Error(`lat: ${lat} lon: ${lon} does not exist`);
 	}
 	return result;
@@ -30,7 +31,11 @@ const findCity = async (lat, lon) => {
 
 const updateCity = async (lat, lon, data) => {
 // (U)pdates city
-	const result = await collection.findOneAndUpdate({ lat: Number.parseFloat(lat), lon: Number.parseFloat(lon) }, { $set: { ...data } });
+	const result = await collection.findOneAndUpdate(
+		{ lat: Number.parseFloat(lat), lon: Number.parseFloat(lon) },
+		{ $set: { ...data } },
+		{ returnDocument: 'after', returnNewDocument: true }
+	);
 	if(!result.lastErrorObject.n) {
 		throw new Error(`lat: ${lat} lon: ${lon} does not exist`);
 	}
@@ -59,6 +64,9 @@ const insertCities = async cities => {
 				return await insertCity(city);
 			}
 			catch(error) {
+				// how to handle?
+				console.error(error.message);
+				return error;
 			}
 		})
 	);
@@ -93,7 +101,7 @@ const close = async () => {
 	collection = null;
 }
 
-module.exports = { 
+export default { 
 	insertCity,
 	insertCities,
 	findCity,
