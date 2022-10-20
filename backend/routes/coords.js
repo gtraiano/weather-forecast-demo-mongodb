@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import forecastDb from '../services/ForecastDatabase/forecastDatabase.js';
 import owService from '../services/OpenWeather/OpenWeatherOneCall.js';
-import { HEADERS } from './routes.js';
+import { HEADERS } from './headers/index.js';
 import { TEMP_API_KEY } from '../middleware/useTemporaryAPIKey/index.js';
 import { removeId } from '../middleware/dbTransformData/index.js';
 
@@ -197,12 +197,13 @@ if(process.env.NODE_ENV === 'test') {
     coordsRouter.post('/coords/clear', async (req, res) => {
         try {
             await forecastDb.clearDatabase();
-            res.send(200).end();
+            res.status(200).end();
         }
         catch(error) {
+            console.log(error);
             res.status(500).end();
         }
-    })
+    });
 }
 
 export default coordsRouter;
