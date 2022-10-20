@@ -26,6 +26,7 @@ apiKeyRouter.get('/apikey', (req, res) => {
 apiKeyRouter.post('/apikey', text(), (req, res) => {
 // set OpenWeather API key
 // if temporary API key is in use, sets a new entry per request IP address
+    console.log('/apikey POST body', req.body)
     let key;
     // if key is sent as text in JSON form (expected from beacon)
     if(typeof req.body === 'string') {
@@ -33,7 +34,7 @@ apiKeyRouter.post('/apikey', text(), (req, res) => {
             key = JSON.parse(req.body).key;
         }
         catch(error) {
-            return res.status(400).json({ error: 'Expected JSON compatible form'});
+            return res.status(400).json({ error: 'Expected JSON compatible form'}).end();
         }
     }
     // sent as JSON
@@ -43,13 +44,14 @@ apiKeyRouter.post('/apikey', text(), (req, res) => {
 
     key = key ? key.trim() : key;
 
-    if(key === undefined || key?.length === 0) return res.status(400).end();
+    if(key === undefined || key?.length === 0) return res.status(400).json({ error: 'Empty key provided'}).end();
 
     if(OpenWeatherOneCall.usesTempOWApiKey()) {                 // if temporary API key in use
         setTempAPIKey(req.ip, key)                              // create entry per request IP address
             ? res.status(getTempAPIKey(req.ip) ? 201 : 204)
                 .set('Content-Type', 'text/plain')
                 .send(getTempAPIKey(req.ip))                    // respond with created key value (or null if no key exists for request ip)
+                .end()
             : res.status(500).end()                             // respond with failure
     }
     else {
@@ -57,7 +59,8 @@ apiKeyRouter.post('/apikey', text(), (req, res) => {
             OpenWeatherOneCall.setOWApiKey(key);                // set key in service
             res.status(200)
                 .set('Content-Type', 'text/plain')
-                .send(key);                                     // respond with newly set key value
+                .send(key)                                      // respond with newly set key value
+                .end();
         }
         catch(e) {
             res.status(403).end();

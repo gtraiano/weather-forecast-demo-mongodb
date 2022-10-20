@@ -38,14 +38,6 @@ import apiKeyRouter from './apikey.js';
 import nominatimRouter from './nominatim.js';
 import openWeatherRouter from './openweather.js';
 
-// special request headers names
-export const HEADERS = {
-	refetch: 'Refetch', 	// set to 'true' or '1' to fetch forecast data from OpenWeather
-	locales: 'Locales',		// Nominatim search for multiple locales ('en', 'el')
-	locale: 'Locale' 		// Nominatim search for single locale
-};
-
-
 const router = Router();
 
 // middleware

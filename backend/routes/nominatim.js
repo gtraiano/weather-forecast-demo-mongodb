@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { HEADERS } from "./routes.js";
+import { HEADERS } from "./headers/index.js";
 import { searchCity, searchLatLon } from "../services/Nominatim/index.js";
 
 const nominatimRouter = Router();
