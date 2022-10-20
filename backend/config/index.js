@@ -14,7 +14,7 @@ const regEx = {
 
 const config = {
     server: {
-        BACKEND_DOMAIN: process.env.BACKEND_DOMAIN?.trim(),
+        BACKEND_DOMAIN: process.env.BACKEND_DOMAIN?.trim() ?? '0.0.0.0',
         BACKEND_SERVER_PROTOCOLS: process.env.BACKEND_SERVER_PROTOCOLS.split(',').map( p => p.trim().toLowerCase() ),
         ...process.env.BACKEND_SERVER_HTTP_PORT && {
             BACKEND_SERVER_HTTP_PORT: Number.parseInt(process.env.BACKEND_SERVER_HTTP_PORT) ?? 3000
@@ -28,11 +28,11 @@ const config = {
         // OpenWeather API key
         OW_API_KEY: process.env.NODE_ENV !== 'test' ? process.env.OW_API_KEY?.trim() : process.env.TEST_OW_API_KEY?.trim(),
         // allow setting API key
-        ALLOW_SET_OW_API_KEY: /^true$|^false$|^[01]$/i.test(process.env.ALLOW_SET_OW_API_KEY?.trim())   // valid values are [true|false|0|1] (ignoring case)
+        ALLOW_SET_OW_API_KEY: /^true$|^false$|^[01]$/i.test(process.env.ALLOW_SET_OW_API_KEY.trim())   // valid values are [true|false|0|1] (ignoring case)
             ? /^true$|^false$/i.test(process.env.ALLOW_SET_OW_API_KEY.trim())
-                ? Boolean(process.env.ALLOW_SET_OW_API_KEY.trim())                                      // is true|false format
-                : Boolean(Number.parseInt(process.env.ALLOW_SET_OW_API_KEY.trim()))                     // is 0|1 format
-            : false,                                                                                    // default value if not defined
+                ? Boolean(process.env.ALLOW_SET_OW_API_KEY.trim())                                     // is true|false format
+                : Boolean(Number.parseInt(process.env.ALLOW_SET_OW_API_KEY.trim()))                    // is 0|1 format
+            : false,                                                                                   // default value if not defined
         // are we using temporary OpenWeather API keys?
         usesTempAPIKey: () => config.openWeather.OW_API_KEY?.length === 0 || config.openWeather.OW_API_KEY === undefined,
         // delay after failed request
