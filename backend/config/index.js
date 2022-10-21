@@ -1,10 +1,15 @@
 import dotenv from 'dotenv';
 
-// allow use of self-signed certificate only for testing
-if(process.env.NODE_ENV === 'test') process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-
 // ENV_PATH may be provide as a command line argument to node
 dotenv.config({ path: process.env.ENV_PATH ?? '../.env' });
+
+// allow use of self-signed certificate for testing on localhost
+if(
+    process.env.NODE_ENV === 'test' &&
+    /^localhost$|^127\.0\.0\.1$|^(?:0\.){3}0$/i.test(process.env.BACKEND_DOMAIN?.trim())
+) {
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+}
 
 const regEx = {
     acceptableEndpoint: /^(?:\/[\w@]+)*\/?$/gm,
