@@ -41,7 +41,9 @@ const config = {
         // are we using temporary OpenWeather API keys?
         usesTempAPIKey: () => config.openWeather.OW_API_KEY?.length === 0 || config.openWeather.OW_API_KEY === undefined,
         // delay after failed request
-        DELAY_AFTER_ERROR: 250
+        DELAY_AFTER_ERROR: 250,
+        // disable refetching of forecast data from OpenWeather API
+        DISABLE_REFETCH: Boolean(Number.parseInt(process.env.DISABLE_REFETCH) ?? 0)
     },
 
     // MongoDD URI
