@@ -1,9 +1,9 @@
 import dotenv from 'dotenv';
 
-// ENV_PATH may be provide as a command line argument to node
+// ENV_PATH may be provided as a command line argument to Node
 dotenv.config({ path: process.env.ENV_PATH ?? '../.env' });
 
-// allow use of self-signed certificate for testing on localhost
+// relax strictness for use of self-signed certificate when testing on localhost
 if(
     process.env.NODE_ENV === 'test' &&
     /^localhost$|^127\.0\.0\.1$|^(?:0\.){3}0$/i.test(process.env.BACKEND_DOMAIN?.trim())
@@ -33,7 +33,7 @@ const config = {
         // OpenWeather API key
         OW_API_KEY: process.env.NODE_ENV !== 'test' ? process.env.OW_API_KEY?.trim() : process.env.TEST_OW_API_KEY?.trim(),
         // allow setting API key
-        ALLOW_SET_OW_API_KEY: /^true$|^false$|^[01]$/i.test(process.env.ALLOW_SET_OW_API_KEY.trim())   // valid values are [true|false|0|1] (ignoring case)
+        ALLOW_SET_OW_API_KEY: /^true$|^false$|^[01]$/i.test(process.env.ALLOW_SET_OW_API_KEY?.trim())   // valid values are [true|false|0|1] (ignoring case)
             ? /^true$|^false$/i.test(process.env.ALLOW_SET_OW_API_KEY.trim())
                 ? Boolean(process.env.ALLOW_SET_OW_API_KEY.trim())                                     // is true|false format
                 : Boolean(Number.parseInt(process.env.ALLOW_SET_OW_API_KEY.trim()))                    // is 0|1 format
@@ -46,7 +46,7 @@ const config = {
         DISABLE_REFETCH: Boolean(Number.parseInt(process.env.DISABLE_REFETCH) ?? 0)
     },
 
-    // MongoDD URI
+    // MongoDB URI
     mongoDB: {
         MONGODB_URI: process.env.NODE_ENV !== 'test' ? process.env.MONGODB_URI?.trim() : process.env.TEST_MONGODB_URI?.trim(),
         DATABASE_NAME: 'weather-forecast',
