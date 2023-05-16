@@ -1,4 +1,4 @@
-import config from "../config";
+import config from "../config/index.js";
 
 const timeLog = (req, res, next) => { // logging timestamp
 	console.log(`${new Date().toLocaleString()} ${req.ip} ${req.protocol} ${req.method} ${req.path} ${res.statusCode}`);
